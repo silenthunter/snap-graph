@@ -1,0 +1,4 @@
+#ifndef _GRAPH_PARTITIONING_H
+#define _GRAPH_PARTITIONING_H
+
+#endif

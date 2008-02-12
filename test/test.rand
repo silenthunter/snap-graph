@@ -1,0 +1,6 @@
+n 10
+m 20
+undirected 1
+weight_type 2
+max_weight 100
+min_weight 2

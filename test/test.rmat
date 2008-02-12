@@ -1,0 +1,8 @@
+n 64
+m 256
+a 0.55
+b 0.1
+c 0.1
+permute_vertices 0
+undirected 0
+weight_type 0

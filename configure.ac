@@ -1,5 +1,5 @@
 AC_PREREQ(2.59)
-AC_INIT(snap,0.1,kamesh@cc.gatech.edu)
+AC_INIT(snap,0.2,kamesh@cc.gatech.edu)
 AC_CONFIG_SRCDIR(include/graph_defs.h)
 AM_INIT_AUTOMAKE
 AM_CONFIG_HEADER(config.h)
@@ -48,7 +48,8 @@ if test "$enable_openmp" = "yes"; then
    AX_OPENMP([THREADLIBS=" "
      AC_DEFINE(USING_OPENMP_THREADS, 1, [Define if we have and are using OpenMP multithreading directives])
      CFLAGS="$CFLAGS $OPENMP_CFLAGS ${pic_flags}"],
-     [AC_MSG_ERROR([don't know how to enable OpenMP])])
+     [AC_MSG_ERROR([Unable to determine the appropriate OpenMP flag for your compiler.
+         Please set the CFLAGS variable manually for OpenMP support.])])
 fi
 
 # Checks for libraries.
@@ -63,17 +64,6 @@ AC_C_INLINE
 AC_TYPE_SIZE_T
 AC_HEADER_TIME
 AC_STRUCT_TM
-
-#AC_CHECK_SIZEOF(int)
-#AC_CHECK_SIZEOF(unsigned int)
-#AC_CHECK_SIZEOF(long)
-#AC_CHECK_SIZEOF(unsigned long)
-#AC_CHECK_SIZEOF(long long)
-#AC_CHECK_SIZEOF(unsigned long long)
-#AC_CHECK_SIZEOF(ptrdiff_t)
-#AC_CHECK_SIZEOF(float)
-#AC_CHECK_SIZEOF(double)
-
 
 AC_FUNC_MALLOC
 AC_CHECK_FUNCS([floor gettimeofday gethrtime memset memalign sqrt drand48 pow])

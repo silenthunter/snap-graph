@@ -1,4 +1,4 @@
-ACLOCAL_AMFLAGS = -I ./m4
+ACLOCAL_AMFLAGS = -I m4
 SUBDIRS = src lib test
 EXTRA_DIST = include
 lib_LTLIBRARIES = libsnap.la

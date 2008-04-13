@@ -35,7 +35,7 @@ void BFS_parallel_frontier_expansion(graph_t* G, long src, long diameter) {
     long pCount, pS_size;
     long v, w;
     int tid, nthreads;
-    
+    long start_iter, end_iter;    
     long j, k, vert, n;
 
 #ifdef _OPENMP    
@@ -89,15 +89,17 @@ void BFS_parallel_frontier_expansion(graph_t* G, long src, long diameter) {
 #ifdef _OPENMP
 #pragma omp barrier
 #endif
-
+        
         while (start[phase_num+1] - start[phase_num] > 0) {
         
             pCount = 0;
 
+            start_iter = start[phase_num];
+            end_iter = start[phase_num+1];
 #ifdef _OPENMP
 #pragma omp for
 #endif
-            for (vert=start[phase_num]; vert<start[phase_num+1]; vert++) {
+            for (vert=start_iter; vert<end_iter; vert++) {
             
                 v = S[vert];
                 for (j=G->numEdges[v]; j<G->numEdges[v+1]; j++) {

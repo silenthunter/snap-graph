@@ -47,7 +47,7 @@ fi
 if test "$enable_openmp" = "yes"; then
    AX_OPENMP([THREADLIBS=" "
      AC_DEFINE(USING_OPENMP_THREADS, 1, [Define if we have and are using OpenMP multithreading directives])
-     CFLAGS="$CFLAGS $OPENMP_CFLAGS ${pic_flags}"],
+     CFLAGS="$CFLAGS $OPENMP_CFLAGS -fPIC"],
      [AC_MSG_ERROR([Unable to determine the appropriate OpenMP flag for your compiler.
          Please set the CFLAGS variable manually for OpenMP support.])])
 fi

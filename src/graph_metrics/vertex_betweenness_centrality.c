@@ -39,6 +39,7 @@ void vertex_betweenness_centrality_parBFS(graph_t* G, double* BC, long numSrcs) 
     long v, w, vert;
     long k0, k1;
     long numV, num_traversals, n, m, phase_num;
+    long start_iter, end_iter;
     long tid, nthreads;
     int* stream;
 #ifdef DIAGNOSTIC
@@ -259,11 +260,13 @@ void vertex_betweenness_centrality_parBFS(graph_t* G, double* BC, long numSrcs) 
         while (end[phase_num] - start[phase_num] > 0) {
 
             myCount = 0;
+            start_iter = start[phase_num];
+            end_iter = end[phase_num];
 #ifdef _OPENMP
 #pragma omp barrier
 #pragma omp for schedule(dynamic) nowait
 #endif
-            for (vert = start[phase_num]; vert < end[phase_num]; vert++) {
+            for (vert = start_iter; vert < end_iter; vert++) {
                 v = S[vert];
                 for (j=G->numEdges[v]; j<G->numEdges[v+1]; j++) {
 
@@ -345,10 +348,12 @@ void vertex_betweenness_centrality_parBFS(graph_t* G, double* BC, long numSrcs) 
         phase_num--;
 
         while (phase_num > 0) {
+            start_iter = start[phase_num];
+            end_iter = end[phase_num];
 #ifdef _OPENMP        
 #pragma omp for schedule(static) nowait
 #endif
-            for (j=start[phase_num]; j<end[phase_num]; j++) {
+            for (j=start_iter; j<end_iter; j++) {
                 w = S[j];
                 for (k = 0; k<P[w].count; k++) {
                     v = P[w].list[k];

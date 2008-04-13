@@ -5,11 +5,11 @@ struct s_ent {
     attr_id_t a, b;
 };
 
-struct s_ent *BiCC_stack;
+// struct s_ent *BiCC_stack;
 
-attr_id_t *dfsnumber, *highwater, lastdfsnumber=0, top=-1, count=0, *cc;
-attr_id_t *color, *Low, *d, *pred, *art, art_count;
-attr_id_t timex;
+// attr_id_t *dfsnumber, *highwater, lastdfsnumber=0, top=-1, count=0, *cc;
+// attr_id_t *color, *Low, *d, *pred, *art, art_count;
+// attr_id_t timex;
 
 void biconnected_components(graph_t* G, attr_id_t* component_num) {
 

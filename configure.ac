@@ -14,7 +14,7 @@ if test "$enable_debug" = "yes"; then
     AC_DEFINE(SNAP_DEBUG,1,[Define to build snap with debug flags])
 fi
 
-AC_PROG_CC([icc xlc cc gcc])
+AC_PROG_CC
 AX_COMPILER_VENDOR
 AC_PROG_CC_STDC
 AC_PROG_LIBTOOL

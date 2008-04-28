@@ -33,7 +33,6 @@ void calculateVertexCover(graph_t *G)
 	{
 		wp_v[i] = G->dbl_weight_v[i];
 		degree_v[i] = G->numEdges[i+1] - G->numEdges[i];
-		//printf("degree_v= %d\n",degree_v[i]);
 		visited_v[i] = 0;
 		if(degree_v[i] == 0)
 			visited_v[i]=1;
@@ -43,7 +42,6 @@ void calculateVertexCover(graph_t *G)
 			v = G->endV[j];
 			delta_e[j] = 0;
 			visited_e[j] = 0;
-			//printf("u=%d, v=%d\n",u,v);
 			if(v < u )
 				continue;		// we have already covered this case when we visited v.
 			for (k=G->numEdges[v]; k<G->numEdges[v+1]; k++)
@@ -56,23 +54,19 @@ void calculateVertexCover(graph_t *G)
 		}
 	}
 	printf("degree:");print_attr_id_t_Vector(degree_v,0,G->n);
-	//printf("position:\n");	print_attr_id_t_Vector(position_e,0,2*G->m);
 
 	printf("Starting real calculation\n");	
 	edge_counter = 2*G->m;
 	double val1,val2;
 	int count =0;
 	while(edge_counter > 0)
-	//while(count <3)
 	{
 		count ++;
-		//printf("%d\t",edge_counter);
 		#pragma omp parallel
 		{
 		#pragma omp for private(j,u,v,val1,val2)
 		for (i=0; i< G->n; i++)
 		{
-		//	printf("count=%d\n",count);
 			if (visited_v[i] == 1)
 				continue;
 			for(j=G->numEdges[i]; j< G->numEdges[i+1]; j++)
@@ -81,7 +75,6 @@ void calculateVertexCover(graph_t *G)
 					continue;
 				u = i;
 				v = G->endV[j];
-				//printf("aa%d\t",degree_v[v]);
 				val1 = wp_v[u]/degree_v[u];
 				val2 = wp_v[v]/degree_v[v];
 				delta_e[j] = val1 < val2 ? val1 : val2;
@@ -141,7 +134,6 @@ void calculateUnweightedVertexCover(graph_t *G)
 	attr_id_t * degree_v;
 	attr_id_t *memblock;
 	memblock = (attr_id_t*) malloc(sizeof(attr_id_t)*(2*G->m + 2*G->n));
-	//memblock = (attr_id_t*) malloc(sizeof(attr_id_t)*(G->m + 2*G->n));
 	visited_v = memblock;
 	degree_v = memblock + G->n;
 	visited_e = memblock + 2*G->n;
@@ -155,15 +147,12 @@ void calculateUnweightedVertexCover(graph_t *G)
 			degree_v[i] = G->numEdges[i+1] - G->numEdges[i];
 		}
 		#pragma omp for
-		//for(i=0; i<G->m; i++)
 		for(i=0; i<2*G->m; i++)
 		{
 			visited_e[i] = 0;
 		}
 	}
-	//print_attr_id_t_Vector(degree_v,0,G->n);
 	edge_counter = 2*G->m;
-	//edge_counter = G->m;
 	while(edge_counter > 0)
 	{
 		max = 0;
@@ -186,14 +175,11 @@ void calculateUnweightedVertexCover(graph_t *G)
 			}
 		}
 		edge_counter -= max;
-		//printf("edgecounter=%d\n",edge_counter);
 		visited_e[max_e] =1;
 		degree_v[max_u] = 0;
 		visited_v[max_u] = 1;
 		degree_v[max_v] = 0;
 		visited_v[max_v] = 1;
-		//print_attr_id_t_Vector(visited_e,0,2*G->m);
-		//print_attr_id_t_Vector(visited_v,0,G->n);
 
 	}
 	attr_id_t count = 0;

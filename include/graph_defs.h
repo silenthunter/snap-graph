@@ -125,4 +125,21 @@ typedef struct {
     attr_id_t degree;
 } plist;
 
+
+typedef struct struct_node
+{
+        int id; 
+        struct struct_node *next;
+}node;
+
+typedef struct
+{
+        node *head;
+        node *tail;
+        int size;
+}list;
+
+
+
+
 #endif

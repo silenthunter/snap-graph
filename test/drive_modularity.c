@@ -16,21 +16,21 @@ int main()
 	read_GML_graph(&G,"./gml/karate.gml");
 	//gen_RMAT_graph(&G, "./test.rmat"); G.m/=2;	
 	//readSample(&G);
-//	read_DIMACS_graph(&G, "./gml/celegans_metabolic_modified.net");G.m/=2;
-//	read_DIMACS_graph(&G, "./gml/email_modified.txt");G.m/=2;
-//	read_DIMACS_graph(&G, "./gml/jazz_modified.net");G.m/=2;
-//	read_DIMACS_graph(&G, "./gml/www.dat");G.m/=2;
+    //	read_DIMACS_graph(&G, "./gml/celegans_metabolic_modified.net");G.m/=2;
+    //	read_DIMACS_graph(&G, "./gml/email_modified.txt");G.m/=2;
+    //	read_DIMACS_graph(&G, "./gml/jazz_modified.net");G.m/=2;
+    //	read_DIMACS_graph(&G, "./gml/www.dat");G.m/=2;
 	//G.dbl_weight_e = (double*)malloc(sizeof(double)*2*G.m);
 	//for(i=0; i<2*G.m;i++)
 	//	G.dbl_weight_e[i]=1.0;
 	printf("reading graph done%d\n",G.n);
-//	print_graph(&G);
+    //	print_graph(&G);
 
-	startTime = omp_get_wtime();
+	startTime = get_seconds();
 	//modularity_spectral(&G,&membership,&numCommunities,1);
 	modularity_spectral_wo_klin(&G,&membership,&numCommunities);
 	//modularity_spectral(&G,&membership,&numCommunities);
-	endTime = omp_get_wtime();
+	endTime = get_seconds();
 	//int comms[] = {1,1,1,1,3,3,3,1,0,0,3,3,1,1,0,0,3,1,0,1,0,1,0,2,2,2,0,2,2,0,0,2,0,0};
 	int comms[]={4,5,5,5,2,2,2,5,1,5,2,2,4,5,1,1,2,4,1,4,1,4,1,3,3,3,1,3,3,1,1,3,1,1};
 	printf("Time taken = %g\n",endTime - startTime);

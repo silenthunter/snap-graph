@@ -27,14 +27,14 @@ int main(int argc, char** argv)
 	//print_graph(&G);
 	printf("reading graph done\n");
 	double startTime, endTime;
-	startTime = omp_get_wtime();
+	startTime = get_seconds();
 	calculateVertexCover(&G);
-	endTime = omp_get_wtime();
+	endTime = get_seconds();
 	printf("Time taken %g\n",endTime - startTime);
 	
-	startTime = omp_get_wtime();
-	//calculateUnweightedVertexCover(&G);
-	endTime = omp_get_wtime();
+	startTime = get_seconds();
+	calculateUnweightedVertexCover(&G);
+	endTime = get_seconds();
 	printf("Time taken %g\n",endTime - startTime);
 }
 

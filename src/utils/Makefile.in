@@ -54,7 +54,7 @@ CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libsnap_utils_la_LIBADD =
-am_libsnap_utils_la_OBJECTS = utils.lo
+am_libsnap_utils_la_OBJECTS = utils.lo vectorUtils.lo list.lo
 libsnap_utils_la_OBJECTS = $(am_libsnap_utils_la_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
@@ -174,7 +174,7 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 AM_CPPFLAGS = -I$(top_srcdir)/include
 noinst_LTLIBRARIES = libsnap_utils.la
-libsnap_utils_la_SOURCES = utils.c 
+libsnap_utils_la_SOURCES = utils.c vectorUtils.c list.c 
 all: all-am
 
 .SUFFIXES:
@@ -226,7 +226,9 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/list.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/utils.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/vectorUtils.Plo@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	if $(COMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \

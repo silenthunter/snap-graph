@@ -83,8 +83,9 @@ void computeModularityValue(graph_t *G, attr_id_t *membership, attr_id_t numComm
 		deleteFirst(Q);
 		printf("\n\nEvaluating Community:%d\n",curCommunity);
 		continue_flag = 0;
-
+#ifdef _OPENMP
 		#pragma omp parallel for
+#endif
 		for(i=0; i<G->n; i++)
 		{
 			vertex[i] = -1;
@@ -112,7 +113,9 @@ void computeModularityValue(graph_t *G, attr_id_t *membership, attr_id_t numComm
 		
 		//Calculating modularity by the current Community.	
 		modularity = 0.0;
+#ifdef _OPENMP
 		#pragma omp parallel for private(j) reduction(+:modularity)
+#endif
 		for(i=0; i<G->n;i++)
 		{
 			if(v2C[i] == curCommunity)
@@ -136,8 +139,9 @@ void computeModularityValue(graph_t *G, attr_id_t *membership, attr_id_t numComm
 		count1=count2=sumV1=sumV2=0;
 		degreeSum1 = degreeSum2 = 0;
 		new_modularity=0.0;
-		
+#ifdef _OPENMP	
 		#pragma omp parallel for reduction(+:count1,count2)
+#endif
 		for(i=0; i<communitySize; i++)
 		{
 			if(eigenVectorOld[i] > 0) count1++;
@@ -148,9 +152,13 @@ void computeModularityValue(graph_t *G, attr_id_t *membership, attr_id_t numComm
 			continue;				//All eigen values are of same size and hence no division is required.
 	
 		//Now, we actually divide the community to new communities.
+#ifdef _OPENMP
 		#pragma omp parallel if (communitySize>100) 
+#endif
 		{
+#ifdef _OPENMP
 			#pragma omp for reduction(+:sumV1,sumV2)
+#endif
 			for(i=0; i<communitySize ; i++)
 			{
 				if(eigenVectorOld[i] > 0)
@@ -163,7 +171,9 @@ void computeModularityValue(graph_t *G, attr_id_t *membership, attr_id_t numComm
 			}
 
 			//Calculating new degree sums.
+#ifdef _OPENMP
 			#pragma omp for reduction(+:degreeSum1, degreeSum2) private(comm)
+#endif
 			for(i=0; i<communitySize; i++)
 			{
 				comm = v2C[vertex[i]];
@@ -174,7 +184,9 @@ void computeModularityValue(graph_t *G, attr_id_t *membership, attr_id_t numComm
 			}
 
 			//Calculating new modularity value.
+#ifdef _OPENMP
 			#pragma omp for private(u,v,degree_u, degree_v, comm) reduction(+:new_modularity)
+#endif
 			for(i=0; i<communitySize; i++)
 			{
 				u = vertex[i];
@@ -214,7 +226,9 @@ void computeModularityValue(graph_t *G, attr_id_t *membership, attr_id_t numComm
 			continue;
 		}
 		//Now updating the degree Vectors
+#ifdef _OPENMP
 		#pragma omp parallel for private(j,comm) if (communitySize>100)
+#endif
 		for(i=0; i<communitySize ; i++)
 		{
 			comm = v2C[vertex[i]];
@@ -262,7 +276,9 @@ void computeModularityValue(graph_t *G, attr_id_t *membership, attr_id_t numComm
 						contribution[G->endV[j]] += 1.0; 	//not they are in different community but earlier same.
 				}
 				degree_u = G->numEdges[maxv+1] - G->numEdges[maxv]; 
-				#pragma omp parallel for private(v, degree_v) if (communitySize>100)
+#ifdef _OPENMP
+                #pragma omp parallel for private(v, degree_v) if (communitySize>100)
+#endif
 				for(j=0; j<communitySize; j++)
 				{
 					v = vertex[j];
@@ -300,10 +316,13 @@ void computeEigen(graph_t *G, double *eigenVectorOld, double *eigenVectorNew, at
 		count++;
 		normalizedSum=0.0;
 		srand(time(NULL));
+#ifdef _OPENMP
 		#pragma omp parallel if(communitySize>100) 
+#endif
 		{
-
+#ifdef _OPENMP
 			#pragma omp for reduction(+:normalizedSum)
+#endif
 			for(i=0; i<communitySize; i++)
 			{
 				eigenVectorOld[i] = 2.0f *((float)rand()/(float)RAND_MAX) -1.0f;
@@ -311,12 +330,15 @@ void computeEigen(graph_t *G, double *eigenVectorOld, double *eigenVectorNew, at
 				normalizedSum += eigenVectorOld[i] * eigenVectorOld[i];
 				//printf("Eigenvector [%d]= %f\n", i,eigenVectorOld[i]);
 			}
-			
+#ifdef _OPENMP	
 			#pragma omp single
+#endif
 			{
 				normalizedSum = sqrt(normalizedSum);
 			}
+#ifdef _OPENMP
 			#pragma omp for
+#endif
 			for(i=0; i<communitySize; i++)
 				eigenVectorOld[i] = eigenVectorOld[i]/normalizedSum;
 
@@ -327,14 +349,20 @@ void computeEigen(graph_t *G, double *eigenVectorOld, double *eigenVectorNew, at
 			{
 				iterCount++;
 				ktx=0.0;
+#ifdef _OPENMP
 				numThreads = omp_get_num_threads();
+#else
+                numThreads = 1;
+#endif
 			}
-			
+#ifdef _OPENMP	
 			#pragma omp parallel if (communitySize>100)
-			{
-
+#endif
+            {
+#ifdef _OPENMP
 				#pragma omp for private(j,degree_u) reduction(+:ktx)
-				for(i=0; i<communitySize; i++)
+#endif
+                for(i=0; i<communitySize; i++)
 				{
 					eigenVectorNew[i]=0.0;
 					degree_u = G->numEdges[vertex[i]+1] - G->numEdges[vertex[i]];
@@ -348,24 +376,31 @@ void computeEigen(graph_t *G, double *eigenVectorOld, double *eigenVectorNew, at
 					eigenVectorNew[i] -= (((double)degree[vertex[i]]) - (double)(degree_u * degreeSum)/(double)(2.0*G->m))* eigenVectorOld[i];
 					ktx += (double) degree_u * eigenVectorOld[i];
 				}
-
+#ifdef _OPENMP
 				#pragma omp single
+#endif
 				{
 					ktx /=(double)(2.0 * G->m);
 					normalizedSum = 0.0;
 				}
+#ifdef _OPENMP
 				#pragma omp for reduction(+:normalizedSum)
+#endif
 				for(i=0; i<communitySize; i++)
 				{
 					eigenVectorNew[i] -= (double)(G->numEdges[vertex[i]+1]-G->numEdges[vertex[i]]) *ktx;
 					eigenVectorNew[i] -= mneg*eigenVectorOld[i];
 					normalizedSum += eigenVectorNew[i]*eigenVectorNew[i];
 				}
+#ifdef _OPENMP
 				#pragma omp single
+#endif
 				{
 					normalizedSum = sqrt(normalizedSum);
 				}
+#ifdef _OPENMP
 				#pragma omp for
+#endif
 				for(i=0; i<communitySize;i++)
 				{
 					eigenVectorOld[i] = eigenVectorNew[i]/normalizedSum;
@@ -374,10 +409,14 @@ void computeEigen(graph_t *G, double *eigenVectorOld, double *eigenVectorNew, at
 		}
 		eigenValue =0.0;
 		ktx=0.0;
+#ifdef _OPENMP
 		#pragma omp parallel if (communitySize>100)
+#endif
 		{
+#ifdef _OPENMP
 			#pragma omp for reduction(+:ktx,eigenValue) private(j,degree_u)
-			for(i=0; i<communitySize; i++)
+#endif
+            for(i=0; i<communitySize; i++)
 			{
 				degree_u = G->numEdges[vertex[i]+1] - G->numEdges[vertex[i]];
 				for(j=G->numEdges[vertex[i]]; j<G->numEdges[vertex[i]+1]; j++)
@@ -390,11 +429,15 @@ void computeEigen(graph_t *G, double *eigenVectorOld, double *eigenVectorNew, at
 				eigenValue += -((double)degree[vertex[i]] - (double)(((double) degree_u *degreeSum)/(double)(2.0*G->m)))* eigenVectorOld[i] * eigenVectorOld[i];
 				ktx += (double)degree_u * eigenVectorOld[i];
 			}
+#ifdef _OPENMP
 			#pragma omp single
+#endif
 			{
 				ktx /=(double)(2.0 * G->m);
 			}
+#ifdef _OPENMP
 			#pragma omp for reduction(-:eigenValue)
+#endif
 			for(i=0; i<communitySize; i++)
 				eigenValue -= ((double)(G->numEdges[vertex[i]+1]- G->numEdges[vertex[i]])) *ktx *eigenVectorOld[i];
 
@@ -508,8 +551,9 @@ void computeEigen(graph_t *G, double *eigenVectorOld, double *eigenVectorNew, at
 
 		newCommunity = *numCommunities;
 		count1=count2=sumV1=sumV2=0;
-		
+#ifdef _OPENMP	
 		#pragma omp parallel for reduction(+:count1,count2)
+#endif
 		for(i=0; i<communitySize; i++)
 		{
 			if(eigenVectorOld[i] > 0) count1++;
@@ -519,9 +563,13 @@ void computeEigen(graph_t *G, double *eigenVectorOld, double *eigenVectorNew, at
 		{
 			continue;				//All eigen values are of same size and hence no division is required.
 		}
-		#pragma omp parallel if (communitySize>100) 
+#ifdef _OPENMP
+		#pragma omp parallel if (communitySize>100)
+#endif
 		{
+#ifdef _OPENMP
 			#pragma omp for reduction(+:sumV1,sumV2)
+#endif
 			for(i=0; i<communitySize ; i++)
 			{
 				if(eigenVectorOld[i] > 0)
@@ -533,7 +581,9 @@ void computeEigen(graph_t *G, double *eigenVectorOld, double *eigenVectorNew, at
 					sumV2++;
 			}
 			//Now updating the degree Vectors
+#ifdef _OPENMP
 			#pragma omp for private(j,comm)
+#endif
 			for(i=0; i<communitySize ; i++)
 			{
 				comm = v2C[vertex[i]];

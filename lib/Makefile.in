@@ -44,7 +44,7 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/ax_cc_maxopt.m4 \
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
-CONFIG_HEADER = $(top_builddir)/include/graph_defs.h
+CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
@@ -64,7 +64,7 @@ libsnap_la_DEPENDENCIES =  \
 	$(top_srcdir)/src/sprng2.0/libsprng.la
 am_libsnap_la_OBJECTS =
 libsnap_la_OBJECTS = $(am_libsnap_la_OBJECTS)
-DEFAULT_INCLUDES = -I. -I$(top_builddir)/include@am__isrc@
+DEFAULT_INCLUDES = -I. -I$(top_builddir)@am__isrc@
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \

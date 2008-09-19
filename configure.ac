@@ -4,7 +4,7 @@ AC_PREREQ(2.59)
 # initialize
 AC_INIT(snap, 0.3, kmadduri@lbl.gov)
 AC_CONFIG_SRCDIR(src/graph_kernels/breadth_first_search.c)
-AM_CONFIG_HEADER(include/graph_defs.h)
+AM_CONFIG_HEADER(config.h)
 AM_INIT_AUTOMAKE
 
 # get platform information

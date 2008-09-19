@@ -44,13 +44,13 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/ax_cc_maxopt.m4 \
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
-CONFIG_HEADER = $(top_builddir)/include/graph_defs.h
+CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libgraph_metrics_la_LIBADD =
 am_libgraph_metrics_la_OBJECTS = vertex_betweenness_centrality.lo
 libgraph_metrics_la_OBJECTS = $(am_libgraph_metrics_la_OBJECTS)
-DEFAULT_INCLUDES = -I. -I$(top_builddir)/include@am__isrc@
+DEFAULT_INCLUDES = -I. -I$(top_builddir)@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \

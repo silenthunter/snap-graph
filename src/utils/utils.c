@@ -128,8 +128,9 @@ void prefix_sums(attr_id_t *input, attr_id_t* result, attr_id_t* p, long n) {
     #pragma omp barrier
 #else
 
+    attr_id_t i;
     result[0] = 0;
-    for (int i=1; i<n+1; i++) {
+    for (i=1; i<n+1; i++) {
         result[i] = result[i-1] + input[i-1];
     }
 #endif

@@ -1,10 +1,10 @@
 # run autoconf to produce the configure script
 AC_PREREQ(2.59)
 
+# initialize
 AC_INIT(snap, 0.3, kmadduri@lbl.gov)
 AC_CONFIG_SRCDIR(src/graph_kernels/breadth_first_search.c)
 AM_CONFIG_HEADER(include/graph_defs.h)
-
 AM_INIT_AUTOMAKE
 
 # get platform information
@@ -12,7 +12,7 @@ AC_CANONICAL_HOST
 
 AC_ARG_ENABLE(debug,
         [AC_HELP_STRING([--enable-debug],
-            [build library and binaries with extra runtime checks for debugging])], 
+        [build library and binaries with extra runtime checks for debugging])], 
         enable_debug=$enableval, enable_debug=no)
 if test "$enable_debug" = "yes"; then
     AC_DEFINE(SNAP_DEBUG,1,[Define to build snap with debug flags])
@@ -38,13 +38,13 @@ fi
 # add more warning flags for gcc, in debug/maintainer mode only
 if test "$enable_debug" = "yes" || test "$USE_MAINTAINER_MODE" = "yes"; then
 if test "${ac_test_CFLAGS}" != "set"; then
-	if test "${ac_cv_prog_gcc}" = "yes"; then
-		CFLAGS="$CFLAGS -Wall -W -Wcast-qual -Wpointer-arith -Wcast-align -pedantic -Wno-long-long -Wshadow -Wbad-function-cast -Wwrite-strings -Wstrict-prototypes -Wredundant-decls -Wnested-externs" # -Wundef -Wconversion -Wmissing-prototypes -Wmissing-declarations 
-	fi
+    if test "${ac_cv_prog_gcc}" = "yes"; then
+        CFLAGS="$CFLAGS -Wall -W -Wcast-qual -Wpointer-arith -Wcast-align -pedantic -Wno-long-long -Wshadow -Wbad-function-cast -Wwrite-strings -Wstrict-prototypes -Wredundant-decls -Wnested-externs" # -Wundef -Wconversion -Wmissing-prototypes -Wmissing-declarations
+    fi
 fi
 fi
 
-# check for the appropriate OpenMP flags and enable it.
+# check for OpenMP flags
 AC_ARG_ENABLE(openmp,
         [AC_HELP_STRING([--enable-openmp],
             [use OpenMP directives for parallelism])],
@@ -92,7 +92,7 @@ AC_CONFIG_FILES([Makefile
                 ])
 AC_OUTPUT
 
-# Print configuration output.
+# print configuration output
 AC_MSG_RESULT([ ])
 AC_MSG_RESULT([snap successfully configured! Please verify that])
 AC_MSG_RESULT([this configuration matches with your expectations.])

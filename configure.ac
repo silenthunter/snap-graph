@@ -1,9 +1,13 @@
+# run autoconf to produce the configure script
 AC_PREREQ(2.59)
-AC_INIT(snap,0.2,kamesh@cc.gatech.edu)
-AC_CONFIG_SRCDIR(include/graph_defs.h)
+
+AC_INIT(snap, 0.3, kmadduri@lbl.gov)
+AC_CONFIG_SRCDIR(src/graph_kernels/breadth_first_search.c)
+AM_CONFIG_HEADER(include/graph_defs.h)
+
 AM_INIT_AUTOMAKE
-AM_CONFIG_HEADER(config.h)
-AM_MAINTAINER_MODE
+
+# get platform information
 AC_CANONICAL_HOST
 
 AC_ARG_ENABLE(debug,
@@ -14,20 +18,24 @@ if test "$enable_debug" = "yes"; then
     AC_DEFINE(SNAP_DEBUG,1,[Define to build snap with debug flags])
 fi
 
+# check for C compiler
 AC_PROG_CC
+
+# macro for determining compiler vendor
 AX_COMPILER_VENDOR
-AC_PROG_CC_STDC
+
+# check for libtool
 AC_PROG_LIBTOOL
 
+# macro for determining optimization flags
 AX_CC_MAXOPT
 
-# override CFLAGS selection when debugging
+# override CFLAGS selection when debug option is selected
 if test "${enable_debug}" = "yes"; then
 	CFLAGS="-g"
-	LDFLAGS="-static"
 fi
 
-# add gcc warnings, in debug/maintainer mode only
+# add more warning flags for gcc, in debug/maintainer mode only
 if test "$enable_debug" = "yes" || test "$USE_MAINTAINER_MODE" = "yes"; then
 if test "${ac_test_CFLAGS}" != "set"; then
 	if test "${ac_cv_prog_gcc}" = "yes"; then
@@ -36,6 +44,7 @@ if test "${ac_test_CFLAGS}" != "set"; then
 fi
 fi
 
+# check for the appropriate OpenMP flags and enable it.
 AC_ARG_ENABLE(openmp,
         [AC_HELP_STRING([--enable-openmp],
             [use OpenMP directives for parallelism])],
@@ -52,34 +61,35 @@ if test "$enable_openmp" = "yes"; then
          Please set the CFLAGS variable manually for OpenMP support.])])
 fi
 
-# Checks for libraries.
+# checks for libraries
 AC_CHECK_LIB(m, log2, [], [])
 
-# Checks for header files.
+# header files
 AC_CHECK_HEADERS([stdarg.h limits.h])
 
-# Checks for typedefs, structures, and compiler characteristics.
+# typedefs, structures, and compiler characteristics
 AC_C_CONST
 AC_C_INLINE
 AC_TYPE_SIZE_T
 AC_HEADER_TIME
 AC_STRUCT_TM
 
+# check functions
 AC_FUNC_MALLOC
 AC_CHECK_FUNCS([floor gettimeofday gethrtime memset memalign sqrt drand48 pow])
 
-# Config files.
+# list of config files
 AC_CONFIG_FILES([Makefile
                  src/Makefile
-				 src/graph_generation/Makefile
-				 src/graph_kernels/Makefile
-				 src/graph_partitioning/Makefile
-				 src/graph_metrics/Makefile
+                 src/graph_generation/Makefile
+                 src/graph_kernels/Makefile
+                 src/graph_partitioning/Makefile
+                 src/graph_metrics/Makefile
                  src/sprng2.0/Makefile
                  src/utils/Makefile
-				 lib/Makefile
+                 lib/Makefile
                  test/Makefile
-				 ])
+                ])
 AC_OUTPUT
 
 # Print configuration output.

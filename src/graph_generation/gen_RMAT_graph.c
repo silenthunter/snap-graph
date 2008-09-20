@@ -268,13 +268,13 @@ void gen_RMAT_graph(graph_t* G, char* filename) {
         }
     } 
 
-            
+    /*
     for (i=0; i<G->n; i++) {
         for (j=G->numEdges[i]; j<G->numEdges[i+1]; j++) {
             fprintf(stderr, "<%ld %ld> ", i, G->endV[j]);
         }
     }
-    
+    */ 
 
     free(src);
     free(dest);

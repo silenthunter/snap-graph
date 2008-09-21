@@ -18,7 +18,7 @@ void gen_random_graph(graph_t* G, char* filename) {
     attr_id_t *src;
     attr_id_t *dest;
     attr_id_t *degree;
- 
+
     read_random_config_file(G, filename);
 
     undirected = G->undirected;
@@ -29,7 +29,7 @@ void gen_random_graph(graph_t* G, char* filename) {
     src = (attr_id_t *) malloc (m * sizeof(attr_id_t));
     dest = (attr_id_t *) malloc(m * sizeof(attr_id_t));
     degree = (attr_id_t *) calloc(n, sizeof(attr_id_t));
-        
+
     assert(src != NULL);
     assert(dest != NULL);
     assert(degree != NULL);
@@ -50,7 +50,7 @@ void gen_random_graph(graph_t* G, char* filename) {
     
     /* Initialize RNG stream */
     seed = 2387;
-	stream = init_sprng(0, 0, 1, seed, SPRNG_DEFAULT);
+    stream = init_sprng(0, 0, 1, seed, SPRNG_DEFAULT);
 
     /* Generate edges */
     for (i=0; i<m; i++) {
@@ -79,12 +79,12 @@ void gen_random_graph(graph_t* G, char* filename) {
     } else if (weight_type == 3) {
         for (i=0; i<m; i++) {
             fl_weight[i]  = min_weight + 
-                (float) floor((max_weight-min_weight)*sprng(stream));
+                (float) (max_weight-min_weight)*sprng(stream);
         }
     } else if (weight_type == 4) {
         for (i=0; i<m; i++) {
             dbl_weight[i]  = min_weight + 
-                floor((max_weight-min_weight)*sprng(stream));
+                (max_weight-min_weight)*sprng(stream);
         }
     } 
 
@@ -104,21 +104,21 @@ void gen_random_graph(graph_t* G, char* filename) {
         G->m = 2*m;
     else
         G->m = m;
-    
+
     if (weight_type) {
 
         if (weight_type == 1) {
-            G->int_weight_e = (int *) malloc(G->m * sizeof(int));       
+            G->int_weight_e = (int *) malloc(G->m * sizeof(int));
             assert(G->int_weight_e != NULL);
         }
 
         if (weight_type == 2) {
-            G->l_weight_e = (long *) malloc(G->m * sizeof(long));       
+            G->l_weight_e = (long *) malloc(G->m * sizeof(long));
             assert(G->l_weight_e != NULL);
         }
 
         if (weight_type == 3) {
-            G->fl_weight_e = (float *) malloc(G->m * sizeof(float));       
+            G->fl_weight_e = (float *) malloc(G->m * sizeof(float));
             assert(G->fl_weight_e != NULL);
         }
 
@@ -171,11 +171,11 @@ void gen_random_graph(graph_t* G, char* filename) {
                     G->dbl_weight_e[G->numEdges[v]+offset-1] = dbl_weight[i];
                 }
             }
-            
-        }
-    } 
 
-    /*         
+        }
+    }
+
+    /*
     for (i=0; i<G->n; i++) {
         for (j=G->numEdges[i]; j<G->numEdges[i+1]; j++) {
             fprintf(stderr, "<%ld %ld> ", i, G->endV[j]);
@@ -189,11 +189,11 @@ void gen_random_graph(graph_t* G, char* filename) {
 
     if (weight_type == 1) 
         free(int_weight);
-    if (weight_type == 2) 
+    if (weight_type == 2)
         free(l_weight);
-    if (weight_type == 3) 
+    if (weight_type == 3)
         free(fl_weight);
-    if (weight_type == 4) 
+    if (weight_type == 4)
         free(dbl_weight);
 
     free_sprng(stream);
@@ -201,25 +201,25 @@ void gen_random_graph(graph_t* G, char* filename) {
 
 void read_random_config_file(graph_t* G, char* configfile) {
 
-	/* read parameters from config file */
-	FILE *fp;
-	char line[128], var[32];
-	double val;
+    /* read parameters from config file */
+    FILE *fp;
+    char line[128], var[32];
+    double val;
 
-	fp = fopen(configfile,"r");
-	if (fp == NULL) {
-		fprintf(stderr, "Unable to open config file:i %s\n",configfile);
-		exit(-1);
-	}
+    fp = fopen(configfile,"r");
+    if (fp == NULL) {
+        fprintf(stderr, "Unable to open config file:i %s\n",configfile);
+        exit(-1);
+    }
 
-	while (fgets(line, sizeof (line), fp) != NULL) {
-		sscanf(line, "%s %lf", var, &val);
-		if (*var == '#') continue;  /* comment */
-		if (strcmp(var, "n") == 0) {
-			G->n = (long) val;
+    while (fgets(line, sizeof (line), fp) != NULL) {
+        sscanf(line, "%s %lf", var, &val);
+        if (*var == '#') continue;  /* comment */
+        if (strcmp(var, "n") == 0) {
+            G->n = (long) val;
             assert(G->n > 0);
-		} else if (strcmp(var, "m") == 0) {
-			G->m = (long) val;
+        } else if (strcmp(var, "m") == 0) {
+            G->m = (long) val;
             assert(G->m > 0);
         } else if (strcmp(var, "undirected") == 0) {
             G->undirected = (int) val;
@@ -232,10 +232,10 @@ void read_random_config_file(graph_t* G, char* configfile) {
             G->max_weight = val;
         } else if (strcmp(var, "min_weight") == 0) {
             G->min_weight = val;
-	    } else {
-			fprintf(stderr,"Unknown parameter: %s\n", line);
-		}
-	}
+        } else {
+            fprintf(stderr,"Unknown parameter: %s\n", line);
+        }
+    }
 
     fclose(fp);
 

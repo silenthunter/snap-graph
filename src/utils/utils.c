@@ -141,42 +141,34 @@ void prefix_sums(attr_id_t *input, attr_id_t* result, attr_id_t* p, long n) {
 
 void print_graph(graph_t* G)
 {
-	int i,j;
-	int degree,start;
-	
-	printf("\n Printing graph\n");
-	printf("Number of vertices =%d, edges=%d\n",G->n,G->m);
-	if(G->undirected) 
-		printf("Graph is undirected\n");
-	else
-		printf("Graph is directed\n");
-	printf("Graph weighttype is %d\n",G->weight_type);
+    attr_id_t i,j;
+    attr_id_t degree,start;
+
+    fprintf(stdout, "\n Printing graph\n");
+    fprintf(stdout, "Number of vertices: %ld, edges: %ld\n", G->n, G->m);
+    if(G->undirected) 
+        fprintf(stdout, "Graph is undirected\n");
+    else
+        fprintf(stdout, "Graph is directed\n");
+
+    fprintf(stdout, "Graph weight type is %ld\n",G->weight_type);
 
 
-	for(i=0;i<G->n;i++)
-	{
-		degree=G->numEdges[i+1]-G->numEdges[i];
-		start=G->numEdges[i];
-		printf("Degree of vertex i=%d is %d. Its neighbours are:",i,degree);
-		
-		for(j=0;j<degree;j++)
-		{
-			if(G->weight_type == 1) 
-				printf("%d[%d], ",G->endV[start+j], G->int_weight_e[start+j]);
-			else if(G->weight_type == 2) 
-				printf("%d[%d], ",G->endV[start+j], G->l_weight_e[start+j]);
-			else if(G->weight_type == 3) 
-				printf("%d[%f], ",G->endV[start+j], G->fl_weight_e[start+j]);
-			else if(G->weight_type == 4) 
-				printf("%d[%f], ",G->endV[start+j], G->dbl_weight_e[start+j]);
-		}
-		printf("\n");
-	}
+    for(i = 0; i < G->n; i++) {
+        degree = G->numEdges[i+1] - G->numEdges[i];
+        start = G->numEdges[i];
+        fprintf(stdout, "Degree of vertex i %ld is %ld. Its neighbours are:", i, degree);
+
+        for(j=0;j<degree;j++) {
+            if(G->weight_type == 1)
+                fprintf(stdout, "%ld [%d], ",G->endV[start+j], G->int_weight_e[start+j]);
+            else if(G->weight_type == 2) 
+                fprintf(stdout, "%ld [%ld], ",G->endV[start+j], G->l_weight_e[start+j]);
+            else if(G->weight_type == 3) 
+                fprintf(stdout, "%ld [%f], ",G->endV[start+j], G->fl_weight_e[start+j]);
+            else if(G->weight_type == 4) 
+                fprintf(stdout, "%ld [%lf], ",G->endV[start+j], G->dbl_weight_e[start+j]);
+        }
+        fprintf(stdout, "\n");
+    }
 }
-
-
-	
-
-
-
-

@@ -58,30 +58,30 @@ typedef struct
 
 /* The graph data structure*/
 typedef struct
-{ 
-	/*** 
+{
+    /***
      The minimal graph repesentation consists of:
-	 n        -- the number of vertices
-	 m        -- the number of edges
-	 endV     -- an array of size 2*m (m for directed graphs) that stores the 
+     n        -- the number of vertices
+     m        -- the number of edges
+     endV     -- an array of size 2*m (m for directed graphs) that stores the 
                  destination ID of an edge <src->dest>.
-	 numEdges -- an array of size n+1 that stores the degree 
+     numEdges -- an array of size n+1 that stores the degree 
                  (out-degree in case of directed graphs) and pointers to
                  the endV array. The degree of vertex i is given by 
                  numEdges[i+1]-numEdges[i], and the edges out of i are
                  stored in the contiguous block endV[numEdges[i] ..
                  numEdges[i+1]].
      Vertices are ordered from 0 in our internal representation
-	 ***/
+     ***/
     long n;
     long m;
     attr_id_t* endV;
     attr_id_t* numEdges;
     
-	int undirected;
+    int undirected;
     int zero_indexed;
 
-	/***
+    /***
      Other useful constructs that can be initialized when needed
      ***/
     edge_t* elist;
@@ -89,7 +89,7 @@ typedef struct
     vert_t* vlist;
     vert_t* vlist_aux;
 
-    /* For directed graphs, endBackV is used to store edges pointing into a
+    /* For directed graphs, endBackV can be used to store edges pointing into a
        vertex, and numBackEdges the in-degree */
     attr_id_t* endBackV;
     attr_id_t* numBackEdges;
@@ -111,7 +111,7 @@ typedef struct
     double max_weight;
 
     /* Fine-grained locking support, currently using 
-       OpenMP Mutex locks */
+       OpenMP mutex locks */
 #ifdef _OPENMP
     omp_lock_t* vLock;
     omp_lock_t* eLock;
@@ -128,18 +128,16 @@ typedef struct {
 
 typedef struct struct_node
 {
-        int id; 
-        struct struct_node *next;
-}node;
+    int id; 
+    struct struct_node *next;
+} node;
 
 typedef struct
 {
-        node *head;
-        node *tail;
-        int size;
-}list;
-
-
+    node *head;
+    node *tail;
+    int size;
+} list;
 
 
 #endif

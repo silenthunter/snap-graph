@@ -64,7 +64,7 @@ void graph_ext_check(char* filename, char* graph_type) {
             strcpy(graph_type, "gml");    
         }
 
-        if (strcmp(ptr, "rand") == 0) {
+        if (strcmp(ptr, "rnd") == 0) {
             strcpy(graph_type, "rand");    
         }
 

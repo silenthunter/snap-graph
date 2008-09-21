@@ -7,7 +7,7 @@
 int main(int argc, char** argv) {
 
     char *infilename, *outfilename, *graph_type;
-    FILE* fp;    
+    FILE* fp;
     graph_t* g;
 
     long src;
@@ -15,6 +15,7 @@ int main(int argc, char** argv) {
     long numSrcs;
     int est_diameter;
     long i, j;
+    long num_vertices_visited;
 
     /* Step 1: Parse command line arguments */
     if (argc < 3) {
@@ -76,8 +77,6 @@ int main(int argc, char** argv) {
     fprintf(stdout, "Input Graph File    : %s\n", infilename);
     fprintf(stdout, "Output Graph File   : %s\n\n", outfilename);
 
-
-
     /* Step 2: Generate graph */
     g = (graph_t *) malloc(sizeof(graph_t));
     graph_gen(g, infilename, graph_type);
@@ -94,10 +93,16 @@ int main(int argc, char** argv) {
     /* Step 3: Run algorithm */
 
     /* Assuming a low diameter graph */
+    /* change the est_diameter value for high diameter graphs */
     est_diameter = 100;
-    BFS_parallel_frontier_expansion(g, src, est_diameter);
- 
-    /* Step 4: Clean up */
+    num_vertices_visited = BFS_parallel_frontier_expansion(g, src, est_diameter);
+
+    /* Step 4: Write output to file */
+    fp = fopen(outfilename, "w");
+    fprintf(fp, "Breadth-first search from vertex %ld\n", src); 
+    fprintf(fp, "No. of vertices visited: %ld\n", num_vertices_visited);
+    
+    /* Step 5: Clean up */
     free(infilename);
     free(outfilename);
     free(graph_type);

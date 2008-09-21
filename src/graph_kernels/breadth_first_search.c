@@ -5,7 +5,7 @@ void BFS_sequential(graph_t* G, long src, int* d) {
 
 }
 
-void BFS_parallel_frontier_expansion(graph_t* G, long src, long diameter) {
+long BFS_parallel_frontier_expansion(graph_t* G, long src, long diameter) {
 
     attr_id_t* S;
     long *start;

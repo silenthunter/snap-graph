@@ -13,7 +13,7 @@ void art_points_recursive(graph_t* G, attr_id_t u);
 void BiCC_stack_push(attr_id_t a, attr_id_t b);
 void BiCC_stack_pop(attr_id_t *a, attr_id_t *b);
 
-void BFS_parallel_frontier_expansion(graph_t* G, long src, long diameter);
+long BFS_parallel_frontier_expansion(graph_t* G, long src, long diameter);
 void BFS_path_limited_search(graph_t* G, long src, long diameter);
 void BFS_sequential(graph_t* G, long src, int* d);
 

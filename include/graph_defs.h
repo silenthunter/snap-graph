@@ -22,7 +22,7 @@
 typedef struct {
     attr_id_t* vals;
     long count;
-	long max_size;
+    long max_size;
 } dyn_array;
 
 void dyn_array_insert(dyn_array* A, attr_id_t val);
@@ -31,17 +31,11 @@ void dyn_array_init(dyn_array* A);
 void dyn_array_clear(dyn_array* A);
 void dyn_array_free(dyn_array* A);
 
-typedef struct {
-    attr_id_t* vals;
-    long count;
-	long max_size;
-} sorted_dyn_array;
-
-void sorted_dyn_array_insert(sorted_dyn_array* A, attr_id_t val);
-void sorted_dyn_array_delete(sorted_dyn_array* A, attr_id_t val);
-void sorted_dyn_array_init(sorted_dyn_array* A);
-void sorted_dyn_array_clear(sorted_dyn_array* A);
-void sorted_dyn_array_free(sorted_dyn_array* A);
+void sorted_dyn_array_insert(dyn_array* A, attr_id_t val);
+void sorted_dyn_array_delete(dyn_array* A, attr_id_t val);
+void sorted_dyn_array_init(dyn_array* A);
+void sorted_dyn_array_clear(dyn_array* A);
+void sorted_dyn_array_free(dyn_array* A);
 
 typedef struct
 {
@@ -125,10 +119,9 @@ typedef struct {
     attr_id_t degree;
 } plist;
 
-
 typedef struct struct_node
 {
-    int id; 
+    int id;
     struct struct_node *next;
 } node;
 

@@ -29,7 +29,8 @@ int main(int argc, char** argv) {
     attr_id_t *degree;
     attr_id_t *degree_hist;
     attr_id_t *mem_chunk;
-    
+    double el_time;
+
     /* For detecting duplicates */
     dyn_array_t* adj;
     long num_self_edges = 0, num_dups = 0, num_mallocs = 0, num_init_mallocs = 0;
@@ -286,6 +287,86 @@ int main(int argc, char** argv) {
             fprintf(stderr, "%ld %ld\n", i, degree_hist[i]);
         }
     }
+
+    /* Case 1: Oracle, we know bucket sizes */
+    for (i=1; i<n; i++) {
+        degree[i] += degree[i-1];
+    }
+    mem_chunk = (attr_id_t *) malloc(2 * m  * sizeof(attr_id_t));
+    G->adj = (dyn_array_t *) calloc(n, sizeof(dyn_array_t));
+
+    G->adj[0].vals = mem_chunk;
+    G->adj[0].max_size = degree[0];
+
+    for (i=1; i<G->n; i++) {
+        G->adj[i].vals = mem_chunk + degree[i];
+        G->adj[i].max_size = degree[i]-degree[i-1];
+    }
+    
+#ifdef _OPENMP
+#pragma omp parallel
+{
+#endif
+    long iter;
+    attr_id_t uid, vid, edge_id;
+    
+#ifdef _OPENMP
+    int tid = omp_get_thread_num();
+    int nthreads = omp_get_num_threads();
+#pragma omp single
+   fprintf(stderr, "No. of threads: %d\n", nthreads);
+#pragma omp barrier
+    double elt = omp_get_wtime();
+#else
+    int tid = 0;
+    int nthreads = 1;
+    double elt = get_seconds();
+#endif
+
+#ifdef _OPENMP
+#pragma omp for nowait
+#endif
+    for (iter = 0; iter < m; iter++) {
+        uid = src[iter];
+        vid = dest[iter];
+
+#ifdef _OPENMP        
+#pragma omp atomic
+#endif
+        edge_id = G->adj[uid].count++;
+        G->adj[uid].vals[edge_id] = vid;
+    }
+
+#ifdef _OPENMP
+    elt = omp_get_wtime() - elt;
+    fprintf(stderr, "Thread: %tid, time: %lf sec\n", elt); 
+#else
+    elt = get_seconds() - elt;
+    fprintf(stderr, "Time taken: %lf sec\n", elt);
+#endif
+
+#ifdef _OPENMP
+}
+#endif
+    
+    /* Case 2: We resize buckets inside code, locking */
+
+    /* Case 3: Oracle, no locking */ 
+
+    /* Case 4: Resize, no locking */
+
+    /* Case 5: Oracle, bunched high-degree vertices */
+
+    /* Case 6: Spanning Forest construction */
+
+    /* Case 7: Deletions, dyn array */
+
+    /* Case 8: Deletions, sorted dyn array */
+
+    /* Case 9: Insertions, Oracle, binary heap for high degree vertices */
+
+    /* Case 10: Deletions, Oracle, binary heap for high degree vertices */
+
 
     free(filename);
     free(params);

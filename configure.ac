@@ -86,7 +86,7 @@ AC_CONFIG_FILES([Makefile
                  src/graph_partitioning/Makefile
                  src/graph_metrics/Makefile
                  src/sprng2.0/Makefile
-                 src/utils/Makefile
+                 src/misc/Makefile
                  lib/Makefile
                  test/Makefile
                 ])

@@ -113,6 +113,29 @@ typedef struct
 
 } graph_t;
 
+/* A simple data structure to experiment with
+   dynamic networks
+ */
+typedef struct
+{
+    /***
+     The minimal dynamic graph repesentation consists of:
+     n        -- the number of vertices
+     m        -- the number of edges
+     adj      -- representation of adjacencies of every vertex 
+     spanf    -- a forest of rooted spanning trees for answering connectivity
+     queries in the dynamic network
+     num_trees-- the number of spanning trees in the forest
+     Vertices are ordered from 0 in our internal representation
+    ***/
+    long n;
+    long m;
+    dyn_array_t* adj;
+    node** spanf;
+    int num_trees;
+
+} dyn_graph_t;
+
 typedef struct {
     attr_id_t* list;
     attr_id_t count;

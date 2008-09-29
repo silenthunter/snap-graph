@@ -12,6 +12,8 @@ void read_GML_graph(graph_t* G, char* filename);
 void gen_RMAT_graph(graph_t* G, char* config_filename);
 void read_RMAT_config_file(graph_t* G, char* configfile, double* params);
 
+void read_dyn_test_config_file(dyn_graph_t* G, char* config_file, double*
+        params);
 void gen_random_graph(graph_t* G, char* config_filename);
 void read_random_config_file(graph_t* G, char* configfile);
 

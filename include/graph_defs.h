@@ -21,6 +21,7 @@
 
 typedef struct {
     attr_id_t* vals;
+    attr_id_t* aux_info;
     long count;
     long max_size;
 } dyn_array_t;
@@ -59,6 +60,7 @@ typedef struct {
 typedef struct struct_node
 {
     int id;
+    int aux_val;
     struct struct_node *next;
 } node_t;
 

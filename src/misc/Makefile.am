@@ -1,5 +1,5 @@
 AM_CPPFLAGS = -I$(top_srcdir)/include
 
-noinst_LTLIBRARIES = libsnap_utils.la
+noinst_LTLIBRARIES = libsnap_misc.la
 
-libsnap_utils_la_SOURCES = utils.c vectorUtils.c list.c 
+libsnap_misc_la_SOURCES = utils.c vectorUtils.c list.c 

@@ -23,19 +23,19 @@ typedef struct {
     attr_id_t* vals;
     long count;
     long max_size;
-} dyn_array;
+} dyn_array_t;
 
-void dyn_array_insert(dyn_array* A, attr_id_t val);
-void dyn_array_delete(dyn_array* A, attr_id_t val);
-void dyn_array_init(dyn_array* A);
-void dyn_array_clear(dyn_array* A);
-void dyn_array_free(dyn_array* A);
+void dyn_array_insert(dyn_array_t* A, attr_id_t val);
+void dyn_array_delete(dyn_array_t* A, attr_id_t val);
+void dyn_array_init(dyn_array_t* A);
+void dyn_array_clear(dyn_array_t* A);
+void dyn_array_free(dyn_array_t* A);
 
-void sorted_dyn_array_insert(dyn_array* A, attr_id_t val);
-void sorted_dyn_array_delete(dyn_array* A, attr_id_t val);
-void sorted_dyn_array_init(dyn_array* A);
-void sorted_dyn_array_clear(dyn_array* A);
-void sorted_dyn_array_free(dyn_array* A);
+void sorted_dyn_array_insert(dyn_array_t* A, attr_id_t val);
+void sorted_dyn_array_delete(dyn_array_t* A, attr_id_t val);
+void sorted_dyn_array_init(dyn_array_t* A);
+void sorted_dyn_array_clear(dyn_array_t* A);
+void sorted_dyn_array_free(dyn_array_t* A);
 
 typedef struct
 {
@@ -46,9 +46,29 @@ typedef struct
 
 typedef struct
 {
-    dyn_array* neighbors;
+    dyn_array_t* neighbors;
     attr_id_t degree;
 } vert_t;
+
+typedef struct {
+    attr_id_t* list;
+    attr_id_t count;
+    attr_id_t degree;
+} plist_t;
+
+typedef struct struct_node
+{
+    int id;
+    struct struct_node *next;
+} node_t;
+
+typedef struct
+{
+    node_t *head;
+    node_t *tail;
+    int size;
+} list_t;
+
 
 /* The graph data structure*/
 typedef struct
@@ -131,29 +151,9 @@ typedef struct
     long n;
     long m;
     dyn_array_t* adj;
-    node** spanf;
+    node_t** spanf;
     int num_trees;
 
 } dyn_graph_t;
-
-typedef struct {
-    attr_id_t* list;
-    attr_id_t count;
-    attr_id_t degree;
-} plist;
-
-typedef struct struct_node
-{
-    int id;
-    struct struct_node *next;
-} node;
-
-typedef struct
-{
-    node *head;
-    node *tail;
-    int size;
-} list;
-
 
 #endif

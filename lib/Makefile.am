@@ -9,5 +9,5 @@ libsnap_la_LIBADD = \
 	$(top_srcdir)/src/graph_kernels/libgraph_kernels.la \
 	$(top_srcdir)/src/graph_metrics/libgraph_metrics.la \
 	$(top_srcdir)/src/graph_partitioning/libgraph_partitioning.la \
-	$(top_srcdir)/src/utils/libsnap_utils.la \
+	$(top_srcdir)/src/misc/libsnap_misc.la \
 	$(top_srcdir)/src/sprng2.0/libsprng.la

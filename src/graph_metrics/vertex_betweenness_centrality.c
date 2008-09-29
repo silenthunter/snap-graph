@@ -8,7 +8,7 @@ void vertex_betweenness_centrality_parBFS(graph_t* G, double* BC, long numSrcs) 
     attr_id_t *S;      /* stack of vertices in the order of non-decreasing 
                           distance from s. Also used to implicitly 
                           represent the BFS queue */
-    plist* P;          /* predecessors of a vertex v on shortest paths from s */
+    plist_t* P;          /* predecessors of a vertex v on shortest paths from s */
     double* sig;       /* No. of shortest paths */
     attr_id_t* d;      /* Length of the shortest path between every pair */
     double* del;       /* dependency of vertices */
@@ -140,7 +140,7 @@ void vertex_betweenness_centrality_parBFS(graph_t* G, double* BC, long numSrcs) 
        vertex */ 
 
     if (tid == 0) {
-        P   = (plist  *) calloc(n, sizeof(plist));
+        P   = (plist_t  *) calloc(n, sizeof(plist_t));
         in_degree = (attr_id_t *) calloc(n+1, sizeof(attr_id_t));
         numEdges = (attr_id_t *) malloc((n+1)*sizeof(attr_id_t));
         pSums = (attr_id_t *) malloc(nthreads*sizeof(attr_id_t));
@@ -471,7 +471,7 @@ void vertex_betweenness_centrality_simple(graph_t* G, double* BC, long numSrcs) 
     attr_id_t *S;      /* stack of vertices in the order of non-decreasing 
                           distance from s. Also used to implicitly 
                           represent the BFS queue */
-    plist* P;          /* predecessors of a vertex v on shortest paths from s */
+    plist_t* P;          /* predecessors of a vertex v on shortest paths from s */
     attr_id_t* pListMem;    
     double* sig;       /* No. of shortest paths */
     attr_id_t* d;      /* Length of the shortest path between every pair */
@@ -599,7 +599,7 @@ void vertex_betweenness_centrality_simple(graph_t* G, double* BC, long numSrcs) 
 
     prefix_sums(in_degree, numEdges, pSums, n);
     
-    P  = (plist  *) calloc(n, sizeof(plist));
+    P  = (plist_t  *) calloc(n, sizeof(plist_t));
     pListMem = (attr_id_t *) malloc(m*sizeof(attr_id_t));
 
     for (i=0; i<n; i++) {

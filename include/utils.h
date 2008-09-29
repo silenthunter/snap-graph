@@ -23,12 +23,12 @@ void print_attr_id_t_Vector(attr_id_t*,attr_id_t,attr_id_t);
 
 
 //list.c
-list* makeList();
-node* makeNode(int);
-void append(list*,node*);
-node *getFirst(list*);
-void deleteFirst(list*);
-void printList(list*);
+list_t* makeList();
+node_t* makeNode(int);
+void append(list_t*,node_t*);
+node_t *getFirst(list_t*);
+void deleteFirst(list_t*);
+void printList(list_t*);
 
 
 

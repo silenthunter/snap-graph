@@ -47,9 +47,9 @@ mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
-libsnap_utils_la_LIBADD =
-am_libsnap_utils_la_OBJECTS = utils.lo vectorUtils.lo list.lo
-libsnap_utils_la_OBJECTS = $(am_libsnap_utils_la_OBJECTS)
+libsnap_misc_la_LIBADD =
+am_libsnap_misc_la_OBJECTS = utils.lo vectorUtils.lo list.lo
+libsnap_misc_la_OBJECTS = $(am_libsnap_misc_la_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(top_builddir)@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -62,8 +62,8 @@ CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = $(libsnap_utils_la_SOURCES)
-DIST_SOURCES = $(libsnap_utils_la_SOURCES)
+SOURCES = $(libsnap_misc_la_SOURCES)
+DIST_SOURCES = $(libsnap_misc_la_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -175,8 +175,8 @@ target_alias = @target_alias@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AM_CPPFLAGS = -I$(top_srcdir)/include
-noinst_LTLIBRARIES = libsnap_utils.la
-libsnap_utils_la_SOURCES = utils.c vectorUtils.c list.c 
+noinst_LTLIBRARIES = libsnap_misc.la
+libsnap_misc_la_SOURCES = utils.c vectorUtils.c list.c 
 all: all-am
 
 .SUFFIXES:
@@ -219,8 +219,8 @@ clean-noinstLTLIBRARIES:
 	  echo "rm -f \"$${dir}/so_locations\""; \
 	  rm -f "$${dir}/so_locations"; \
 	done
-libsnap_utils.la: $(libsnap_utils_la_OBJECTS) $(libsnap_utils_la_DEPENDENCIES) 
-	$(LINK)  $(libsnap_utils_la_OBJECTS) $(libsnap_utils_la_LIBADD) $(LIBS)
+libsnap_misc.la: $(libsnap_misc_la_OBJECTS) $(libsnap_misc_la_DEPENDENCIES) 
+	$(LINK)  $(libsnap_misc_la_OBJECTS) $(libsnap_misc_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)

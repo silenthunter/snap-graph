@@ -369,7 +369,7 @@ void par_gen_RMAT_edges(dyn_graph_t* G, double* params, attr_id_t* src,
 #pragma omp barrier
 #endif
         /* Write partial results to src and dest */
-        int offset = edges_added + edgeCount[tid];
+        offset = edges_added + edgeCount[tid];
         for (j = 0; j<pEdgeCount; j++) {
             src[offset+j] = psrc[j];
             dest[offset+j] = pdest[j];
@@ -501,14 +501,14 @@ void par_gen_RMAT_edges(dyn_graph_t* G, double* params, attr_id_t* src,
         el_time = get_seconds() - el_time;
         fprintf(stderr, "\nDegree hist time: %lf sec\n", el_time);
     }
-
+/*
 #ifdef _OPENMP
 #pragma omp for 
 #endif
     for (int i=0; i<n; i++) {
         omp_destroy_lock(&vLock[i]);
     }
-
+*/
 }
 
     fprintf(stderr, "num self edges: %ld, num dups: %ld\n", num_self_edges,
@@ -580,6 +580,8 @@ void dyn_ds_init_nomalloc(dyn_graph_t* G, attr_id_t* src, attr_id_t* dest,
     for (int i=1; i<G->n; i++) {
         degree[i] += degree[i-1];
     }
+    fprintf(stderr, "m is %ld, n is %ld\n", G->m, G->n);
+
     mem_chunk = (attr_id_t *) malloc(G->m  * sizeof(attr_id_t));
     G->adj = (dyn_array_t *) calloc(G->n, sizeof(dyn_array_t));
 
@@ -587,6 +589,7 @@ void dyn_ds_init_nomalloc(dyn_graph_t* G, attr_id_t* src, attr_id_t* dest,
     G->adj[0].max_size = degree[0];
 
     for (int i=1; i<G->n; i++) {
+        fprintf(stderr, "%ld ", degree[i]);
         G->adj[i].vals = mem_chunk + degree[i];
         G->adj[i].max_size = degree[i]-degree[i-1];
     }
@@ -671,7 +674,7 @@ void dyn_ds_init_nomalloc(dyn_graph_t* G, attr_id_t* src, attr_id_t* dest,
     free(mem_chunk);
     free(G->adj);
 #ifdef _OPENMP
-    free(vLock);
+    // free(vLock);
 #endif
 
 }

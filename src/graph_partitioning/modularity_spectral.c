@@ -6,11 +6,14 @@ void computeEigen(graph_t *G, double *eigenVectorOld, double *eigenVectorNew, at
 void computeModularityValue(graph_t *G, attr_id_t *membership, attr_id_t numCommunities, double *modularity)
 {
     attr_id_t i,j;
+    attr_id_t n, m;
     attr_id_t comm;
     double mod=0.0;
     double degree_u,degree_v;
+    n = G->n;
+    m = G->m; 
     
-    for(i=0; i<G->n; i++)
+    for(i=0; i<n; i++)
     {
         comm = membership[i];
         degree_u = (double)G->numEdges[i+1] - G->numEdges[i];
@@ -32,9 +35,9 @@ void computeModularityValue(graph_t *G, attr_id_t *membership, attr_id_t numComm
 
  void modularity_spectral(graph_t *G, attr_id_t **membership, attr_id_t *numCommunities, attr_id_t use_improvement)
  {
-     attr_id_t *v2C, *degree, *vertex, *v2pos;
+    attr_id_t *v2C, *degree, *vertex, *v2pos;
     attr_id_t u,v,curCommunity=0, newCommunity,toSplit;
-    attr_id_t n=G->n,sumV1,sumV2,comm,count1,count2;
+    attr_id_t sumV1,sumV2,comm,count1,count2;
     attr_id_t *memblock;
     attr_id_t i,j,communitySize,degreeSum,start;
     list_t *Q;
@@ -43,7 +46,10 @@ void computeModularityValue(graph_t *G, attr_id_t *membership, attr_id_t numComm
     attr_id_t continue_flag = 0;    
     double *contribution, max_contrib, modularity, new_modularity;
     attr_id_t degree_u, degree_v, degreeSum1, degreeSum2, maxv, flag, flag_counter;
+    attr_id_t n, m;
 
+    n = G->n;
+    m = G->m;
     *numCommunities = 1;
 
     printf("Allocating memory\n");
@@ -86,7 +92,7 @@ void computeModularityValue(graph_t *G, attr_id_t *membership, attr_id_t numComm
 #ifdef _OPENMP
         #pragma omp parallel for
 #endif
-        for(i=0; i<G->n; i++)
+        for(i=0; i<n; i++)
         {
             vertex[i] = -1;
         }
@@ -116,7 +122,7 @@ void computeModularityValue(graph_t *G, attr_id_t *membership, attr_id_t numComm
 #ifdef _OPENMP
         #pragma omp parallel for private(j) reduction(+:modularity)
 #endif
-        for(i=0; i<G->n;i++)
+        for(i=0; i<n;i++)
         {
             if(v2C[i] == curCommunity)
             {
@@ -297,6 +303,7 @@ void computeModularityValue(graph_t *G, attr_id_t *membership, attr_id_t numComm
         append(Q,makeNode(curCommunity));
         append(Q,makeNode(newCommunity));
     }
+
 }
 
 

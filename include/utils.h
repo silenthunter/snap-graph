@@ -4,7 +4,7 @@
 
 /* utils.c */
 double get_seconds(void);
-void prefix_sums(attr_id_t*, attr_id_t*, attr_id_t*, long);
+void prefix_sums(attr_id_t*, attr_id_t*, attr_id_t*, attr_id_t);
 void usage_graph_options();
 void graph_ext_check(char*, char*);
 void print_graph(graph_t*);

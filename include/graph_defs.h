@@ -158,4 +158,8 @@ typedef struct
 
 } dyn_graph_t;
 
+void par_gen_RMAT_edges(dyn_graph_t* G, double* params, attr_id_t *src, attr_id_t* dest,
+        attr_id_t* degree);
+void dyn_ds_init_nomalloc(dyn_graph_t* G, attr_id_t* src, attr_id_t* dest,
+        attr_id_t* degree);
 #endif

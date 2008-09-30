@@ -8,7 +8,7 @@ void calculateVertexCover(graph_t *G)
     attr_id_t *degree_v;                //Degree of each vertex
     attr_id_t *visited_e, *visited_v;        //Whether that edge has been visited or not. Ditto for vertex. Visited_v is the final cover.
     attr_id_t *position_e;                //Position stores the corresponding position of the undirected edge for each edge.
-    attr_id_t i,j,u,v,k, edge_counter;
+    attr_id_t i,j,u,v,n,k, edge_counter;
 
     double *memblock;
     attr_id_t *memblock1;
@@ -20,10 +20,11 @@ void calculateVertexCover(graph_t *G)
     visited_v = memblock1 + G->n;
     visited_e = memblock1 + 2*G->n;
     position_e = memblock1 + 2*(G->n + G->m);
+    n = G->n;
 #ifdef _OPENMP
     #pragma omp parallel for private(u,v,j,k)
 #endif
-    for(i=0; i<G->n; i++)
+    for(i=0; i<n; i++)
     {
         wp_v[i] = G->dbl_weight_v[i];
         degree_v[i] = G->numEdges[i+1] - G->numEdges[i];
@@ -61,7 +62,7 @@ void calculateVertexCover(graph_t *G)
         {
         #pragma omp for private(j,u,v,val1,val2)
 #endif
-        for (i=0; i< G->n; i++)
+        for (i=0; i< n; i++)
         {
             if (visited_v[i] == 1)
                 continue;
@@ -79,7 +80,7 @@ void calculateVertexCover(graph_t *G)
 #ifdef _OPENMP
         #pragma omp for private(j) reduction(-:edge_counter)
 #endif
-        for(i=0; i<G->n; i++)
+        for(i=0; i<n; i++)
         {
             //printf("This vertex %d is executed by thread %d\n",i,omp_get_thread_num());
             if (visited_v[i] == 1)
@@ -128,7 +129,7 @@ void calculateVertexCover(graph_t *G)
 
 void calculateUnweightedVertexCover(graph_t *G)
 {
-    attr_id_t i,j,u,v;
+    attr_id_t i,j,u,v, n, m;
     attr_id_t max, max_e, max_u, max_v,edge_counter;
     
     attr_id_t *visited_v, *visited_e;
@@ -138,13 +139,14 @@ void calculateUnweightedVertexCover(graph_t *G)
     visited_v = memblock;
     degree_v = memblock + G->n;
     visited_e = memblock + 2*G->n;
-
+    n = G->n;
+    m = G->m;
 #ifdef _OPENMP    
     #pragma omp parallel 
     {
         #pragma omp for
 #endif
-        for(i=0; i<G->n; i++)
+        for(i=0; i<n; i++)
         {
             visited_v[i] = 0;
             degree_v[i] = G->numEdges[i+1] - G->numEdges[i];
@@ -152,7 +154,7 @@ void calculateUnweightedVertexCover(graph_t *G)
 #ifdef _OPENMP
         #pragma omp for
 #endif
-        for(i=0; i<2*G->m; i++)
+        for(i=0; i<2*m; i++)
         {
             visited_e[i] = 0;
         }
@@ -166,7 +168,7 @@ void calculateUnweightedVertexCover(graph_t *G)
 #ifdef _OPENMP
         #pragma omp parallel for shared(max,max_e,max_u,max_v) private(j,u,v)
 #endif
-        for(i=0; i<G->n; i++)
+        for(i=0; i<n; i++)
         {
             if(degree_v[i] == 0)
                 continue;
@@ -198,4 +200,5 @@ void calculateUnweightedVertexCover(graph_t *G)
             count ++;
     }
     printf("The size of VC = %d\n", count);
+
 }

@@ -83,7 +83,7 @@ void graph_ext_check(char* filename, char* graph_type) {
 
 }
 
-void prefix_sums(attr_id_t *input, attr_id_t* result, attr_id_t* p, long n) {
+void prefix_sums(attr_id_t *input, attr_id_t* result, attr_id_t* p, attr_id_t n) {
 
 #ifdef _OPENMP
     attr_id_t i, j, r, start, end, add_value;

@@ -1,1 +1,1 @@
-/usr/share/libtool/ltmain.sh
+/opt/sfw/share/libtool/ltmain.sh

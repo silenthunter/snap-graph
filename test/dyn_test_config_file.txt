@@ -1,8 +1,8 @@
-n 1048576
-m 8388608
-a 0.5
-b 0.135
-c 0.135
+n 64
+m 512
+a 0.6
+b 0.15
+c 0.15
 permute_vertices 1
 num_batches 100
 ins_del_ratio 0.75

@@ -1,7 +1,7 @@
 AM_CPPFLAGS = -I$(top_srcdir)/include
 
 lib_LTLIBRARIES = libsnap.la
-
+libsnap_la_LDFLAGS = -64
 libsnap_la_SOURCES = 
 
 libsnap_la_LIBADD = \

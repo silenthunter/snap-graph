@@ -55,13 +55,11 @@ CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libsprng_la_LIBADD =
 am_libsprng_la_OBJECTS = libsprng_la-primes_32.lo \
-	libsprng_la-primes_64.lo libsprng_la-fwrap_mpi.lo \
-	libsprng_la-cputime.lo libsprng_la-makeseed.lo \
-	libsprng_la-simple_mpi.lo libsprng_la-memory.lo \
-	libsprng_la-communicate.lo libsprng_la-checkid.lo \
-	libsprng_la-store.lo libsprng_la-lcg.lo libsprng_la-lfg.lo \
-	libsprng_la-lcg64.lo libsprng_la-mlfg.lo libsprng_la-cmrg.lo \
-	libsprng_la-sprng.lo
+	libsprng_la-primes_64.lo libsprng_la-cputime.lo \
+	libsprng_la-makeseed.lo libsprng_la-memory.lo \
+	libsprng_la-checkid.lo libsprng_la-store.lo libsprng_la-lcg.lo \
+	libsprng_la-lfg.lo libsprng_la-lcg64.lo libsprng_la-mlfg.lo \
+	libsprng_la-cmrg.lo libsprng_la-sprng.lo
 libsprng_la_OBJECTS = $(am_libsprng_la_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
@@ -178,13 +176,13 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 AM_CPPFLAGS = -I$(top_srcdir)/include/sprng2.0
 noinst_LTLIBRARIES = libsprng.la
-libsprng_la_SOURCES = primes_32.c primes_64.c fwrap_mpi.c cputime.c makeseed.c \
-simple_mpi.c memory.c communicate.c checkid.c store.c lcg.c lfg.c lcg64.c \
-mlfg.c cmrg.c sprng.c checkid.h cputime.h fwrap.h lcg64.h lfg.h mlfg.h \
-primelist_32.h primes_32.h simple_.h sprng.h store.h cmrg.h fwrap_.h int64.h \
-lcg.h memory.h multiply.h primelist_64.h primes_64.h sprng_f.h sprng_interface.h
+libsprng_la_SOURCES = primes_32.c primes_64.c cputime.c makeseed.c \
+memory.c checkid.c store.c lcg.c lfg.c lcg64.c \
+mlfg.c cmrg.c sprng.c checkid.h cputime.h lcg64.h lfg.h mlfg.h \
+primelist_32.h primes_32.h sprng.h store.h cmrg.h int64.h \
+lcg.h memory.h multiply.h primelist_64.h primes_64.h sprng_interface.h
 
-SPRNG_CFLAGS = -DAdd__ -DLittleEndian
+SPRNG_CFLAGS = -DLittleEndian
 libsprng_la_CFLAGS = $(SPRNG_CFLAGS) 
 libsprng_la_LDFLAGS = $(SPRNG_CFLAGS)
 all: all-am
@@ -240,9 +238,7 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsprng_la-checkid.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsprng_la-cmrg.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsprng_la-communicate.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsprng_la-cputime.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsprng_la-fwrap_mpi.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsprng_la-lcg.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsprng_la-lcg64.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsprng_la-lfg.Plo@am__quote@
@@ -251,7 +247,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsprng_la-mlfg.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsprng_la-primes_32.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsprng_la-primes_64.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsprng_la-simple_mpi.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsprng_la-sprng.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsprng_la-store.Plo@am__quote@
 
@@ -290,13 +285,6 @@ libsprng_la-primes_64.lo: primes_64.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsprng_la_CFLAGS) $(CFLAGS) -c -o libsprng_la-primes_64.lo `test -f 'primes_64.c' || echo '$(srcdir)/'`primes_64.c
 
-libsprng_la-fwrap_mpi.lo: fwrap_mpi.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsprng_la_CFLAGS) $(CFLAGS) -MT libsprng_la-fwrap_mpi.lo -MD -MP -MF "$(DEPDIR)/libsprng_la-fwrap_mpi.Tpo" -c -o libsprng_la-fwrap_mpi.lo `test -f 'fwrap_mpi.c' || echo '$(srcdir)/'`fwrap_mpi.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libsprng_la-fwrap_mpi.Tpo" "$(DEPDIR)/libsprng_la-fwrap_mpi.Plo"; else rm -f "$(DEPDIR)/libsprng_la-fwrap_mpi.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='fwrap_mpi.c' object='libsprng_la-fwrap_mpi.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsprng_la_CFLAGS) $(CFLAGS) -c -o libsprng_la-fwrap_mpi.lo `test -f 'fwrap_mpi.c' || echo '$(srcdir)/'`fwrap_mpi.c
-
 libsprng_la-cputime.lo: cputime.c
 @am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsprng_la_CFLAGS) $(CFLAGS) -MT libsprng_la-cputime.lo -MD -MP -MF "$(DEPDIR)/libsprng_la-cputime.Tpo" -c -o libsprng_la-cputime.lo `test -f 'cputime.c' || echo '$(srcdir)/'`cputime.c; \
 @am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libsprng_la-cputime.Tpo" "$(DEPDIR)/libsprng_la-cputime.Plo"; else rm -f "$(DEPDIR)/libsprng_la-cputime.Tpo"; exit 1; fi
@@ -311,26 +299,12 @@ libsprng_la-makeseed.lo: makeseed.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsprng_la_CFLAGS) $(CFLAGS) -c -o libsprng_la-makeseed.lo `test -f 'makeseed.c' || echo '$(srcdir)/'`makeseed.c
 
-libsprng_la-simple_mpi.lo: simple_mpi.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsprng_la_CFLAGS) $(CFLAGS) -MT libsprng_la-simple_mpi.lo -MD -MP -MF "$(DEPDIR)/libsprng_la-simple_mpi.Tpo" -c -o libsprng_la-simple_mpi.lo `test -f 'simple_mpi.c' || echo '$(srcdir)/'`simple_mpi.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libsprng_la-simple_mpi.Tpo" "$(DEPDIR)/libsprng_la-simple_mpi.Plo"; else rm -f "$(DEPDIR)/libsprng_la-simple_mpi.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='simple_mpi.c' object='libsprng_la-simple_mpi.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsprng_la_CFLAGS) $(CFLAGS) -c -o libsprng_la-simple_mpi.lo `test -f 'simple_mpi.c' || echo '$(srcdir)/'`simple_mpi.c
-
 libsprng_la-memory.lo: memory.c
 @am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsprng_la_CFLAGS) $(CFLAGS) -MT libsprng_la-memory.lo -MD -MP -MF "$(DEPDIR)/libsprng_la-memory.Tpo" -c -o libsprng_la-memory.lo `test -f 'memory.c' || echo '$(srcdir)/'`memory.c; \
 @am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libsprng_la-memory.Tpo" "$(DEPDIR)/libsprng_la-memory.Plo"; else rm -f "$(DEPDIR)/libsprng_la-memory.Tpo"; exit 1; fi
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='memory.c' object='libsprng_la-memory.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsprng_la_CFLAGS) $(CFLAGS) -c -o libsprng_la-memory.lo `test -f 'memory.c' || echo '$(srcdir)/'`memory.c
-
-libsprng_la-communicate.lo: communicate.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsprng_la_CFLAGS) $(CFLAGS) -MT libsprng_la-communicate.lo -MD -MP -MF "$(DEPDIR)/libsprng_la-communicate.Tpo" -c -o libsprng_la-communicate.lo `test -f 'communicate.c' || echo '$(srcdir)/'`communicate.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libsprng_la-communicate.Tpo" "$(DEPDIR)/libsprng_la-communicate.Plo"; else rm -f "$(DEPDIR)/libsprng_la-communicate.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='communicate.c' object='libsprng_la-communicate.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsprng_la_CFLAGS) $(CFLAGS) -c -o libsprng_la-communicate.lo `test -f 'communicate.c' || echo '$(srcdir)/'`communicate.c
 
 libsprng_la-checkid.lo: checkid.c
 @am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsprng_la_CFLAGS) $(CFLAGS) -MT libsprng_la-checkid.lo -MD -MP -MF "$(DEPDIR)/libsprng_la-checkid.Tpo" -c -o libsprng_la-checkid.lo `test -f 'checkid.c' || echo '$(srcdir)/'`checkid.c; \

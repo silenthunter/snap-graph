@@ -101,7 +101,7 @@ int store_int(unsigned int l, int nbytes, unsigned char *c)
   int i;
   
   for(i=0; i<nbytes; i++)
-    c[i] = (l>>(8*(nbytes-i-1)))&0xff;
+    c[i] = (unsigned char) (l>>(8*(nbytes-i-1)))&0xff;
   
   return nbytes;		/* return number of chars filled */
 }

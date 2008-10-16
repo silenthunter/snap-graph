@@ -30,9 +30,6 @@
 #include "lcg64.h"
 #include "cmrg.h"
 #include "mlfg.h"
-#ifdef USE_PMLCG
-#include "pmlcg.h"
-#endif
 
 #define NDEBUG
 #include <assert.h>
@@ -319,8 +316,4 @@ int *igen;
 {
 	return print_rng_tbl[((struct rngen *)igen)->rng_type](igen);
 }
-
-
-#include "simple_.h"
-#include "fwrap_.h"
 

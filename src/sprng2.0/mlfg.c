@@ -684,7 +684,7 @@ char **buffer;
 #endif
 {
   unsigned char *p, *initp;
-  int size, i;
+  int size;
   struct rngen *q;
 
   q = (struct rngen *) genptr;
@@ -739,7 +739,7 @@ char *packed;
   if(strcmp((char *) p,GENTYPE) != 0)
   {
     fprintf(stderr,"ERROR: Unpacked ' %.24s ' instead of ' %s '\n",  
-	    p, GENTYPE); 
+	    (char *) p, GENTYPE); 
     return NULL; 
   }
   else

@@ -182,10 +182,9 @@ int *multiplier=NULL;
 
 int NGENS=0;
 
-void plus ANSI_ARGS((int *a, int *b, int *c));
-void mult ANSI_ARGS((int *a, int *b, int *c, int size));
 void advance_seed ANSI_ARGS((struct rngen *gen));
-double get_rn_dbl ANSI_ARGS((int *gen));
+/* double get_rn_dbl ANSI_ARGS((int *gen));  */
+
 
 #ifdef __STDC__
 int bit_reverse(int n)
@@ -380,10 +379,11 @@ int *igenptr;
     struct rngen *genptr = (struct rngen *) igenptr;
 
 #ifdef LONG64
+#if defined(CONVEX) || defined(GENERIC)
     double temp[1];
     unsigned LONG64 *ltemp;
-    
     temp[0] = 0.0;
+#endif
     multiply(genptr);
     /* Add defined(O2K) || defined(SGI) if optimization level is -O2 
        or lower */
@@ -472,11 +472,11 @@ int *igenptr,nspawned, ***newgens, checkid;
     genptr[i]->init_seed = tempptr->init_seed;
     genptr[i]->prime_position = tempptr->prime_position + 
       tempptr->prime_next*(i+1);
-    if(genptr[i]->prime_position > MAXPRIMEOFFSET)
+    if(genptr[i]->prime_position > MAXPRIMEOFFSETINT)
     {
       fprintf(stderr,"WARNING - spawn_rng: gennum: %d > maximum number of independent streams: %d\n\tIndependence of streams cannot be guranteed.\n",
 	      genptr[i]->prime_position, MAX_STREAMS); 
-      genptr[i]->prime_position %= MAXPRIMEOFFSET;
+      genptr[i]->prime_position %= MAXPRIMEOFFSETINT;
     }
     
     genptr[i]->prime_next = (nspawned+1)*tempptr->prime_next;
@@ -499,7 +499,7 @@ int *igenptr,nspawned, ***newgens, checkid;
       genptr[i]->seed[1] |= 1;
 #endif
 
-    if(genptr[i]->prime_position > MAXPRIMEOFFSET)
+    if(genptr[i]->prime_position > MAXPRIMEOFFSETINT)
       advance_seed(genptr[i]); /* advance lcg 10^6 steps from initial seed */
 
     for(j=0; j<LCGRUNUP*(genptr[i]->prime_position); j++)
@@ -740,7 +740,10 @@ char **buffer;
 #endif
 {
   unsigned char *p, *initp;
-  unsigned int size, m[2], i;
+  unsigned int size;
+#ifndef LONG64
+  unsigned int m[2], i;
+#endif
   struct rngen *q;
   
   q = (struct rngen *) genptr;
@@ -812,7 +815,9 @@ char *packed;
 {
   struct rngen *q;
   unsigned char *p;
+#ifndef LONG64
   unsigned int m[4], m2[2], i;
+#endif
 
   p = (unsigned char *) packed;
   q = (struct rngen *) mymalloc(sizeof(struct rngen));
@@ -823,7 +828,7 @@ char *packed;
   if(strcmp((char *)p,GENTYPE) != 0)
   {
     fprintf(stderr,"ERROR: Unpacked ' %.24s ' instead of ' %s '\n",  
-	    p, GENTYPE); 
+	    (char *) p, GENTYPE); 
     return NULL; 
   }
   else

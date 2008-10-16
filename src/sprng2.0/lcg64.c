@@ -141,7 +141,6 @@ int rng_type,gennum,param,seed,total_gen;
 /*      of gennum in [0,total_gen) each call                              */
   struct rngen *genptr;
   int i;
-  double tempdbl;
   if (total_gen <= 0) /* Is total_gen valid ? */
   {
     total_gen = 1;
@@ -225,7 +224,7 @@ int rng_type,gennum,param,seed,total_gen;
 #endif  
 
   for(i=0; i<127*genptr->stream_number; i++)
-    tempdbl = get_rn_dbl((int *) genptr);
+    get_rn_dbl((int *) genptr);
   
   NGENS++;			/* NGENS = # of streams */
   
@@ -274,7 +273,10 @@ int *igenptr;
 #else
 #define EXPO 0x3ff0000000000000UL
 #endif
+
+#if defined(CONVEX) || defined(O2K) || defined(SGI) || defined(GENERIC)
   static double dtemp[1] = {0.0};
+#endif
 
   advance_state(genptr);	/* next state in sequence */
 #if defined(CONVEX) || defined(O2K) || defined(SGI) || defined(GENERIC)
@@ -372,7 +374,7 @@ int *igenptr,nspawned, ***newgens, checkid;
 #endif
 {
   struct rngen **genptr, *tempptr = (struct rngen *) igenptr;
-  int i, j;
+  int i;
   
   if (nspawned <= 0) /* is nspawned valid ? */
   {
@@ -468,9 +470,11 @@ char **buffer;
 #endif
 {
   unsigned char *p, *initp;
-  int size, i;
-  unsigned int temp, m[2];
+  int size;
   struct rngen *q;
+#ifndef LONG64
+  unsigned int temp, m[2];
+#endif
 
   q = (struct rngen *) genptr;
   size = 4 + 48 + strlen(q->gentype)+1;
@@ -523,8 +527,10 @@ char *packed;
 #endif
 {
   struct rngen *q;
-  unsigned int i, m[2];
   unsigned char *p;
+#ifndef LONG64
+  unsigned int i, m[2];
+#endif
 
   p = (unsigned char *) packed;
   q = (struct rngen *) mymalloc(sizeof(struct rngen));
@@ -535,7 +541,7 @@ char *packed;
   if(strcmp((char *)p,GENTYPE) != 0)
   {
     fprintf(stderr,"ERROR: Unpacked ' %.24s ' instead of ' %s '\n",  
-	    p, GENTYPE); 
+	    (char *) p, GENTYPE); 
     return NULL; 
   }
   else

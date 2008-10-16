@@ -412,7 +412,7 @@ int *genptr;
   r1[hptr] = INT_MOD_MASK&(r1[hptr] + r1[lptr]);
   *hp = (--hptr<0) ? lval-1 : hptr;
 
-        return (new_val*FLT_MULT);
+        return ((float) new_val*FLT_MULT);
 } 
 
 #ifdef __STDC__
@@ -723,7 +723,7 @@ int *genptr,nspawned, ***newgens, checkid;
 /*                  UTILITY ROUTINES                                     */
 /*************************************************************************/
 /*************************************************************************/
-
+/*
 #ifdef __STDC__
 static int get_llag_rng(void)
 #else
@@ -743,16 +743,6 @@ static int get_klag_rng()
 }
 
 #ifdef __STDC__
-int get_seed_rng(int *gen)
-#else
-int get_seed_rng(gen)
-int *gen;
-#endif
-{
-        return(GS0^gseed);
-}
-
-#ifdef __STDC__
 static int get_hptr_rng( int *genptr)
 #else
 static int get_hptr_rng(genptr)
@@ -761,6 +751,7 @@ int *genptr;
 {
         return (((struct rngen *)genptr)->hptr);
 }
+
 
 #ifdef __STDC__
 static int *get_fill_rng( int *genptr)
@@ -788,6 +779,29 @@ int *genptr;
 
   return(p);
 }
+
+#ifdef __STDC__
+static int *get_node_index_rng( int *genptr)
+#else
+static int *get_node_index_rng(genptr)
+int *genptr;
+#endif
+{
+  int *p, length;
+
+  length = ( (struct rngen *) genptr)->lval;
+  
+  p = get_next_index_rng(genptr);
+  if(p == NULL)
+    return NULL;
+  
+  while (!(p[0]&1)) 
+    si_halve(p,length);
+  si_halve(p, length);
+
+  return(p);
+}
+
 
 #ifdef __STDC__
 static int *get_next_index_rng( int *genptr)
@@ -830,30 +844,19 @@ int *a, length;
 
   a[length-2] >>= 1;
 }
+*/
 
 #ifdef __STDC__
-static int *get_node_index_rng( int *genptr)
+int get_seed_rng(int *gen)
 #else
-static int *get_node_index_rng(genptr)
-int *genptr;
+int get_seed_rng(gen)
+int *gen;
 #endif
 {
-  int *p, length;
-
-  length = ( (struct rngen *) genptr)->lval;
-  
-  p = get_next_index_rng(genptr);
-  if(p == NULL)
-    return NULL;
-  
-  while (!(p[0]&1)) 
-    si_halve(p,length);
-  si_halve(p, length);
-
-  return(p);
+        return(GS0^gseed);
 }
 
- 
+
 /*************************************************************************/
 /*************************************************************************/
 /*                  MESSAGE PASSING ROUTINES                             */
@@ -869,7 +872,7 @@ int *genptr;
 char **buffer;
 #endif
 {
-  int i, size;
+  int size;
   struct rngen *q;
   unsigned char *p, *initp;
   
@@ -911,7 +914,7 @@ int *unpack_rng(p)
 char *p;
 #endif
 {
-  int doexit=0,i, found, length, k, param;
+  int i, found, length, k, param;
   struct rngen *q;
   unsigned seed, lag1, lag2;
   unsigned char *packed;
@@ -923,7 +926,7 @@ char *p;
   if(strcmp((char *)packed,GENTYPE) != 0)
   {
     fprintf(stderr,"ERROR: Unpacked ' %.24s ' instead of ' %s '\n",  
-	    packed, GENTYPE); 
+	    (char *)packed, GENTYPE); 
     return NULL; 
   }
   packed += strlen(GENTYPE)+1;

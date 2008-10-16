@@ -12,7 +12,6 @@ int store_intarray(unsigned int *l, int n, int nbytes, unsigned char *c);
 int load_int(unsigned char *c, int nbytes, unsigned int *l);
 int load_intarray(unsigned char *c, int n, int nbytes, unsigned int *l);
 
-
 #ifdef _LONG_LONG
 
 int store_longlong(unsigned long long l, int nbytes, unsigned char *c);

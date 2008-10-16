@@ -10,6 +10,7 @@
 #endif
 
 int getprime_32 ANSI_ARGS((int need, int *prime_array, int offset));
+int init_prime_32(void);
 
 #define MAXPRIMEINT 11863285 /* sqrt(2)*2^23 + 2 */
 #define MINPRIMEINT 3444     /* sqrt(MAXPRIME) */

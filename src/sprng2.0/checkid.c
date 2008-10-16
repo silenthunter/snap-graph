@@ -88,7 +88,7 @@ int *ptr;
 #endif
 {
   int bucket;
-  Checklisttype *next, *temp;
+  Checklisttype *temp;
   
   if(ptr == NULL)
     return NULL;

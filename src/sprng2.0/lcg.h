@@ -27,6 +27,14 @@ int lcg_pack_rng ANSI_ARGS(( int *genptr, char **buffer));
 int *lcg_unpack_rng ANSI_ARGS(( char *packed));
 int lcg_print_rng ANSI_ARGS(( int *igen));
 
+void plus ANSI_ARGS((int *a, int *b, int *c));
+void mult ANSI_ARGS((int *a, int *b, int *c, int size));
+
+double get_rn_dbl ANSI_ARGS((int *gen));
+
+int bit_reverse(int n);
+void errprint(char *level, char *routine, char *error);
+int strxncmp(char *s1, char *s2, int n);
 
 #ifdef __cplusplus
 }

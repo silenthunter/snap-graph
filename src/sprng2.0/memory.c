@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "memory.h"
 
 #ifdef __STDC__
 void *_mymalloc(long size, int line, char *message)

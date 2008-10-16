@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include   <sys/time.h>
 #include   <sys/resource.h>
-#include "fwrap.h"
+#include "cputime.h"
 
 #ifdef __STDC__
 double    cputime(void)
@@ -30,15 +30,3 @@ double    cputime()
     return (current_time);
 }
 
-
-
-
-
-#ifdef __STDC__
-double    FNAMEOF_fcpu_t(void)
-#else
-double    FNAMEOF_fcpu_t()
-#endif
-{
-    return cputime();
-}

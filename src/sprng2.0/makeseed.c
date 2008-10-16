@@ -1,10 +1,7 @@
 #include <time.h>
+#include "makeseed.h"
 
-#ifdef __STDC__
 int make_new_seed()
-#else
-int make_new_seed()
-#endif
 {
   time_t tp;
   struct tm *temp;

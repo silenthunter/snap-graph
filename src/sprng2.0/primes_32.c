@@ -18,7 +18,7 @@ int init_prime_32()
 {
   int i, j, obtained = 0, isprime;
   
-  for(i=3; i < MINPRIME; i += 2)
+  for(i=3; i < MINPRIMEINT; i += 2)
   {
     isprime = YES;
     
@@ -81,14 +81,14 @@ int need, *prime_array,offset;
     num_prime = init_prime_32();
 
     
-    largest = MAXPRIME;
+    largest = MAXPRIMEINT;
     initiallized = YES;
   }
   
-  if(offset > MAXPRIMEOFFSET)
+  if(offset > MAXPRIMEOFFSETINT)
   {
     fprintf(stderr,"WARNING: generator has branched maximum number of times;\nindependence of generators no longer guaranteed");
-    offset = offset % MAXPRIMEOFFSET;
+    offset = offset % MAXPRIMEOFFSETINT;
   }
   
   if(offset < PRIMELISTSIZE1)	/* search table for previous prime */
@@ -104,7 +104,7 @@ int need, *prime_array,offset;
   }
   
   
-  while(need > obtained && largest > MINPRIME)
+  while(need > obtained && largest > MINPRIMEINT)
   {
     isprime = YES;
     largest -= 2;

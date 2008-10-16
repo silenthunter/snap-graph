@@ -11,8 +11,8 @@
 
 int getprime_32 ANSI_ARGS((int need, int *prime_array, int offset));
 
-#define MAXPRIME 11863285 /* sqrt(2)*2^23 + 2 */
-#define MINPRIME 3444     /* sqrt(MAXPRIME) */
-#define MAXPRIMEOFFSET 779156
+#define MAXPRIMEINT 11863285 /* sqrt(2)*2^23 + 2 */
+#define MINPRIMEINT 3444     /* sqrt(MAXPRIME) */
+#define MAXPRIMEOFFSETINT 779156
 
 #endif

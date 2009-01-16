@@ -1,5 +1,6 @@
 #ifndef _BINARY_HEAP_H
 #define _BINARY_HEAP_H
+#include "graph_defs.h"
 
 typedef struct {
     /* value is the key */

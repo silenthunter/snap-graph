@@ -199,7 +199,7 @@ long BFS_parallel_frontier_expansion(graph_t* G, long src, long diameter) {
     elapsed_time = get_seconds() - elapsed_time;
     fprintf(stderr, "Time taken for BFS: %lf seconds\n", elpased_time);
 #endif
-
+    return count;
 }
 
 

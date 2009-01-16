@@ -16,9 +16,9 @@ void read_dyn_test_config_file(dyn_graph_t* G, char* config_file, double*
         params);
 void gen_random_graph(graph_t* G, char* config_filename);
 void read_random_config_file(graph_t* G, char* configfile);
-
 void gen_lmesh_graph(graph_t* G, char* config_filename);
 void gen_sqmesh_graph(graph_t* G, char* config_filename);
+
 
 #define GRAPH_GEN_SEED 34234 
 void init_graph(graph_t* G);

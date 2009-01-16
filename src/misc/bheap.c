@@ -1,4 +1,4 @@
-#include "binary_heap.h"
+#include "graph_defs.h"
 
 void adj_bheap_insert(adj_bheap_t *h, attr_id_t val)
 {

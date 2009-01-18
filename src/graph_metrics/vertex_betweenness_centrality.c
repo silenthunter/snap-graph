@@ -126,7 +126,7 @@ void vertex_betweenness_centrality_parBFS(graph_t* G, double* BC, long numSrcs) 
 #endif
 
     if (tid == 0) {
-        MAX_NUM_PHASES = 50;
+        MAX_NUM_PHASES = 500;
     }
 
 #ifdef _OPENMP
@@ -314,6 +314,16 @@ void vertex_betweenness_centrality_parBFS(graph_t* G, double* BC, long numSrcs) 
             }
             /* Merge all local stacks for next iteration */
             phase_num++; 
+            if (tid == 0) {
+                if (phase_num >= MAX_NUM_PHASES) {
+                    fprintf(stderr, "Error: Max num phases set to %d\n",
+                        MAX_NUM_PHASES);
+                    fprintf(stderr, "Diameter of input network greater than"
+                        " this value. Increase MAX_NUM_PHASES"
+                        " in vertex_betweenness_centrality_parBFS()\n");
+                    exit(-1);
+                }
+            }
 
             psCount[tid+1] = myCount;
 
@@ -447,7 +457,6 @@ void vertex_betweenness_centrality_parBFS(graph_t* G, double* BC, long numSrcs) 
 }
 
 void vertex_betweenness_centrality_simple(graph_t* G, double* BC, long numSrcs) {
-
 
     attr_id_t *in_degree, *numEdges, *pSums;
 #if RANDSRCS
@@ -789,18 +798,18 @@ void vertex_betweenness_centrality(graph_t* G, double* BC, long numSrcs) {
 #ifdef _OPENMP
     /* Exact BC */
     if (G->n == numSrcs) {
-        if (G->n < 50000) {
+        if (G->n < 5000) {
             vertex_betweenness_centrality_simple(G, BC, numSrcs);    
         } else {
             vertex_betweenness_centrality_parBFS(G, BC, numSrcs);
         }
-    } else if (numSrcs < 1000) {
+    } else if (numSrcs < 50) {
         vertex_betweenness_centrality_simple(G, BC, numSrcs);
     } else {
         vertex_betweenness_centrality_parBFS(G, BC, numSrcs);
     }
 #else
-    vertex_betweenness_centrality_parBFS(G, BC, numSrcs);
+    vertex_betweenness_centrality_simple(G, BC, numSrcs);
 #endif
 
 }

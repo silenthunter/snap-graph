@@ -45,7 +45,7 @@ int main(int argc, char** argv) {
         
         if (strcmp(argv[curArgIndex],"-approx")==0) {
             run_approx_BC = 1;
-            sampling_val = atof(argv[++curArgIndex])/100;
+            sampling_val = atof(argv[++curArgIndex]);
         }
 
         if (strcmp(argv[curArgIndex],"-infile")==0) {
@@ -109,11 +109,18 @@ int main(int argc, char** argv) {
     /* Step 4: Write results to output file */ 
     fp = fopen(outfilename, "w"); 
     fprintf(fp, "Input file: %s\n", infilename);
-    fprintf(fp, "n: %ld, m: %ld\n", g->n, g->m);
+    if (g->undirected)
+        fprintf(fp, "n: %ld, m: %ld\n", g->n, g->m/2);
+    else 
+        fprintf(fp, "n: %ld, m: %ld\n", g->n, g->m);
     fprintf(fp, "numSrcs: %ld\n", numSrcs);
     fprintf(fp, "\n<Vertex ID> <BC score>\n\n");
     for (i=0; i<g->n; i++) {
-        fprintf(fp, "%ld %lf\n", i, vBC[i]);     
+        if (g->zero_indexed)
+            fprintf(fp, "%ld %lf\n", i, vBC[i]);  
+        else
+            fprintf(fp, "%ld %lf\n", i+1, vBC[i]);  
+
     }
     fclose(fp);
 

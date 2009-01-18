@@ -174,7 +174,7 @@ void gen_random_graph(graph_t* G, char* filename) {
 
         }
     }
-
+    G->zero_indexed = 1;
     /*
     for (i=0; i<G->n; i++) {
         for (j=G->numEdges[i]; j<G->numEdges[i+1]; j++) {

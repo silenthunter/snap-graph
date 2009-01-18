@@ -1,64 +1,119 @@
+#include "graph_defs.h"
+#include "graph_gen.h"
+#include "graph_kernels.h"
+#include "graph_metrics.h"
+#include "utils.h"
 
+int main(int argc, char** argv) {
 
-#include "graph_vertex_cover.h"
+    char *infilename, *outfilename, *graph_type;
+    FILE* fp;
+    graph_t* g;
 
-void readSample(graph_t*);
+    int curArgIndex;
+    long numSrcs;
+    int est_diameter;
+    long i, j;
+    long num_vertices_visited;
+    int vc_weighted_size, vc_unweighted_size;
 
-int main(int argc, char** argv)
-{
-	printf("Starting vertex cover\n");
-	graph_t G;
-	attr_id_t i;
-	//readSample(&G);
+    /* Step 1: Parse command line arguments */
+    if (argc < 3) {
+        fprintf(stdout, "\nUsage: %s -infile <graph filename>"
+                " (-graph <graph type> -outfile <output filename>)\n\n",
+                "eval_vertex_cover");
+        
+        usage_graph_options();
+        exit(-1);
+    }
 
-	//read_DIMACS_graph(&G,"vcdata/frb59-26-mis/frb59-26-2.mis");
-	read_DIMACS_graph(&G,"vcdata/frb56-25-mis/frb56-25-1.mis");
-	//read_DIMACS_graph(&G,"vcdata/frb100-40.mis");
-	// gen_RMAT_graph(&G, "./test.rmat");
-	G.dbl_weight_v = (double*)malloc(sizeof(double)*G.n);
+    curArgIndex = 0;
+    infilename = (char *) calloc(500, sizeof(char));
+    outfilename = (char *) calloc(500, sizeof(char));
+    graph_type = (char *) calloc(500, sizeof(char));
+
+    strcpy(outfilename, "/tmp/results.out");
+
+    while (curArgIndex < argc) {
+        
+        if (strcmp(argv[curArgIndex],"-infile")==0) {
+            strcpy(infilename, argv[++curArgIndex]);
+        }
+
+        if (strcmp(argv[curArgIndex], "-outfile")==0) {
+            strcpy(outfilename, argv[++curArgIndex]);
+        } 
+ 
+        if (strcmp(argv[curArgIndex], "-graph")==0) {
+            strcpy(graph_type, argv[++curArgIndex]);
+        } 
+        curArgIndex++; 
+    }
+
+    fp = fopen(infilename, "r");
+    if (fp == NULL) {
+        fprintf(stderr, "Error! Could not open input file. Exiting ...\n");
+        exit(-1);
+    }
+    fclose(fp);
+
+    fp = fopen(outfilename, "w");
+    if (fp == NULL) {
+        fprintf(stderr, "Error! Could not write to output file. Exiting ...\n");   
+        exit(-1);
+    }
+    fclose(fp);
+
+    graph_ext_check(infilename, graph_type);
+
+    fprintf(stdout, "\n");
+    fprintf(stdout, "Input Graph File    : %s\n", infilename);
+    fprintf(stdout, "Output Graph File   : %s\n\n", outfilename);
+
+    /* Step 2: Generate graph */
+    g = (graph_t *) malloc(sizeof(graph_t));
+    graph_gen(g, infilename, graph_type);
+   
+    fprintf(stdout, "No. of vertices     : %ld\n", g->n);
+    if (g->undirected)
+        fprintf(stdout, "No. of edges        : %ld\n\n", g->m/2);
+    else 
+        fprintf(stdout, "No. of edges        : %ld\n\n", g->m);
+
+    if (g->undirected == 0) {
+        fprintf(stderr, "Error: the graph has to be undirected.\n");
+        fprintf(stderr, "Please check input file.\n");
+        exit(-1);
+    }
+
+    /* Step 3: Run algorithm */
+	g->dbl_weight_v = (double *) malloc(g->n * sizeof(double));
 	
-	G.m /=2;
+    if (g->undirected) {
+	    g->m /=2;
+    }
 
-	for(i=0; i<G.n; i++)
-	{
-		
-		G.dbl_weight_v[i] = 1;
+	for (i=0; i<g->n; i++) {
+		g->dbl_weight_v[i] = 1;
 	}
-	//print_graph(&G);
-	printf("reading graph done\n");
-	double startTime, endTime;
-	startTime = get_seconds();
-	calculateVertexCover(&G);
-	endTime = get_seconds();
-	printf("Time taken %g\n",endTime - startTime);
 	
-	startTime = get_seconds();
-	calculateUnweightedVertexCover(&G);
-	endTime = get_seconds();
-	printf("Time taken %g\n",endTime - startTime);
+    vc_weighted_size = vertex_cover_weighted(g);
+	
+	vc_unweighted_size = vertex_cover_unweighted(g);
+
+    /* Step 4: Write output to file */
+    fp = fopen(outfilename, "w");
+    fprintf(fp, "Vertex cover size (weighted): %ld\n", vc_weighted_size);
+    fprintf(fp, "Vertex cover size (unweighted): %ld\n", vc_unweighted_size);
+    
+    /* Step 5: Clean up */
+    free(g->dbl_weight_v);
+    free(infilename);
+    free(outfilename);
+    free(graph_type);
+
+    free_graph(g);
+    free(g);
+
+    return 0;
 }
-
-
-
-
-
-
-attr_id_t endV[] = {1,2,0,2,0,1,3,2,4,5,3,6,3,6,4,5};
-attr_id_t numEdges[]= {0,2,4,7,10,12,14,16};
-double dbl_weight_e[] = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
-double dbl_weight_v[] = {1,2,1,2,1,2.0,1.0};
-
-void readSample(graph_t *G) 
-{
-        G->n = 7;
-        G->m = 8;
-	G->endV = endV;
-	G->numEdges = numEdges;
-	G->weight_type=4;
-	G->zero_indexed=1;
-	G->dbl_weight_e = dbl_weight_e;
-	G->dbl_weight_v = dbl_weight_v;
-	G->undirected=1;
-}
-
-

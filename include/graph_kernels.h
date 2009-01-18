@@ -16,5 +16,6 @@ void BiCC_stack_pop(attr_id_t *a, attr_id_t *b);
 long BFS_parallel_frontier_expansion(graph_t* G, long src, long diameter);
 void BFS_path_limited_search(graph_t* G, long src, long diameter);
 void BFS_sequential(graph_t* G, long src, int* d);
-
+int vertex_cover_weighted(graph_t*);
+int vertex_cover_unweighted(graph_t*);
 #endif

@@ -13,18 +13,21 @@ void usage_graph_options() {
     fprintf(stdout, "Supported graph file formats (for use with the -graph option):\n");
     fprintf(stdout, "snap    (.gr)       SNAP file format (default file format supported by this package).\n");
     fprintf(stdout, "dimacs  (.dim)      graph format used in the 9th DIMACS Shortest Paths Challenge.\n");
+#if 0
+    /* Commenting out unimplemented options */
     fprintf(stdout, "metis   (.met)      graph representation used by the Metis partitioning package.\n");
     fprintf(stdout, "graphml (.graphml)  GraphML representation.\n");
     fprintf(stdout, "gml     (.gml)      GML format.\n");
-    fprintf(stdout, "rand    (.rnd)      a synthetic random graph generator is invoked."
-            " The input file specifies the generator parameters.\n");
-    fprintf(stdout, "rmat    (.rmat)       a synthetic scale-free graph generator is invoked."
-            " The input file specifies the generator parameters.\n");
     fprintf(stdout, "sqmesh  (.sqm)      a synthetic 2D square mesh generator is invoked."
             " The input file specifies the generator parameters.\n");
     fprintf(stdout, "lmesh   (.lm)       a synthetic 2D long mesh generator is invoked."
             " The input file specifies the generator parameters.\n");
-    fprintf(stdout, "\n");
+#endif    
+    fprintf(stdout, "rand    (.rnd)      a synthetic random graph generator is invoked."
+            " The input file specifies the generator parameters.\n");
+    fprintf(stdout, "rmat    (.rmat)       a synthetic scale-free graph generator is invoked."
+            " The input file specifies the generator parameters.\n");
+   fprintf(stdout, "\n");
     fprintf(stdout, "The default output filename is \"results.out\"."
             " Specify an alternate file name with the -outfile option.\n");
 }

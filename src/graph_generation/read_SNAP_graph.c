@@ -37,14 +37,12 @@ void read_SNAP_graph(graph_t* G, char* filename) {
     
     while (fgets(buf, 500, fp) != NULL)  {
    
-        /* c is the comment symbol */
-        if (buf[0] == 'c')
+        /* Skip all lines until we reach the problem line */
+        if (buf[0] != 'p')
            continue;
         
-        if (buf[0] == 'p') {
-            sscanf(buf, "%*c %ld %ld %c %c %c", &n, &m, &udc, &wtc,
-                    &zic);
-        }
+        sscanf(buf, "%*c %ld %ld %c %c %c", &n, &m, &udc, &wtc,
+                &zic);
         
         assert(n>0);
         assert(m>0);

@@ -20,7 +20,7 @@
 
 # The problem line is followed by a listing on exactly m edges. The format
 # is <u v w> for a weighted graph, and <u v> for an unweighted graph. 
-p 5 8 d u 0
+p 5 8 u u 0
 0 1
 1 2
 2 3

@@ -2,10 +2,10 @@ AM_CPPFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)/include/sprng
 AM_LDFLAGS = -L$(top_srcdir)/lib -lm
 
 bin_PROGRAMS = eval_BFS eval_biconnected_components eval_modularity \
-eval_vertex_cover
+eval_vertex_cover eval_vertex_betweenness
 
-#eval_vertex_betweenness_SOURCES = drive_vertex_betweenness.c
-#eval_vertex_betweenness_LDADD = $(top_srcdir)/lib/libsnap.la
+eval_vertex_betweenness_SOURCES = drive_vertex_betweenness.c
+eval_vertex_betweenness_LDADD = $(top_srcdir)/lib/libsnap.la
 
 eval_BFS_SOURCES = drive_BFS.c
 eval_BFS_LDADD = $(top_srcdir)/lib/libsnap.la

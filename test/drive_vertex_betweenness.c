@@ -97,7 +97,7 @@ int main(int argc, char** argv) {
     if (g->undirected)
         fprintf(stdout, "No. of edges        : %ld\n\n", g->m/2);
     else
-        fprintf(stdout, "No. of edges        : %ld\n\n", g->m/2);
+        fprintf(stdout, "No. of edges        : %ld\n\n", g->m);
         
     /* Step 3: Run algorithm */
     vBC = (double *) calloc(g->n, sizeof(double));

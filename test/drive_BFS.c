@@ -82,8 +82,11 @@ int main(int argc, char** argv) {
     graph_gen(g, infilename, graph_type);
    
     fprintf(stdout, "No. of vertices     : %ld\n", g->n);
-    fprintf(stdout, "No. of edges        : %ld\n\n", g->m);
-   
+    if (g->undirected)
+        fprintf(stdout, "No. of edges        : %ld\n\n", g->m/2);
+    else 
+        fprintf(stdout, "No. of edges        : %ld\n\n", g->m);
+
     if (src == -1)
        src = lrand48() % g->n;
 

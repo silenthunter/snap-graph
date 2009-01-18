@@ -94,9 +94,12 @@ int main(int argc, char** argv) {
     graph_gen(g, infilename, graph_type);
    
     fprintf(stdout, "No. of vertices     : %ld\n", g->n);
-    fprintf(stdout, "No. of edges        : %ld\n\n", g->m);
-
-   /* Step 3: Run algorithm */
+    if (g->undirected)
+        fprintf(stdout, "No. of edges        : %ld\n\n", g->m/2);
+    else
+        fprintf(stdout, "No. of edges        : %ld\n\n", g->m/2);
+        
+    /* Step 3: Run algorithm */
     vBC = (double *) calloc(g->n, sizeof(double));
     numSrcs = g->n * (sampling_val/100.0);
     if (numSrcs == 0) 

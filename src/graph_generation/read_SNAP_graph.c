@@ -369,10 +369,12 @@ void read_SNAP_graph(graph_t* G, char* filename) {
     G->zero_indexed = zero_indexed;
 
     G->n = n;
-    if (G->undirected)
+    if (G->undirected) {
         G->m = 2*m;
-    else
+    }
+    else {
         G->m = m;
+    }
 
     if (weight_type) {
 

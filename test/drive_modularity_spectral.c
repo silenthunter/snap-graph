@@ -10,19 +10,17 @@ int main(int argc, char** argv) {
     char *infilename, *outfilename, *graph_type;
     FILE* fp;
     graph_t* g;
-
     int curArgIndex;
-    long numSrcs;
-    int est_diameter;
-    long i, j;
-    int *membership;
+    attr_id_t *membership;
     int num_communities;
     double modularity;
+    int with_klin;
+    long i;
 
     /* Step 1: Parse command line arguments */
     if (argc < 3) {
         fprintf(stdout, "\nUsage: %s -infile <graph filename>"
-                " (-graph <graph type> -outfile <output filename>)\n\n",
+                " (-klin -graph <graph type> -outfile <output filename>)\n\n",
                 "eval_modularity_spectral");
         
         usage_graph_options();
@@ -30,6 +28,7 @@ int main(int argc, char** argv) {
     }
 
     curArgIndex = 0;
+    with_klin = 0;
     infilename = (char *) calloc(500, sizeof(char));
     outfilename = (char *) calloc(500, sizeof(char));
     graph_type = (char *) calloc(500, sizeof(char));
@@ -49,6 +48,11 @@ int main(int argc, char** argv) {
         if (strcmp(argv[curArgIndex], "-graph")==0) {
             strcpy(graph_type, argv[++curArgIndex]);
         } 
+ 
+        if (strcmp(argv[curArgIndex],"-klin")==0) {
+            with_klin = 1;
+        }
+
         curArgIndex++; 
 
     }
@@ -95,31 +99,45 @@ int main(int argc, char** argv) {
     if (g->undirected) {
 	    g->m /=2;
     }
+    
+    membership = (attr_id_t *) malloc(g->n * sizeof(attr_id_t));
+    assert(membership != NULL);
 
-    /*
-    fprintf(stderr, "Running the spectral algorithm for modularity "
-        "optimization (with Kernighan-Lin refinement)\n");
-    modularity_spectral(g, &membership, &num_communities, 1);
-	computeModularityValue(g, membership, num_communities, &modularity);
-    */
-    fprintf(stderr, "Running the spectral algorithm for modularity "
-        "optimization (without Kernighan-Lin refinement)\n");
-    modularity_spectral_wo_klin(g, &membership,&num_communities);
-	computeModularityValue(g, membership, num_communities, &modularity);
-	
+    if (with_klin) { 
+        fprintf(stderr, "Running the spectral algorithm for modularity "
+            "optimization (with Kernighan-Lin refinement)\n");
+        modularity_spectral(g, membership, &num_communities, 1);
+	    computeModularityValue(g, membership, num_communities, &modularity);
+    } else {
+        fprintf(stderr, "Running the spectral algorithm for modularity "
+            "optimization (without Kernighan-Lin refinement)\n");
+        modularity_spectral_wo_klin(g, membership,&num_communities);
+	    computeModularityValue(g, membership, num_communities, &modularity);
+    }
+
     /* Step 4: Write output to file */
     fp = fopen(outfilename, "w");
-    fprintf(fp, "Number of communities: %ld\n", num_communities);
+    fprintf(fp, "Number of communities: %d\n", num_communities);
     fprintf(fp, "Modularity score: %lf\n", modularity);
-    
+    fprintf(fp, "\n<Vertex ID> <Community ID>\n\n");
+    for (i=0; i<g->n; i++) {
+        if (g->zero_indexed)
+            fprintf(fp, "%ld %ld\n", i, membership[i]);  
+        else
+            fprintf(fp, "%ld %ld\n", i+1, membership[i]);  
+
+    }
+    fclose(fp);
+
+
     /* Step 5: Clean up */
-    free(g->dbl_weight_v);
     free(infilename);
     free(outfilename);
     free(graph_type);
 
     free_graph(g);
     free(g);
+    free(membership);
 
     return 0;
 }

@@ -27,17 +27,16 @@ void computeModularityValue(graph_t *G, attr_id_t *membership, attr_id_t numComm
             if(comm == membership[j])
                 mod -= (double)(degree_u*degree_v)/(double)(2.0*G->m);
         }
-    }        
-    printf("Modularity is:%g\n",mod/(2*G->m));
+    }
+    *modularity = mod/(2*G->m);
 }
 
 
- void modularity_spectral(graph_t *G, attr_id_t **membership, attr_id_t *numCommunities, attr_id_t use_improvement)
+ void modularity_spectral(graph_t *G, attr_id_t *membership, attr_id_t *numCommunities, attr_id_t use_improvement)
  {
     attr_id_t *v2C, *degree, *vertex, *v2pos;
     attr_id_t u,v,curCommunity=0, newCommunity,toSplit;
     attr_id_t sumV1,sumV2,comm,count1,count2;
-    attr_id_t *memblock;
     attr_id_t i,j,communitySize,degreeSum,start;
     list_t *Q;
     node_t *first;
@@ -51,20 +50,18 @@ void computeModularityValue(graph_t *G, attr_id_t *membership, attr_id_t numComm
     m = G->m;
     *numCommunities = 1;
 
-    //printf("Allocating memory\n");
-    //Allocating memories to the above datastructures
-    memblock = (attr_id_t*)malloc(sizeof(attr_id_t)*4*n);
-    assert(memblock!=NULL);
-    v2C=memblock;            //v2C is a map from vertex to the community it belongs.
-    vertex=memblock + 1*n;        //vertex is an array of vertices belonging to a particular community.
-    v2pos=memblock + 2*n;        //v2pos is a map from vertex to its respective position in the community.
-    degree = memblock + 3*n;    //degree is a map from vertex to its degree in its respective community.
+    v2C = membership;         //v2C is a map from vertex to the community it belongs.
+    vertex = (attr_id_t *) malloc(sizeof(attr_id_t)*n);  //vertex is an array of vertices belonging to a particular community.
+    v2pos  = (attr_id_t *) malloc(sizeof(attr_id_t)*n);  //v2pos is a map from vertex to its respective position in the community.
+    degree =  (attr_id_t *) malloc(sizeof(attr_id_t)*n); //degree is a map from vertex to its degree in its respective community.
+    
     eigenVectorOld=(double*)malloc(sizeof(double)*n);
     eigenVectorNew=(double*)malloc(sizeof(double)*n);
     contribution = (double*)malloc(sizeof(double)*n);
-    assert(eigenVectorOld!=NULL);assert(eigenVectorNew!=NULL);
 
-    //printf("Allocating memory done\n");
+    assert(v2C != NULL); assert(vertex != NULL); assert(degree != NULL);
+    assert(eigenVectorOld!=NULL); assert(eigenVectorNew!=NULL);
+    assert(contribution != NULL);
 
     for(i=0; i< G->n; i++)
     {
@@ -74,11 +71,10 @@ void computeModularityValue(graph_t *G, attr_id_t *membership, attr_id_t numComm
         degree[i] = G->numEdges[i+1] - G->numEdges[i];
     }
     //print_attr_id_t_Vector(vertex,0,n);
-    *membership=v2C;
     //Making a queue. This queue will store all the communities that are yet to be processed.
     Q=(list_t*)makeList();
     append(Q, makeNode(curCommunity));
-    printList(Q);
+    //printList(Q);
     
 
     while(Q->size > 0)
@@ -473,12 +469,11 @@ void computeEigen(graph_t *G, double *eigenVectorOld, double *eigenVectorNew, at
 
 
 //SImplist_tic mod without klin
- void modularity_spectral_wo_klin(graph_t *G, attr_id_t **membership, attr_id_t *numCommunities)
+ void modularity_spectral_wo_klin(graph_t *G, attr_id_t *membership, attr_id_t *numCommunities)
  {
      attr_id_t *v2C, *degree, *vertex, *v2pos;
     attr_id_t curCommunity=0, newCommunity,toSplit;
     attr_id_t n=G->n,sumV1,sumV2,comm,count1,count2;
-    attr_id_t *memblock;
     attr_id_t i,j,communitySize,degreeSum,start;
     list_t *Q;
     node_t *first;
@@ -487,19 +482,14 @@ void computeEigen(graph_t *G, double *eigenVectorOld, double *eigenVectorNew, at
 
     *numCommunities = 1;
 
-    //printf("Allocating memory\n");
-    //Allocating memories to the above datastructures
-    memblock = (attr_id_t*)malloc(sizeof(attr_id_t)*4*n);
-    assert(memblock!=NULL);
-    v2C=memblock;            //v2C is a map from vertex to the community it belongs.
-    vertex=memblock + 1*n;        //vertex is an array of vertices belonging to a particular community.
-    v2pos=memblock + 2*n;        //v2pos is a map from vertex to its respective position in the community.
-    degree = memblock + 3*n;    //degree is a map from vertex to its degree in its respective community.
+    v2C = membership;         //v2C is a map from vertex to the community it belongs.
+    vertex = (attr_id_t *) malloc(sizeof(attr_id_t)*n);  //vertex is an array of vertices belonging to a particular community.
+    v2pos  = (attr_id_t *) malloc(sizeof(attr_id_t)*n);  //v2pos is a map from vertex to its respective position in the community.
+    degree =  (attr_id_t *) malloc(sizeof(attr_id_t)*n); //degree is a map from vertex to its degree in its respective community.
+    
     eigenVectorOld=(double*)malloc(sizeof(double)*n);
     eigenVectorNew=(double*)malloc(sizeof(double)*n);
     assert(eigenVectorOld!=NULL);assert(eigenVectorNew!=NULL);
-
-    //printf("Allocating memory done\n");
 
     for(i=0; i< G->n; i++)
     {
@@ -508,7 +498,7 @@ void computeEigen(graph_t *G, double *eigenVectorOld, double *eigenVectorNew, at
         v2pos[i] = i;
         degree[i] = G->numEdges[i+1] - G->numEdges[i];
     }
-    *membership=v2C;
+    
     //Making a queue. This queue will store all the communities that are yet to be processed.
     Q=(list_t*)makeList();
     append(Q, makeNode(curCommunity));

@@ -117,6 +117,8 @@ int vertex_cover_weighted(graph_t *G)
         if(visited_v[i] == 1 && ((G->numEdges[i+1] - G->numEdges[i])>0))
             count ++;
     }
+    free(memblock);
+    free(memblock1);
     return count;
 }
 
@@ -195,6 +197,7 @@ int vertex_cover_unweighted(graph_t *G)
         if(visited_v[i] == 1)
             count ++;
     }
+    free(memblock);
     return count;
 
 }

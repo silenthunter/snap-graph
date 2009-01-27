@@ -18,4 +18,6 @@ void BFS_path_limited_search(graph_t* G, long src, long diameter);
 void BFS_sequential(graph_t* G, long src, int* d);
 int vertex_cover_weighted(graph_t*);
 int vertex_cover_unweighted(graph_t*);
+void calculateVertexCover(graph_t* G);
+void calculateUnweightedVertexCover(graph_t* G);
 #endif

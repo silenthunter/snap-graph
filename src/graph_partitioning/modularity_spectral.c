@@ -1,5 +1,5 @@
-
-#include "graph_modularity.h"
+#include "graph_defs.h"
+#include "graph_partitioning.h"
 
 void computeEigen(graph_t *G, double *eigenVectorOld, double *eigenVectorNew, attr_id_t *v2C, attr_id_t *v2pos, attr_id_t* degree, attr_id_t *vertex, attr_id_t *toSplit, attr_id_t currCommunity, attr_id_t communitySize, attr_id_t degreeSum);
 

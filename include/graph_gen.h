@@ -1,6 +1,5 @@
 #ifndef _GRAPH_GEN_H
 #define _GRAPH_GEN_H
-
 void graph_gen(graph_t* G, char* filename, char* graph_type);
 
 void read_SNAP_graph(graph_t* G, char* filename);

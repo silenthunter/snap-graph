@@ -5,59 +5,121 @@
 #include "graph_partitioning.h"
 #include "utils.h"
 
-int main()
-{
-	printf("\n Starting driver of modularity\n");
-	graph_t G;
-	int *membership, numCommunities,i;
-	double modularity, startTime, endTime;
-	
-	read_GML_graph(&G,"./gml/karate.gml");
-	//gen_RMAT_graph(&G, "./test.rmat"); G.m/=2;	
-	//readSample(&G);
-    //	read_DIMACS_graph(&G, "./gml/celegans_metabolic_modified.net");G.m/=2;
-    //	read_DIMACS_graph(&G, "./gml/email_modified.txt");G.m/=2;
-    //	read_DIMACS_graph(&G, "./gml/jazz_modified.net");G.m/=2;
-    //	read_DIMACS_graph(&G, "./gml/www.dat");G.m/=2;
-	//G.dbl_weight_e = (double*)malloc(sizeof(double)*2*G.m);
-	//for(i=0; i<2*G.m;i++)
-	//	G.dbl_weight_e[i]=1.0;
-	printf("reading graph done%d\n",G.n);
-    //	print_graph(&G);
+int main(int argc, char** argv) {
 
-	startTime = get_seconds();
-	//modularity_spectral(&G,&membership,&numCommunities,1);
-	modularity_spectral_wo_klin(&G,&membership,&numCommunities);
-	//modularity_spectral(&G,&membership,&numCommunities);
-	endTime = get_seconds();
-	//int comms[] = {1,1,1,1,3,3,3,1,0,0,3,3,1,1,0,0,3,1,0,1,0,1,0,2,2,2,0,2,2,0,0,2,0,0};
-	int comms[]={4,5,5,5,2,2,2,5,1,5,2,2,4,5,1,1,2,4,1,4,1,4,1,3,3,3,1,3,3,1,1,3,1,1};
-	printf("Time taken = %g\n",endTime - startTime);
-	
-	computeModularityValue(&G,membership,numCommunities,&modularity);
-	//computeModularityValue(&G,comms3,4,&modularity);
-	printf("Num communities=%d\n",numCommunities);
+    char *infilename, *outfilename, *graph_type;
+    FILE* fp;
+    graph_t* g;
 
+    int curArgIndex;
+    long numSrcs;
+    int est_diameter;
+    long i, j;
+    int *membership;
+    int num_communities;
+    double modularity;
+
+    /* Step 1: Parse command line arguments */
+    if (argc < 3) {
+        fprintf(stdout, "\nUsage: %s -infile <graph filename>"
+                " (-graph <graph type> -outfile <output filename>)\n\n",
+                "eval_modularity_spectral");
+        
+        usage_graph_options();
+        exit(-1);
+    }
+
+    curArgIndex = 0;
+    infilename = (char *) calloc(500, sizeof(char));
+    outfilename = (char *) calloc(500, sizeof(char));
+    graph_type = (char *) calloc(500, sizeof(char));
+
+    strcpy(outfilename, "/tmp/results.out");
+
+    while (curArgIndex < argc) {
+        
+        if (strcmp(argv[curArgIndex],"-infile")==0) {
+            strcpy(infilename, argv[++curArgIndex]);
+        }
+
+        if (strcmp(argv[curArgIndex], "-outfile")==0) {
+            strcpy(outfilename, argv[++curArgIndex]);
+        } 
+ 
+        if (strcmp(argv[curArgIndex], "-graph")==0) {
+            strcpy(graph_type, argv[++curArgIndex]);
+        } 
+        curArgIndex++; 
+
+    }
+
+    fp = fopen(infilename, "r");
+    if (fp == NULL) {
+        fprintf(stderr, "Error! Could not open input file. Exiting ...\n");
+        exit(-1);
+    }
+    fclose(fp);
+
+    fp = fopen(outfilename, "w");
+    if (fp == NULL) {
+        fprintf(stderr, "Error! Could not write to output file. Exiting ...\n");   
+        exit(-1);
+    }
+    fclose(fp);
+
+    graph_ext_check(infilename, graph_type);
+
+    fprintf(stdout, "\n");
+    fprintf(stdout, "Input Graph File    : %s\n", infilename);
+    fprintf(stdout, "Output Graph File   : %s\n\n", outfilename);
+
+    /* Step 2: Generate graph */
+    g = (graph_t *) malloc(sizeof(graph_t));
+    graph_gen(g, infilename, graph_type);
+   
+    fprintf(stdout, "No. of vertices     : %ld\n", g->n);
+    if (g->undirected)
+        fprintf(stdout, "No. of edges        : %ld\n\n", g->m/2);
+    else 
+        fprintf(stdout, "No. of edges        : %ld\n\n", g->m);
+
+    if (g->undirected == 0) {
+        fprintf(stderr, "Error: the graph has to be undirected.\n");
+        fprintf(stderr, "Please check input file.\n");
+        exit(-1);
+    }
+
+    /* Step 3: Run algorithm */
+    
+    /* Fix in future version of code */    
+    if (g->undirected) {
+	    g->m /=2;
+    }
+
+    /*
+    fprintf(stderr, "Running the spectral algorithm for modularity "
+        "optimization (with Kernighan-Lin refinement)\n");
+    modularity_spectral(g, &membership, &num_communities, 1);
+	computeModularityValue(g, membership, num_communities, &modularity);
+    */
+    fprintf(stderr, "Running the spectral algorithm for modularity "
+        "optimization (without Kernighan-Lin refinement)\n");
+    modularity_spectral_wo_klin(g, &membership,&num_communities);
+	computeModularityValue(g, membership, num_communities, &modularity);
+	
+    /* Step 4: Write output to file */
+    fp = fopen(outfilename, "w");
+    fprintf(fp, "Number of communities: %ld\n", num_communities);
+    fprintf(fp, "Modularity score: %lf\n", modularity);
+    
+    /* Step 5: Clean up */
+    free(g->dbl_weight_v);
+    free(infilename);
+    free(outfilename);
+    free(graph_type);
+
+    free_graph(g);
+    free(g);
+
+    return 0;
 }
-
-attr_id_t endV[] = {1,2,0,2,0,1,3,2,4,5,3,6,3,6,4,5};
-attr_id_t numEdges[]= {0,2,4,7,10,12,14,16};
-double dbl_weight_e[] = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
-
-void readSample(graph_t *G)
-{
-	G->n = 7;
-	G->m = 8;
-	G->endV = endV;
-	G->numEdges = numEdges;
-	G->weight_type=4;
-	G->zero_indexed=1;
-	G->dbl_weight_e = dbl_weight_e;
-	G->undirected=1;
-}
-
-	
-
-
-
-

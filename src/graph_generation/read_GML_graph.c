@@ -1,10 +1,31 @@
 #include "graph_defs.h"
 #include "graph_gen.h"
-#include "network.h"
 
 #define LINELENGTH 1000
 
 // Types
+
+typedef struct {
+  int target;        // Index in the vertex[] array of neighboring vertex.
+                     // (Note that this is not necessarily equal to the GML
+                     // ID of the neighbor if IDs are nonconsecutive or do
+                     // not start at zero.)
+  double weight;     // Weight of edge.  1 if no weight is specified.
+} EDGE;
+
+typedef struct {
+  int id;            // GML ID number of vertex
+  int degree;        // Degree of vertex (out-degree for directed nets)
+  char *label;       // GML label of vertex.  NULL if no label specified
+  EDGE *edge;        // Array of EDGE structs, one for each neighbor
+} VERTEX;
+
+typedef struct {
+  int nvertices;     // Number of vertices in network
+  int directed;      // 1 = directed network, 0 = undirected
+  VERTEX *vertex;    // Array of VERTEX structs, one for each vertex
+} NETWORK;
+
 
 typedef struct line {
   char *str;
@@ -15,66 +36,6 @@ typedef struct line {
 
 LINE *first;
 LINE *current;
-
-void read_GML_graph(graph_t* G, char* filename) 
-{
-	NETWORK *N = (NETWORK*)malloc(sizeof(NETWORK));;
-	FILE *ifile = fopen(filename, "r");
-	read_network(N,ifile);	//Note that readgml is hardcoded to read undirected graphs,even if the input graph is directed.
-	network_to_graph(G,N);
-}	
-
-void network_to_graph(graph_t *G, NETWORK *N)
-{
-	G->n = N->nvertices;
-	int i,numEdges=0;
-	VERTEX vertex;
-	int j,degree,target,sumDegree=0;
-	double weight;
-	attr_id_t start;
-	for(i=0; i<N->nvertices; i++)
-	{
-		vertex = N->vertex[i];
-		numEdges+=vertex.degree;
-	}
-	assert(numEdges%2==0);
-	G->m = numEdges;
-	assert(G->n > 0);
-	assert(G->m > 0);
-	G->undirected=1;	//Hard-coded undiected
-	G->zero_indexed=0;	//Hard-coded false
-	G->weight_type=4;	//Hard-coded weight_type is double
-	//Allocating memory 
-	G->numEdges = (attr_id_t*) calloc(G->n+1, sizeof(attr_id_t) );
-    G->endV = (attr_id_t*) calloc(G->m, sizeof(attr_id_t)  );
-    G->dbl_weight_e = (double*) malloc(sizeof(double)* G->m  );
-	
-    assert(G->numEdges != NULL);
-    assert(G->endV != NULL);
-    assert(G->dbl_weight_e != NULL);
-
-    G->numEdges[0]=0;
-	int count=0;
-	for(i=0; i<N->nvertices; i++)
-	{
-		vertex = N->vertex[i];
-		degree = vertex.degree;
-		G->numEdges[i+1] = G->numEdges[i] + degree;
-		start = G->numEdges[i];
-
-		for(j=0; j<degree;j++)
-		{
-			target = vertex.edge[j].target;
-			weight = vertex.edge[j].weight;
-			G->endV[start+j] = target;
-			G->dbl_weight_e[start+j] = weight;
-			count++;
-		}
-	}
-	free_network(N);
-	free(N);
-
-}
 
 // Function to read one line from a specified stream.  Return value is
 // 1 if an EOF was encountered.  Otherwise 0.
@@ -447,9 +408,7 @@ int temp = 0;
 
 
 // Function to read a complete network
-
-int read_network(NETWORK *network, FILE *stream)
-{
+int read_network(NETWORK *network, FILE *stream) {
   fill_buffer(stream);
   create_network(network);
 	
@@ -463,9 +422,7 @@ int read_network(NETWORK *network, FILE *stream)
 
 
 // Function to free the memory used by a network again
-
-void free_network(NETWORK *network)
-{
+void free_network(NETWORK *network) {
   int i;
   for (i=0; i<network->nvertices; i++) {
     free(network->vertex[i].edge);
@@ -473,3 +430,63 @@ void free_network(NETWORK *network)
   }
   free(network->vertex);
 }
+
+void network_to_graph(graph_t *G, NETWORK *N)
+{
+	G->n = N->nvertices;
+	int i,numEdges=0;
+	VERTEX vertex;
+	int j,degree,target,sumDegree=0;
+	double weight;
+	attr_id_t start;
+	for(i=0; i<N->nvertices; i++)
+	{
+		vertex = N->vertex[i];
+		numEdges+=vertex.degree;
+	}
+	assert(numEdges%2==0);
+	G->m = numEdges;
+	assert(G->n > 0);
+	assert(G->m > 0);
+	G->undirected=1;	//Hard-coded undiected
+	G->zero_indexed=0;	//Hard-coded false
+	G->weight_type=4;	//Hard-coded weight_type is double
+	//Allocating memory 
+	G->numEdges = (attr_id_t*) calloc(G->n+1, sizeof(attr_id_t) );
+    G->endV = (attr_id_t*) calloc(G->m, sizeof(attr_id_t)  );
+    G->dbl_weight_e = (double*) malloc(sizeof(double)* G->m  );
+	
+    assert(G->numEdges != NULL);
+    assert(G->endV != NULL);
+    assert(G->dbl_weight_e != NULL);
+
+    G->numEdges[0]=0;
+	int count=0;
+	for(i=0; i<N->nvertices; i++)
+	{
+		vertex = N->vertex[i];
+		degree = vertex.degree;
+		G->numEdges[i+1] = G->numEdges[i] + degree;
+		start = G->numEdges[i];
+
+		for(j=0; j<degree;j++)
+		{
+			target = vertex.edge[j].target;
+			weight = vertex.edge[j].weight;
+			G->endV[start+j] = target;
+			G->dbl_weight_e[start+j] = weight;
+			count++;
+		}
+	}
+	free_network(N);
+	free(N);
+
+}
+
+void read_GML_graph(graph_t* G, char* filename) {
+	NETWORK *N = (NETWORK*)malloc(sizeof(NETWORK));;
+	FILE *ifile = fopen(filename, "r");
+	read_network(N,ifile);	//Note that readgml is hardcoded to read undirected graphs,even if the input graph is directed.
+	network_to_graph(G,N);
+}	
+

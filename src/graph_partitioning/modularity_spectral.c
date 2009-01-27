@@ -51,7 +51,7 @@ void computeModularityValue(graph_t *G, attr_id_t *membership, attr_id_t numComm
     m = G->m;
     *numCommunities = 1;
 
-    printf("Allocating memory\n");
+    //printf("Allocating memory\n");
     //Allocating memories to the above datastructures
     memblock = (attr_id_t*)malloc(sizeof(attr_id_t)*4*n);
     assert(memblock!=NULL);
@@ -64,7 +64,7 @@ void computeModularityValue(graph_t *G, attr_id_t *membership, attr_id_t numComm
     contribution = (double*)malloc(sizeof(double)*n);
     assert(eigenVectorOld!=NULL);assert(eigenVectorNew!=NULL);
 
-    printf("Allocating memory done\n");
+    //printf("Allocating memory done\n");
 
     for(i=0; i< G->n; i++)
     {
@@ -86,7 +86,7 @@ void computeModularityValue(graph_t *G, attr_id_t *membership, attr_id_t numComm
         first = (node_t*) getFirst(Q);
         curCommunity = first->id;
         deleteFirst(Q);
-        printf("\n\nEvaluating Community:%d\n",curCommunity);
+        //printf("\n\nEvaluating Community:%d\n",curCommunity);
         continue_flag = 0;
 #ifdef _OPENMP
         #pragma omp parallel for
@@ -113,7 +113,7 @@ void computeModularityValue(graph_t *G, attr_id_t *membership, attr_id_t numComm
         }
         
         communitySize ++;
-        printf("community Size =%d, degree Sum =%d\n",communitySize, degreeSum);
+        //printf("community Size =%d, degree Sum =%d\n",communitySize, degreeSum);
         if(communitySize == 1)    continue;
         
         //Calculating modularity by the current Community.    
@@ -152,7 +152,7 @@ void computeModularityValue(graph_t *G, attr_id_t *membership, attr_id_t numComm
             if(eigenVectorOld[i] > 0) count1++;
             else count2++;
         }
-        printf("count1=%d, count2=%d\n",count1,count2);
+        //printf("count1=%d, count2=%d\n",count1,count2);
         if(count1 == 0 || count2 == 0)
             continue;                //All eigen values are of same size and hence no division is required.
     
@@ -448,7 +448,7 @@ void computeEigen(graph_t *G, double *eigenVectorOld, double *eigenVectorNew, at
                 eigenValue -= ((double)(G->numEdges[vertex[i]+1]- G->numEdges[vertex[i]])) *ktx *eigenVectorOld[i];
 
         }    
-        printf("The eigenValue is %f\n",eigenValue);
+        //printf("The eigenValue is %f\n",eigenValue);
             {
                 if(eigenValue <0.0000001)
                 {
@@ -487,7 +487,7 @@ void computeEigen(graph_t *G, double *eigenVectorOld, double *eigenVectorNew, at
 
     *numCommunities = 1;
 
-    printf("Allocating memory\n");
+    //printf("Allocating memory\n");
     //Allocating memories to the above datastructures
     memblock = (attr_id_t*)malloc(sizeof(attr_id_t)*4*n);
     assert(memblock!=NULL);
@@ -499,7 +499,7 @@ void computeEigen(graph_t *G, double *eigenVectorOld, double *eigenVectorNew, at
     eigenVectorNew=(double*)malloc(sizeof(double)*n);
     assert(eigenVectorOld!=NULL);assert(eigenVectorNew!=NULL);
 
-    printf("Allocating memory done\n");
+    //printf("Allocating memory done\n");
 
     for(i=0; i< G->n; i++)
     {
@@ -512,7 +512,7 @@ void computeEigen(graph_t *G, double *eigenVectorOld, double *eigenVectorNew, at
     //Making a queue. This queue will store all the communities that are yet to be processed.
     Q=(list_t*)makeList();
     append(Q, makeNode(curCommunity));
-    printList(Q);
+    //printList(Q);
     
     while(Q->size > 0)
     {
@@ -526,7 +526,7 @@ void computeEigen(graph_t *G, double *eigenVectorOld, double *eigenVectorNew, at
             vertex[i] = -1;
         }
 
-        printf("\n\nEvaluating Community:%d\n",curCommunity);
+        //printf("\n\nEvaluating Community:%d\n",curCommunity);
         degreeSum=0;
         communitySize=-1;
         //Checking which all vertices belong to this community and updating the vertex Vector accordingly.
@@ -545,12 +545,12 @@ void computeEigen(graph_t *G, double *eigenVectorOld, double *eigenVectorNew, at
             }
         }
         communitySize ++;
-        printf("community Size =%d, degree Sum =%d\n",communitySize, degreeSum);
+        //printf("community Size =%d, degree Sum =%d\n",communitySize, degreeSum);
         if(communitySize == 1)    continue;
-        printf("Calling compute eigen\n");
+        //printf("Calling compute eigen\n");
         computeEigen(G,eigenVectorOld, eigenVectorNew, v2C,v2pos,degree,vertex,&toSplit,curCommunity,communitySize,degreeSum);
         
-        printf("tosplit=%d\n",toSplit);
+        //printf("tosplit=%d\n",toSplit);
 
         if(toSplit == 0)
             continue;

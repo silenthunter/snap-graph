@@ -13,11 +13,11 @@ void usage_graph_options() {
     fprintf(stdout, "Supported graph file formats (for use with the -graph option):\n");
     fprintf(stdout, "snap    (.gr)       SNAP file format (default file format supported by this package).\n");
     fprintf(stdout, "dimacs  (.dim)      graph format used in the 9th DIMACS Shortest Paths Challenge.\n");
+    fprintf(stdout, "GML     (.gml)      a limited implementation of the GML graph format (only supports undirected graphs, edge weights represented as doubles.)\n");
 #if 0
     /* Commenting out unimplemented options */
     fprintf(stdout, "metis   (.met)      graph representation used by the Metis partitioning package.\n");
     fprintf(stdout, "graphml (.graphml)  GraphML representation.\n");
-    fprintf(stdout, "gml     (.gml)      GML format.\n");
     fprintf(stdout, "sqmesh  (.sqm)      a synthetic 2D square mesh generator is invoked."
             " The input file specifies the generator parameters.\n");
     fprintf(stdout, "lmesh   (.lm)       a synthetic 2D long mesh generator is invoked."
@@ -55,14 +55,6 @@ void graph_ext_check(char* filename, char* graph_type) {
             strcpy(graph_type, "dimacs");    
         }
 
-        if (strcmp(ptr, "met") == 0) {
-            strcpy(graph_type, "metis");    
-        }
-
-        if (strcmp(ptr, "graphml") == 0) {
-            strcpy(graph_type, "graphml");    
-        }
-
         if (strcmp(ptr, "gml") == 0) {
             strcpy(graph_type, "gml");    
         }
@@ -74,6 +66,14 @@ void graph_ext_check(char* filename, char* graph_type) {
         if (strcmp(ptr, "rmat") == 0) {
             strcpy(graph_type, "rmat");    
         }
+#if 0
+        if (strcmp(ptr, "met") == 0) {
+            strcpy(graph_type, "metis");    
+        }
+
+        if (strcmp(ptr, "graphml") == 0) {
+            strcpy(graph_type, "graphml");    
+        }
 
         if (strcmp(ptr, "sqmesh") == 0) {
             strcpy(graph_type, "sqmesh");    
@@ -82,6 +82,7 @@ void graph_ext_check(char* filename, char* graph_type) {
         if (strcmp(ptr, "lmesh") == 0) {
             strcpy(graph_type, "lmesh");    
         }
+#endif
     }
 
 }

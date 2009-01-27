@@ -9,8 +9,6 @@ void graph_gen(graph_t* g, char* filename, char* graph_type) {
         read_DIMACS_graph(g, filename);
     } else if (strcmp(graph_type, "metis") == 0) {
         read_METIS_graph(g, filename);
-    } else if (strcmp(graph_type, "graphml") == 0) {
-        read_GraphML_graph(g, filename);
     } else if (strcmp(graph_type, "gml") == 0) {
         read_GML_graph(g, filename);
     } else if (strcmp(graph_type, "rand") == 0) {

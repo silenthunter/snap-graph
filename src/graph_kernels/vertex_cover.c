@@ -1,6 +1,6 @@
-#include "graph_vertex_cover.h"
+#include "graph_kernels.h"
 
-void calculateVertexCover(graph_t *G)
+int vertex_cover_weighted(graph_t *G)
 {    
 
     double *wp_v;                    //weight associated with each vertex.
@@ -48,9 +48,7 @@ void calculateVertexCover(graph_t *G)
             position_e[k] = j;
         }
     }
-    printf("degree:");print_attr_id_t_Vector(degree_v,0,G->n);
 
-    printf("Starting real calculation\n");    
     edge_counter = 2*G->m;
     double val1,val2;
     int count =0;
@@ -82,7 +80,6 @@ void calculateVertexCover(graph_t *G)
 #endif
         for(i=0; i<n; i++)
         {
-            //printf("This vertex %d is executed by thread %d\n",i,omp_get_thread_num());
             if (visited_v[i] == 1)
                 continue;
             double sum = 0.0;
@@ -114,20 +111,19 @@ void calculateVertexCover(graph_t *G)
     }
 #endif
 
-    print_attr_id_t_Vector(visited_v,0,G->n);
     count=0;
     for(i=0; i<G->n; i++)
     {
         if(visited_v[i] == 1 && ((G->numEdges[i+1] - G->numEdges[i])>0))
             count ++;
     }
-    printf("The size of VC = %d\n", count);
+    return count;
 }
 
 
 
 
-void calculateUnweightedVertexCover(graph_t *G)
+int vertex_cover_unweighted(graph_t *G)
 {
     attr_id_t i,j,u,v, n, m;
     attr_id_t max, max_e, max_u, max_v,edge_counter;
@@ -199,6 +195,6 @@ void calculateUnweightedVertexCover(graph_t *G)
         if(visited_v[i] == 1)
             count ++;
     }
-    printf("The size of VC = %d\n", count);
+    return count;
 
 }

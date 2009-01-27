@@ -48,7 +48,7 @@ CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libgraph_partitioning_la_LIBADD =
-am_libgraph_partitioning_la_OBJECTS = betweenness_partitioning.lo \
+am_libgraph_partitioning_la_OBJECTS = modularity_betweenness.lo \
 	modularity_spectral.lo
 libgraph_partitioning_la_OBJECTS =  \
 	$(am_libgraph_partitioning_la_OBJECTS)
@@ -180,7 +180,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AM_CPPFLAGS = -I$(top_srcdir)/include 
 noinst_LTLIBRARIES = libgraph_partitioning.la
-libgraph_partitioning_la_SOURCES = betweenness_partitioning.c modularity_spectral.c 
+libgraph_partitioning_la_SOURCES = modularity_betweenness.c modularity_spectral.c 
 all: all-am
 
 .SUFFIXES:
@@ -232,7 +232,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/betweenness_partitioning.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/modularity_betweenness.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/modularity_spectral.Plo@am__quote@
 
 .c.o:
@@ -437,8 +437,6 @@ uninstall-am:
 	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
 	pdf pdf-am ps ps-am tags uninstall uninstall-am
 
-# betweenness_centrality.c 
-#closeness_centrality.c stress_centrality.c
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

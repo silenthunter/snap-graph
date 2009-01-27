@@ -33,7 +33,7 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 bin_PROGRAMS = eval_BFS$(EXEEXT) eval_biconnected_components$(EXEEXT) \
-	eval_modularity$(EXEEXT) eval_vertex_cover$(EXEEXT) \
+	eval_modularity_spectral$(EXEEXT) eval_vertex_cover$(EXEEXT) \
 	eval_vertex_betweenness$(EXEEXT)
 subdir = test
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
@@ -61,9 +61,11 @@ eval_biconnected_components_OBJECTS =  \
 	$(am_eval_biconnected_components_OBJECTS)
 eval_biconnected_components_DEPENDENCIES =  \
 	$(top_srcdir)/lib/libsnap.la
-am_eval_modularity_OBJECTS = drive_modularity.$(OBJEXT)
-eval_modularity_OBJECTS = $(am_eval_modularity_OBJECTS)
-eval_modularity_DEPENDENCIES = $(top_srcdir)/lib/libsnap.la
+am_eval_modularity_spectral_OBJECTS =  \
+	drive_modularity_spectral.$(OBJEXT)
+eval_modularity_spectral_OBJECTS =  \
+	$(am_eval_modularity_spectral_OBJECTS)
+eval_modularity_spectral_DEPENDENCIES = $(top_srcdir)/lib/libsnap.la
 am_eval_vertex_betweenness_OBJECTS =  \
 	drive_vertex_betweenness.$(OBJEXT)
 eval_vertex_betweenness_OBJECTS =  \
@@ -85,11 +87,13 @@ LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = $(eval_BFS_SOURCES) $(eval_biconnected_components_SOURCES) \
-	$(eval_modularity_SOURCES) $(eval_vertex_betweenness_SOURCES) \
+	$(eval_modularity_spectral_SOURCES) \
+	$(eval_vertex_betweenness_SOURCES) \
 	$(eval_vertex_cover_SOURCES)
 DIST_SOURCES = $(eval_BFS_SOURCES) \
 	$(eval_biconnected_components_SOURCES) \
-	$(eval_modularity_SOURCES) $(eval_vertex_betweenness_SOURCES) \
+	$(eval_modularity_spectral_SOURCES) \
+	$(eval_vertex_betweenness_SOURCES) \
 	$(eval_vertex_cover_SOURCES)
 ETAGS = etags
 CTAGS = ctags
@@ -201,7 +205,6 @@ sharedstatedir = @sharedstatedir@
 srcdir = @srcdir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
-top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AM_CPPFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)/include/sprng
@@ -210,16 +213,12 @@ eval_vertex_betweenness_SOURCES = drive_vertex_betweenness.c
 eval_vertex_betweenness_LDADD = $(top_srcdir)/lib/libsnap.la
 eval_BFS_SOURCES = drive_BFS.c
 eval_BFS_LDADD = $(top_srcdir)/lib/libsnap.la
-eval_biconnected_components_SOURCES = drive_biconnected_components.c
-eval_biconnected_components_LDADD = $(top_srcdir)/lib/libsnap.la
-eval_modularity_SOURCES = drive_modularity.c
-eval_modularity_LDADD = $(top_srcdir)/lib/libsnap.la
-
-# Commented out for now
-#eval_dyn_ds_SOURCES = test_dyn_ds.c
-#eval_dyn_ds_LDADD = $(top_srcdir)/lib/libsnap.la
 eval_vertex_cover_SOURCES = drive_vertex_cover.c
 eval_vertex_cover_LDADD = $(top_srcdir)/lib/libsnap.la
+eval_biconnected_components_SOURCES = drive_biconnected_components.c
+eval_biconnected_components_LDADD = $(top_srcdir)/lib/libsnap.la
+eval_modularity_spectral_SOURCES = drive_modularity_spectral.c
+eval_modularity_spectral_LDADD = $(top_srcdir)/lib/libsnap.la
 all: all-am
 
 .SUFFIXES:
@@ -287,9 +286,9 @@ eval_BFS$(EXEEXT): $(eval_BFS_OBJECTS) $(eval_BFS_DEPENDENCIES)
 eval_biconnected_components$(EXEEXT): $(eval_biconnected_components_OBJECTS) $(eval_biconnected_components_DEPENDENCIES) 
 	@rm -f eval_biconnected_components$(EXEEXT)
 	$(LINK) $(eval_biconnected_components_OBJECTS) $(eval_biconnected_components_LDADD) $(LIBS)
-eval_modularity$(EXEEXT): $(eval_modularity_OBJECTS) $(eval_modularity_DEPENDENCIES) 
-	@rm -f eval_modularity$(EXEEXT)
-	$(LINK) $(eval_modularity_OBJECTS) $(eval_modularity_LDADD) $(LIBS)
+eval_modularity_spectral$(EXEEXT): $(eval_modularity_spectral_OBJECTS) $(eval_modularity_spectral_DEPENDENCIES) 
+	@rm -f eval_modularity_spectral$(EXEEXT)
+	$(LINK) $(eval_modularity_spectral_OBJECTS) $(eval_modularity_spectral_LDADD) $(LIBS)
 eval_vertex_betweenness$(EXEEXT): $(eval_vertex_betweenness_OBJECTS) $(eval_vertex_betweenness_DEPENDENCIES) 
 	@rm -f eval_vertex_betweenness$(EXEEXT)
 	$(LINK) $(eval_vertex_betweenness_OBJECTS) $(eval_vertex_betweenness_LDADD) $(LIBS)
@@ -305,7 +304,7 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/drive_BFS.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/drive_biconnected_components.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/drive_modularity.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/drive_modularity_spectral.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/drive_vertex_betweenness.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/drive_vertex_cover.Po@am__quote@
 
@@ -514,6 +513,10 @@ uninstall-am: uninstall-binPROGRAMS
 	pdf pdf-am ps ps-am tags uninstall uninstall-am \
 	uninstall-binPROGRAMS
 
+
+# Not building this code for now.
+#eval_dyn_ds_SOURCES = test_dyn_ds.c
+#eval_dyn_ds_LDADD = $(top_srcdir)/lib/libsnap.la
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

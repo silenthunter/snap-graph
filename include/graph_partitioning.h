@@ -1,12 +1,9 @@
 #ifndef _GRAPH_PARTITIONING_H
 #define _GRAPH_PARTITIONING_H
-
+#include "graph_defs.h"
 void modularity_spectral(graph_t *G, attr_id_t **membership, attr_id_t *numCommunities, attr_id_t use_improvement);
 void computeModularityValue(graph_t *G, attr_id_t *membership, attr_id_t numCommunities, double *modularity);
 void modularity_spectral_wo_klin(graph_t *G, attr_id_t **membership, attr_id_t *numCommunities);
-
-
-
 
 typedef struct
 {
@@ -16,8 +13,5 @@ typedef struct
         int *from;      // map from vertex to its parents in djkstra
         int size;
 }heap;
-
-
-
 
 #endif

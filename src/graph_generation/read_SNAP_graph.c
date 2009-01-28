@@ -354,13 +354,16 @@ void read_SNAP_graph(graph_t* G, char* filename) {
     }
     */
 
-    if (undirected)
+    if (undirected) {
         G->endV = (attr_id_t *) calloc(2*m, sizeof(attr_id_t));
-    else 
+        G->edge_id = (attr_id_t *) calloc(2*m, sizeof(attr_id_t));
+    } else {
         G->endV = (attr_id_t *) calloc(m, sizeof(attr_id_t));
-        
+        G->edge_id = (attr_id_t *) calloc(m, sizeof(attr_id_t)); 
+    }  
     assert(G->endV != NULL);
-    
+    assert(G->edge_id != NULL);
+
     G->numEdges = (attr_id_t *) malloc((n+1)*sizeof(attr_id_t));
     assert(G->numEdges != NULL);
 
@@ -411,6 +414,7 @@ void read_SNAP_graph(graph_t* G, char* filename) {
         v = dest[i];
         offset = degree[u]--;
         G->endV[G->numEdges[u]+offset-1] = v;
+        G->edge_id[G->numEdges[u]+offset-1] = i;
         if (weight_type) {
             if (weight_type == 1) {
                 G->int_weight_e[G->numEdges[u]+offset-1] = int_weight[i];
@@ -429,6 +433,8 @@ void read_SNAP_graph(graph_t* G, char* filename) {
         if (undirected) {
             offset = degree[v]--;
             G->endV[G->numEdges[v]+offset-1] = u;
+            G->edge_id[G->numEdges[v]+offset-1] = i;
+
             if (weight_type) {
                 if (weight_type == 1) {
                     G->int_weight_e[G->numEdges[v]+offset-1] = int_weight[i];

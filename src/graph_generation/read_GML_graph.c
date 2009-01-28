@@ -11,6 +11,7 @@ typedef struct {
                      // ID of the neighbor if IDs are nonconsecutive or do
                      // not start at zero.)
   double weight;     // Weight of edge.  1 if no weight is specified.
+  int id;
 } EDGE;
 
 typedef struct {
@@ -392,10 +393,12 @@ int temp = 0;
       vt = find_vertex(t,network);
       network->vertex[vs].edge[count[vs]].target = vt;
       network->vertex[vs].edge[count[vs]].weight = w;
+      network->vertex[vs].edge[count[vs]].id = temp;
       count[vs]++;
       if (network->directed==0) {
 	network->vertex[vt].edge[count[vt]].target = vs;
 	network->vertex[vt].edge[count[vt]].weight = w;
+    network->vertex[vt].edge[count[vt]].id = temp;
 	count[vt]++;
       }
     }
@@ -448,12 +451,13 @@ void network_to_graph(graph_t *G, NETWORK *N)
 	G->m = numEdges;
 	assert(G->n > 0);
 	assert(G->m > 0);
-	G->undirected=1;	//Hard-coded undiected
+	G->undirected=1;	//Hard-coded undirected
 	G->zero_indexed=0;	//Hard-coded false
 	G->weight_type=4;	//Hard-coded weight_type is double
 	//Allocating memory 
-	G->numEdges = (attr_id_t*) calloc(G->n+1, sizeof(attr_id_t) );
-    G->endV = (attr_id_t*) calloc(G->m, sizeof(attr_id_t)  );
+	G->numEdges = (attr_id_t*) calloc(G->n+1, sizeof(attr_id_t));
+    G->endV = (attr_id_t*) calloc(G->m, sizeof(attr_id_t));
+    G->edge_id = (attr_id_t *) calloc(G->m, sizeof(attr_id_t));
     G->dbl_weight_e = (double*) malloc(sizeof(double)* G->m  );
 	
     assert(G->numEdges != NULL);
@@ -473,6 +477,7 @@ void network_to_graph(graph_t *G, NETWORK *N)
 		{
 			target = vertex.edge[j].target;
 			weight = vertex.edge[j].weight;
+            G->edge_id[start+j] = vertex.edge[j].id;
 			G->endV[start+j] = target;
 			G->dbl_weight_e[start+j] = weight;
 			count++;

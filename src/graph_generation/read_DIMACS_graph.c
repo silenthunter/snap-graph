@@ -88,7 +88,10 @@ void read_DIMACS_graph(graph_t* G, char* filename) {
 
     G->endV = (attr_id_t *) calloc(2*m, sizeof(attr_id_t));
     assert(G->endV != NULL);
-    
+ 
+    G->edge_id = (attr_id_t *) calloc(2*m, sizeof(attr_id_t));
+    assert(G->edge_id != NULL);
+   
     G->numEdges = (attr_id_t *) malloc((n+1)*sizeof(attr_id_t));
     assert(G->numEdges != NULL);
 
@@ -114,10 +117,12 @@ void read_DIMACS_graph(graph_t* G, char* filename) {
         offset = degree[u]--;
         G->endV[G->numEdges[u]+offset-1] = v;
         G->int_weight_e[G->numEdges[u]+offset-1] = int_weight[i];
+        G->edge_id[G->numEdges[u]+offset-1] = i;
           
         offset = degree[v]--;
         G->endV[G->numEdges[v]+offset-1] = u;
         G->int_weight_e[G->numEdges[v]+offset-1] = int_weight[i];
+        G->edge_id[G->numEdges[v]+offset-1] = i;
     } 
  
     /*          

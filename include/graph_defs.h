@@ -69,6 +69,18 @@ typedef struct {
     attr_id_t degree;
 } plist_t;
 
+typedef struct {
+    attr_id_t dest;
+    attr_id_t eid;
+    attr_id_t mask;
+    double cval;
+} c_edge_t;
+
+typedef struct {
+    attr_id_t num_edges;
+    attr_id_t comm_id;
+} c_vert_t;
+
 typedef struct struct_node
 {
     int id;
@@ -117,11 +129,19 @@ typedef struct
     vert_t* vlist;
     vert_t* vlist_aux;
 
+    /* An internal id for each edge, useful in case of undirected networks */
+    attr_id_t* edge_id;
+
     /* For directed graphs, endBackV can be used to store edges pointing into a
        vertex, and numBackEdges the in-degree */
     attr_id_t* endBackV;
     attr_id_t* numBackEdges;
-    
+   
+    /* Data representation used in some centrality and community identification
+     * routines */
+    c_vert_t* cvl;
+    c_edge_t* cel;
+
     /* Vertex weights */
     int* int_weight_v;
     float* fl_weight_v;

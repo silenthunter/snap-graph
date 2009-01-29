@@ -1,486 +1,557 @@
 #include "graph_defs.h"
 #include "graph_metrics.h"
 #include "utils.h"
+#include "sprng.h"
+
+#define CACHELOG 7
+#define NOSHARE(x) ((x)<<CACHELOG)
+
+void evaluate_edge_centrality_bcpart(graph_t* g, attr_id_t* ebc_eval_data1, 
+        double* ebc_eval_data2, comm_list_t* comm_list, attr_id_t num_components, 
+        attr_id_t curr_component1, attr_id_t curr_component2) {
 
 
-double betweenness_ceentrality_parBFS(graph* G, DOUBLE_T* BC) {
-
-    VERT_T *S;         /* stack of vertices in the order of non-decreasing 
-                          distance from s. Also used to implicitly 
-                          represent the BFS queue */
-    plist* P;          /* predecessors of a vertex v on shortest paths from s */
-    DOUBLE_T* sig;     /* No. of shortest paths */
-    LONG_T* d;         /* Length of the shortest path between every pair */
-    DOUBLE_T* del;     /* dependency of vertices */
-    LONG_T *in_degree, *numEdges, *pSums;
-    LONG_T *pListMem;    
-    LONG_T* Srcs; 
-    LONG_T *start, *end;
-    LONG_T MAX_NUM_PHASES;
-    LONG_T *psCount;
-#ifdef _OPENMP    
-    omp_lock_t* vLock;
-    LONG_T chunkSize;
+    /* stack of vertices in the order of non-decreasing 
+     * distance from s. Also used to implicitly 
+     * represent the BFS queue. 
+	 */
+	attr_id_t* visited_vertices;    
+	
+    /* A struct to store information about the visited vertex */
+	typedef struct {
+#ifdef _OPENMP
+		omp_lock_t vlock;
 #endif
-    int seed = 2387;
-    double elapsed_time;
+		attr_id_t sigma;         /* No. of shortest paths */
+		attr_id_t child_count;   /* Child count associated with each vertex */ 
+		double delta;            /* Partial dependency    */
+		unsigned short d;        /* distance of vertex from source vertex */		
+		/* char padding[32];*/	 /* If necessary, we can pad this structure to
+                                    align to cache line size */
+	} S_info_t;
+	
+	S_info_t *vis_path_info;
 
+    attr_id_t* child;      /* vertices that succeed v on 
+                              shortest paths from s */
+    attr_id_t* child_epos; /* Edge corresponding to this child vertex */
+	attr_id_t* vis_srcs;   /* Randomly chosen set of vertices 
+                              to initiate traversals from */
+#ifdef _OPENMP
+	omp_lock_t* vLock;     /* Need locks for permuting vertices */
+#endif
+
+    long* num_visited;
+    long* visited_counts;
+	double elapsed_time;
+    attr_id_t l;
 #ifdef _OPENMP    
-#pragma omp parallel firstprivate(G)
+#pragma omp parallel
+#endif
 {
-#endif
+	/* Vars to index local thread stacks */
+    attr_id_t* p_vis;
+    attr_id_t* p_vis_temp;
+    long p_vis_size, p_vis_count;
+	long phase_num;
 
-    VERT_T *myS, *myS_t;
-    LONG_T myS_size;
-    LONG_T i, j, k, p, count, myCount;
-    LONG_T v, w, vert;
-    LONG_T numV, num_traversals, n, m, phase_num;
-    LONG_T tid, nthreads;
+	/* Other vars */
+    long i, j, k, p, s;
+    long v, w;
+	
+    long n, m, num_traversals;
+	c_vert_t* cvl;
+	c_edge_t* cel;
+	long d_phase;
+    int tid, nthreads;
     int* stream;
-#ifdef DIAGNOSTIC
-    double elapsed_time_part;
+	long MAX_NUM_PHASES;
+    int SPRNG_SEED;
+	long ph_start, ph_end;
+	long sigma_v;
+	attr_id_t num_edges_v;
+    long offset;
+
+	int seed;
+
+	S_info_t *vis_path_info_i, *vis_path_info_v, *vis_path_info_w;
+	attr_id_t vis_path_info_v_child_count;
+	attr_id_t vis_path_info_v_sigma;
+	double vis_path_info_v_delta;
+	int d_val;
+    double incr;
+    attr_id_t epos;
+    attr_id_t comm_id;
+
+#if DIAGNOSTIC
+    double elapsed_time_part, elapsed_time_all;
 #endif
-    double proc_time, all_time1, all_time2, all_time2a, all_time3, all_time4;
 
 #ifdef _OPENMP
-    int myLock;
+    int myLock, l1, l2;
     tid = omp_get_thread_num();
     nthreads = omp_get_num_threads();
 #else
     tid = 0;
     nthreads = 1;
 #endif
+    
+    SPRNG_SEED = 129832;
 
-    all_time1= all_time2 = all_time2a = all_time3 = all_time4 = 0;
-
-#ifdef DIAGNOSTIC
+#if DIAGNOSTIC
     if (tid == 0) {
+        elapsed_time_all = get_seconds();
         elapsed_time_part = get_seconds();
     }
 #endif
 
-    /* numV: no. of vertices to run BFS from = 2^K4approx */
-    numV = 1<<K4approx;
-    n = G->n;
-    m = G->m;
-
-    /* Permute vertices */
+    n = g->n;
+    m = g->m;
+	cvl = g->cvl;
+	cel = g->cel;
+    /* Generate a random stream of source vertices */
     if (tid == 0) {
-        Srcs = (LONG_T *) malloc(n*sizeof(LONG_T));
+        vis_srcs = (attr_id_t *) malloc(n*sizeof(attr_id_t));
+		assert(vis_srcs != NULL);
 #ifdef _OPENMP
-        vLock = (omp_lock_t *) malloc(n*sizeof(omp_lock_t));
+		vLock = (omp_lock_t *) malloc(n*sizeof(omp_lock_t));
+		assert(vLock != NULL);
 #endif
     }
+//#if DIAGNOSTIC
+    if (tid == 0) 
+        fprintf(stdout, "Size of S_info struct: %d\n", sizeof(S_info_t));
+//#endif
+    
+    /* Initialize RNG stream */
+	seed = SPRNG_SEED;
+	stream = init_sprng(SPRNG_CMRG, tid, nthreads, seed, SPRNG_DEFAULT);
 
-#ifdef _OPENMP   
+#ifdef _OPENMP
 #pragma omp barrier
 #pragma omp for
-    for (i=0; i<n; i++) {
-        omp_init_lock(&vLock[i]);
-    }
 #endif
-
-    /* Initialize RNG stream */ 
-	stream = init_sprng(0, tid, nthreads, seed, SPRNG_DEFAULT);
-
+    for (i=0; i<n; i++) {
+        vis_srcs[i] = i;
 #ifdef _OPENMP
-#pragma omp for
+		omp_init_lock(&vLock[i]);
 #endif
-    for (i=0; i<n; i++) {
-        Srcs[i] = i;
     }
 
 #ifdef _OPENMP
 #pragma omp for
-#endif
+#endif    
     for (i=0; i<n; i++) {
-        j = n * sprng(stream);
+        j = n*sprng(stream);
         if (i != j) {
-            k = Srcs[i];
 #ifdef _OPENMP
-            omp_set_lock(&vLock[j]);
+            l1 = omp_test_lock(&vLock[i]);
+            if (l1) {
+                l2 = omp_test_lock(&vLock[j]);
+                if (l2) {
 #endif
-            Srcs[i] = Srcs[j];
-            Srcs[j] = k;
+                    k = vis_srcs[i];
+                    vis_srcs[i] = vis_srcs[j];
+                    vis_srcs[j] = k;
 #ifdef _OPENMP
-            omp_unset_lock(&vLock[j]);
-#endif        
+                    omp_unset_lock(&vLock[j]);
+                }
+                omp_unset_lock(&vLock[i]);
+            }
+#endif
         }
-    } 
-
-#ifdef _OPENMP    
-#pragma omp barrier
-#endif
-
-#ifdef DIAGNOSTIC
-    if (tid == 0) {
-        elapsed_time_part = get_seconds() -elapsed_time_part;
-        fprintf(stderr, "Vertex ID permutation time: %lf seconds\n", elapsed_time_part);
-        elapsed_time_part = get_seconds();
     }
+
+    /* Clear current betweenness values */
+    if (curr_component1 != -1) {
+#ifdef _OPENMP
+#pragma omp barrier
+#pragma omp for schedule(guided)
 #endif
+        for (i=0; i<n; i++) {
+            if ((cvl[i].comm_id != curr_component1) && (cvl[i].comm_id != curr_component2))
+                continue;
+            for (j=cvl[i].num_edges; j<cvl[i+1].num_edges; j++) {
+                cel[j].cval = 0.0;
+            }
+
+        }
+    }
+
+    if (tid == 0) {
+#ifdef _OPENMP
+		free(vLock);
+#endif
+#if DIAGNOSTIC
+        elapsed_time_part = get_seconds() - elapsed_time_part;
+        fprintf(stdout, "Vertex ID permutation time: %lf seconds\n", elapsed_time_part);
+        elapsed_time_part = get_seconds();
+#endif
+    }
 
     /* Start timing code from here */
-    if (tid == 0) {
+
+	if (tid == 0) {
         elapsed_time = get_seconds();
-#ifdef VERIFYK4
+    }
+
+#if VERIFYK4
         MAX_NUM_PHASES = 2*sqrt(n);
 #else
         MAX_NUM_PHASES = 50;
 #endif
-    }
 
-#ifdef _OPENMP
-#pragma omp barrier    
-#endif
+	if (tid == 0) {
+		/* Allocate memory for the data structures */
+		visited_vertices = (attr_id_t *) malloc(n * sizeof(attr_id_t));
+		vis_path_info = (S_info_t *) malloc(n * sizeof(S_info_t));
+		child = (attr_id_t *) malloc(m * sizeof(attr_id_t));
+        child_epos = (attr_id_t *) malloc(m * sizeof(attr_id_t));
+		assert(visited_vertices != NULL);
+		assert(vis_path_info != NULL);
+		assert(child != NULL);
+        assert(child_epos != NULL);
+	    num_visited = (long *) malloc(MAX_NUM_PHASES*sizeof(long));
+        visited_counts = (long *) malloc(NOSHARE(nthreads+1)*sizeof(long));
 
-    /* Initialize predecessor lists */
-    
-    /* The size of the predecessor list of each vertex is bounded by 
-       its in-degree. So we first compute the in-degree of every
-       vertex */ 
+		assert(num_visited != NULL);
+		assert(visited_counts != NULL);
+	}
 
-    if (tid == 0) {
-        P   = (plist  *) calloc(n, sizeof(plist));
-        in_degree = (LONG_T *) calloc(n+1, sizeof(LONG_T));
-        numEdges = (LONG_T *) malloc((n+1)*sizeof(LONG_T));
-        pSums = (LONG_T *) malloc(nthreads*sizeof(LONG_T));
-    }
-
-#ifdef _OPENMP
-#pragma omp barrier
-#pragma omp for
-#endif
-    for (i=0; i<m; i++) {
-        v = G->endV[i];
-#ifdef _OPENMP
-        omp_set_lock(&vLock[v]);
-#endif
-        in_degree[v]++;
-#ifdef _OPENMP
-        omp_unset_lock(&vLock[v]);
-#endif
-    }
-
-    prefix_sums(in_degree, numEdges, pSums, n);
-    
-    if (tid == 0) {
-        pListMem = (LONG_T *) malloc(m*sizeof(LONG_T));
-    }
-
-#ifdef _OPENMP
-#pragma omp barrier
-#pragma omp for
-#endif
-    for (i=0; i<n; i++) {
-        P[i].list = pListMem + numEdges[i];
-        P[i].degree = in_degree[i];
-        P[i].count = 0;
-    }
-
-#ifdef DIAGNOSTIC
-    if (tid == 0) {
-        elapsed_time_part = get_seconds() -elapsed_time_part;
-        fprintf(stderr, "In-degree computation time: %lf seconds\n", elapsed_time_part);
-        elapsed_time_part = get_seconds();
-    }
-#endif
-
-    /* Allocate shared memory */ 
-    if (tid == 0) {
-        free(in_degree);
-        free(numEdges);
-        free(pSums);
-        
-        S   = (VERT_T *) malloc(n*sizeof(VERT_T));
-        sig = (DOUBLE_T *) malloc(n*sizeof(DOUBLE_T));
-        d   = (LONG_T *) malloc(n*sizeof(LONG_T));
-        del = (DOUBLE_T *) calloc(n, sizeof(DOUBLE_T));
-        
-        start = (LONG_T *) malloc(MAX_NUM_PHASES*sizeof(LONG_T));
-        end = (LONG_T *) malloc(MAX_NUM_PHASES*sizeof(LONG_T));
-        psCount = (LONG_T *) malloc((nthreads+1)*sizeof(LONG_T));
-    }
-
-    /* local memory for each thread */  
-    myS_size = (2*n)/nthreads;
-    myS = (VERT_T *) malloc(myS_size*sizeof(VERT_T));
+    /* local memory for each thread */
+    p_vis_size = (2*n)/nthreads;
+    p_vis = (attr_id_t *) malloc(p_vis_size*sizeof(attr_id_t));
+	assert(p_vis != NULL);
     num_traversals = 0;
-    myCount = 0;
+    p_vis_count = 0;
 
-#ifdef _OPENMP    
-#pragma omp barrier
-#endif
-
-#ifdef _OPENMP    
-#pragma omp for
-#endif
-    for (i=0; i<n; i++) {
-        d[i] = -1;
-    }
- 
-#ifdef DIAGNOSTIC
+#if DIAGNOSTIC
     if (tid == 0) {
-        elapsed_time_part = get_seconds() -elapsed_time_part;
-        fprintf(stderr, "BC initialization time: %lf seconds\n", elapsed_time_part);
+        elapsed_time_part = get_seconds() - elapsed_time_part;
+        fprintf(stdout, "Memory allocation time: %9.6lf seconds\n", elapsed_time_part);
         elapsed_time_part = get_seconds();
     }
 #endif
-   
-    for (p=0; p<n; p++) {
 
-        i = Srcs[p];
-        if (G->numEdges[i+1] - G->numEdges[i] == 0) {
+#ifdef _OPENMP
+#pragma omp barrier
+#endif
+
+#ifdef _OPENMP
+#pragma omp for
+#endif
+    for (i=0; i<n; i++) {
+        vis_path_info_i = &(vis_path_info[i]);
+        vis_path_info_i->d = 0;
+		vis_path_info_i->sigma = 0;
+		vis_path_info_i->child_count = 0;
+#ifdef _OPENMP
+		omp_init_lock(&(vis_path_info_i->vlock));
+#endif
+	}
+ 
+#if DIAGNOSTIC
+    if (tid == 0) {
+        elapsed_time_part = get_seconds() - elapsed_time_part;
+        fprintf(stdout, "BC initialization time: %9.6lf seconds\n", elapsed_time_part);
+    }
+#endif
+
+	/* Start traversals */
+    for (p = 0; p < n; p ++) {
+
+        s = vis_srcs[p];
+        if ((cvl[s+1].num_edges - cvl[s].num_edges) == 0) {
             continue;
-        } else {
-            num_traversals++;
         }
 
+        if (curr_component1 != -1) {
+            if ((cvl[s].comm_id != curr_component1) && (cvl[s].comm_id != curr_component2))
+                continue;
+        }
+
+        num_traversals++;
+
+        /*
         if (num_traversals == numV + 1) {
             break;
         }
+        */
+
+        phase_num = 0;
         
         if (tid == 0) {
-            sig[i] = 1;
-            d[i] = 0;
-            S[0] = i;
-            start[0] = 0;
-            end[0] = 1;
+
+			visited_vertices[0] = s;
+			vis_path_info[s].sigma = 1;
+			vis_path_info[s].d = 1;
+			vis_path_info[s].child_count = 0;
+
+            num_visited[phase_num] = 0;
+            num_visited[phase_num+1] = 1;
+			visited_counts[NOSHARE(0)] = 0;
         }
+
+		visited_counts[NOSHARE(tid+1)] = 0;
+
+		d_phase = 1;
         
-        count = 1;
-        phase_num = 0;
+#if DIAGNOSTIC
+        if (tid == 0) 
+            elapsed_time_part = get_seconds();
+#endif
 
 #ifdef _OPENMP       
 #pragma omp barrier
 #endif
         
-        while (end[phase_num] - start[phase_num] > 0) {
-
-            proc_time = get_seconds();
-            myCount = 0;
-#ifdef _OPENMP
-#pragma omp barrier
-#pragma omp for schedule(dynamic) nowait
-#endif
-            for (vert = start[phase_num]; vert < end[phase_num]; vert++) {
-                v = S[vert];
-                for (j=G->numEdges[v]; j<G->numEdges[v+1]; j++) {
-
-#ifndef VERIFYK4
-                    /* Filter edges with weights divisible by 8 */
-                    if ((G->weight[j] & 7) != 0) {
-#endif
-                        w = G->endV[j];
-                        if (v != w) {
-
-#ifdef _OPENMP                            
-                            myLock = omp_test_lock(&vLock[w]);
-                            if (myLock) { 
-#endif             
-                                /* w found for the first time? */ 
-                                if (d[w] == -1) {
-                                    if (myS_size == myCount) {
-                                        /* Resize myS */
-                                        myS_t = (VERT_T *)
-                                            malloc(2*myS_size*sizeof(VERT_T));
-                                        memcpy(myS_t, myS, myS_size*sizeof(VERT_T));
-                                        free(myS);
-                                        myS = myS_t;
-                                        myS_size = 2*myS_size;
-                                    }
-                                    myS[myCount++] = w;
-                                    d[w] = d[v] + 1;
-                                    sig[w] = sig[v];
-                                    P[w].list[P[w].count++] = v;
-                                } else if (d[w] == d[v] + 1) {
-                                    sig[w] += sig[v];
-                                    P[w].list[P[w].count++] = v;
-                                }
-#ifdef _OPENMP  
-                            
-                            omp_unset_lock(&vLock[w]);
-                            } else {
-                                if ((d[w] == -1) || (d[w] == d[v]+ 1)) {
-                                    omp_set_lock(&vLock[w]);
-                                    sig[w] += sig[v];
-                                    P[w].list[P[w].count++] = v;
-                                    omp_unset_lock(&vLock[w]);
-                                }
-                            }
-#endif
-                            
-                        }
-#ifndef VERIFYK4
-                    }
-#endif
-                }
-            }
-            /* Merge all local stacks for next iteration */
-            phase_num++; 
-
-            proc_time = get_seconds() - proc_time;
-            all_time1 += proc_time;
+        while (num_visited[phase_num+1] - num_visited[phase_num] > 0) {
             
-            psCount[tid+1] = myCount;
+			ph_start = num_visited[phase_num];
+			ph_end = num_visited[phase_num+1];
+
+            p_vis_count = 0;
+			d_phase++;
 
 #ifdef _OPENMP
 #pragma omp barrier
+#pragma omp for schedule(guided,4)
 #endif
-            proc_time = get_seconds();            
+            for (i = ph_start; i < ph_end; i++) {
+                v = visited_vertices[i];
+                vis_path_info_v = &(vis_path_info[v]);
+                sigma_v = vis_path_info_v->sigma;
+                num_edges_v = cvl[v].num_edges;
+
+                for (j = num_edges_v; j < cvl[v+1].num_edges; j++) {
+				
+                    /* Filter edges that are deleted */
+                    if (cel[j].mask == 0) {
+                        
+                        w = cel[j].dest;
+						vis_path_info_w = &(vis_path_info[w]);
+                        
+						d_val = vis_path_info_w->d;
+						if (d_val == 0) {
+#ifdef _OPENMP
+							myLock = omp_test_lock(&(vis_path_info_w->vlock));
+                            if (myLock == 1) {
+#endif
+								vis_path_info_w->d = d_phase;
+								vis_path_info_w->sigma += sigma_v;
+#ifdef _OPENMP
+								omp_unset_lock(&(vis_path_info_w->vlock));
+#endif
+								child[num_edges_v+vis_path_info_v->child_count] = w;
+                                child_epos[num_edges_v+vis_path_info_v->child_count] = j;
+                                vis_path_info_v->child_count++;
+								/* Add w to local stack */
+                                if (p_vis_count == p_vis_size) {
+								    //fprintf(stdout, "thread: %d, size: %d\n",
+                                    //        tid, 2*p_vis_size);
+                                    /* Resize p_vis */
+                                    p_vis_temp = (attr_id_t *)
+                                        malloc(2*p_vis_size*sizeof(attr_id_t));
+									assert(p_vis_temp != NULL);
+                                    memcpy(p_vis_temp, p_vis, p_vis_size*sizeof(attr_id_t));
+                                    free(p_vis);
+                                    p_vis = p_vis_temp;
+                                    p_vis_size = 2*p_vis_size;
+                                }
+                                p_vis[p_vis_count++] = w;
+#ifdef _OPENMP
+							} else {
+								child[num_edges_v+vis_path_info_v->child_count] = w;
+                                child_epos[num_edges_v+vis_path_info_v->child_count] = j;
+                                vis_path_info_v->child_count++;
+
+								omp_set_lock(&(vis_path_info_w->vlock));
+								vis_path_info_w->sigma += sigma_v;
+								omp_unset_lock(&(vis_path_info_w->vlock));
+                            }	
+#endif
+							
+						} else if (d_val == d_phase) {
+#ifdef _OPENMP
+							omp_set_lock(&(vis_path_info_w->vlock));
+#endif
+							vis_path_info_w->sigma += sigma_v;
+#ifdef _OPENMP
+							omp_unset_lock(&(vis_path_info_w->vlock));
+#endif
+							child[num_edges_v+vis_path_info_v->child_count] = w;
+                            child_epos[num_edges_v+vis_path_info_v->child_count] = j;
+                            vis_path_info_v->child_count++;
+
+						}
+
+					} /* End of edge filter loop */
+
+				} /* End of inner loop */
+			} /* End of outer for loop */
+        
+            /* Merge all local stacks for next iteration */
+            phase_num++;
+
+            visited_counts[NOSHARE(tid+1)] = p_vis_count;
+			//fprintf(stdout, "s: %d, tid: %d, phase %d, count %d\n", s, tid, phase_num, p_vis_count);
+#ifdef _OPENMP
+#pragma omp barrier
+#endif
 
             if (tid == 0) {
-                start[phase_num] = end[phase_num-1];
-                psCount[0] = start[phase_num];
+                visited_counts[NOSHARE(0)] = num_visited[phase_num];
                 for(k=1; k<=nthreads; k++) {
-                    psCount[k] = psCount[k-1] + psCount[k];
+					visited_counts[NOSHARE(k)] += visited_counts[NOSHARE(k-1)];
                 }
-                end[phase_num] = psCount[nthreads];
+                num_visited[phase_num+1] = visited_counts[NOSHARE(nthreads)];
             }
-            
-            proc_time = get_seconds() - proc_time;
-            all_time2a += proc_time;
-            
-
+       
+           
 #ifdef _OPENMP           
 #pragma omp barrier
 #endif
-            proc_time = get_seconds();
-            
-            LONG_T k0 = psCount[tid]; 
-            LONG_T k1 = psCount[tid+1];
-            for (k = k0; k < k1; k++) {
-                S[k] = myS[k-k0];
+
+            for (k = visited_counts[NOSHARE(tid)]; k < visited_counts[NOSHARE(tid+1)]; k++) {
+                offset = visited_counts[NOSHARE(tid)];
+                visited_vertices[k] = p_vis[k-offset];
             } 
             
-            count = end[phase_num];
-            proc_time = get_seconds() - proc_time;
-            all_time2 += proc_time;
+           
+#ifdef _OPENMP            
+#pragma omp barrier
+#endif
         }
-     
+        
+#if DIAGNOSTIC 
+        if (tid == 0) {
+             elapsed_time_part = get_seconds() - elapsed_time_part;
+             fprintf(stdout, "Traversal time: %9.6lf seconds, src"
+                " %d, num phases %d\n",elapsed_time_part, s, phase_num);
+        }
+#endif
+   
         phase_num--;
 
-        proc_time = get_seconds();
+        /*        
+        if (tid == 0)  
+		    fprintf(stdout, "s: %d, phase %d, start %d, end %d\n", s, phase_num,
+                    num_visited[phase_num], num_visited[phase_num+1]);
+        */
+        /* Clear delta scores of leaf vertices */
+        if (tid == 0) {
+		    for (j = num_visited[phase_num]; j < num_visited[phase_num+1]; j++) {
+			    v = visited_vertices[j];
+			    vis_path_info[v].delta = 0.0;
+		    }
+        }
 
-        while (phase_num > 0) {
+		phase_num--;
+        
+#if DIAGNOSTIC
+        if (tid ==0)
+            elapsed_time_part = get_seconds();
+#endif
+
 #ifdef _OPENMP        
-#pragma omp for schedule(static) nowait
+#pragma omp barrier
 #endif
-            for (j=start[phase_num]; j<end[phase_num]; j++) {
-                w = S[j];
-                for (k = 0; k<P[w].count; k++) {
-                    v = P[w].list[k];
+		/* Dependency accumulation phase */
+        while (phase_num >= 0) {
+			ph_start = num_visited[phase_num];
+			ph_end = num_visited[phase_num+1];
 #ifdef _OPENMP
-                    omp_set_lock(&vLock[v]);
+#pragma omp for schedule(guided,4) nowait
 #endif
-                    del[v] = del[v] + sig[v]*(1+del[w])/sig[w];
-#ifdef _OPENMP
-                    omp_unset_lock(&vLock[v]);
-#endif
+            for (j = ph_start; j < ph_end; j++) {
+                v = visited_vertices[j];
+				vis_path_info_v = &vis_path_info[v];
+				vis_path_info_v_child_count = vis_path_info_v->child_count;
+				vis_path_info_v_delta = 0.0;
+				vis_path_info_v_sigma = vis_path_info_v->sigma;
+				num_edges_v = cvl[v].num_edges;
+                for (k = 0; k < vis_path_info_v_child_count; k++) {
+					w = child[num_edges_v+k];
+                    epos = child_epos[num_edges_v+k];
+                    incr = vis_path_info_v_sigma*(1+vis_path_info[w].delta)/vis_path_info[w].sigma;
+                    cel[epos].cval += incr;
+                    vis_path_info_v_delta += incr;
                 }
-                BC[w] += del[w];
+				vis_path_info_v->delta = vis_path_info_v_delta;
+                //BC[v] += vis_path_info_v_delta;
             }
 
             phase_num--;
             
 #ifdef _OPENMP
-// #pragma omp barrier
+#pragma omp barrier
 #endif            
         }
-
-        proc_time = get_seconds() - proc_time;
-        all_time3 += proc_time;
-        proc_time = get_seconds();
         
-#ifdef _OPENMP
-        chunkSize = n/nthreads;
-// #pragma omp for schedule(static, chunkSize) nowait
-#endif
-        for (j=0; j<count; j++) {
-            w = S[j];
-            d[w] = -1;
-            del[w] = 0;
-            // P[w].count = 0;
+#if DIAGNOSTIC
+        if (tid == 0) {
+            elapsed_time_part = get_seconds() - elapsed_time_part;
+            fprintf(stdout, "Accumulation time: %9.6lf seconds\n", elapsed_time_part);
         }
-
-        proc_time = get_seconds() - proc_time;
-        all_time4 += proc_time;
-
-#ifdef _OPENMP
-#pragma omp barrier
 #endif
-
-    }
- 
-#ifdef _OPENMP
-#pragma omp barrier
-#endif
-
-#ifdef DIAGNOSTIC
-    if (tid == 0) {
-        elapsed_time_part = get_seconds() -elapsed_time_part;
-        fprintf(stderr, "BC computation time: %lf seconds\n", elapsed_time_part);
-    }
-#endif
-    fprintf(stderr, "tid: %d, forward: %lf, merge: %lf %lf, backward: %lf, clear: %lf\n", tid,
-            all_time1, all_time2a, all_time2, all_time3, all_time4);
 
 #ifdef _OPENMP
 #pragma omp for nowait
-    for (i=0; i<n; i++) {
-        omp_destroy_lock(&vLock[i]);
+#endif
+        for (j=0; j<n; j++) {
+            vis_path_info[j].d = 0;
+			vis_path_info[j].sigma = 0;
+			vis_path_info[j].child_count = 0;
+        }
+
+#ifdef _OPENMP
+#pragma omp barrier
+#endif
+    }
+ 
+#if DIAGNOSTIC
+    if (tid == 0) {
+        elapsed_time_all = get_seconds() - elapsed_time_all;
+        fprintf(stdout, "BC computation time: %9.6lf seconds\n",
+                elapsed_time_all);
     }
 #endif
 
-    free(myS);
+    free(p_vis);
     
     if (tid == 0) { 
-        free(S);
-        free(pListMem);
-        free(P);
-        free(sig);
-        free(d);
-        free(del);
-#ifdef _OPENMP
-        free(vLock);
-#endif
-        free(start);
-        free(end);
-        free(psCount);
+        free(visited_vertices);
+        free(vis_path_info);
+        free(num_visited);
+        free(visited_counts);
+        free(child);
         elapsed_time = get_seconds() - elapsed_time;
-        free(Srcs);
+        free(vis_srcs);
     }
 
     free_sprng(stream);
+
+    /* Initial run, update maxbc values of all the components */
+    if (tid == 0) {
+        if (curr_component1 == -1) {
+            for (i=0; i<n; i++) {        
+                comm_id = cvl[i].comm_id;
+                for (j=cvl[i].num_edges; j<cvl[i+1].num_edges; j++) {
+                    if (cel[j].cval > comm_list[comm_id].mbc_val) {
+                        comm_list[comm_id].mbc_val = cel[j].cval;
+                        comm_list[comm_id].mbc_esrc = i;
+                        comm_list[comm_id].mbc_eid = cel[j].eid;
+                    }
+                }
+
+            }
+        }   
+    }
+
 #ifdef _OPENMP
+#pragma omp barrier
+#endif
+}
+
 }    
-#endif
-
-    /* Verification */
-#ifdef VERIFYK4
-    double BCval;
-    if (SCALE % 2 == 0) {
-        BCval = 0.5*pow(2, 3*SCALE/2)-pow(2, SCALE)+1.0;
-    } else {
-        BCval = 0.75*pow(2, (3*SCALE-1)/2)-pow(2, SCALE)+1.0;
-    }
-    int failed = 0;
-    for (int i=0; i<G->n; i++) {
-        if (round(BC[i] - BCval) != 0) {
-            failed = 1;
-            break;
-        }
-    }
-    if (failed) {
-        fprintf(stderr, "Kernel 4 failed validation!\n");
-    } else {
-        fprintf(stderr, "Kernel 4 validation successful!\n");
-    }
-#endif
-    return elapsed_time;
-}
-
-void edge_betweenness_centrality(graph_t* G, double* eBC) {
-
-}
 

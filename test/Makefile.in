@@ -34,7 +34,8 @@ build_triplet = @build@
 host_triplet = @host@
 bin_PROGRAMS = eval_BFS$(EXEEXT) eval_biconnected_components$(EXEEXT) \
 	eval_modularity_spectral$(EXEEXT) eval_vertex_cover$(EXEEXT) \
-	eval_vertex_betweenness$(EXEEXT)
+	eval_vertex_betweenness$(EXEEXT) \
+	eval_modularity_betweenness$(EXEEXT)
 subdir = test
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -60,6 +61,12 @@ am_eval_biconnected_components_OBJECTS =  \
 eval_biconnected_components_OBJECTS =  \
 	$(am_eval_biconnected_components_OBJECTS)
 eval_biconnected_components_DEPENDENCIES =  \
+	$(top_srcdir)/lib/libsnap.la
+am_eval_modularity_betweenness_OBJECTS =  \
+	drive_modularity_edge_betweenness.$(OBJEXT)
+eval_modularity_betweenness_OBJECTS =  \
+	$(am_eval_modularity_betweenness_OBJECTS)
+eval_modularity_betweenness_DEPENDENCIES =  \
 	$(top_srcdir)/lib/libsnap.la
 am_eval_modularity_spectral_OBJECTS =  \
 	drive_modularity_spectral.$(OBJEXT)
@@ -87,11 +94,13 @@ LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = $(eval_BFS_SOURCES) $(eval_biconnected_components_SOURCES) \
+	$(eval_modularity_betweenness_SOURCES) \
 	$(eval_modularity_spectral_SOURCES) \
 	$(eval_vertex_betweenness_SOURCES) \
 	$(eval_vertex_cover_SOURCES)
 DIST_SOURCES = $(eval_BFS_SOURCES) \
 	$(eval_biconnected_components_SOURCES) \
+	$(eval_modularity_betweenness_SOURCES) \
 	$(eval_modularity_spectral_SOURCES) \
 	$(eval_vertex_betweenness_SOURCES) \
 	$(eval_vertex_cover_SOURCES)
@@ -219,6 +228,8 @@ eval_biconnected_components_SOURCES = drive_biconnected_components.c
 eval_biconnected_components_LDADD = $(top_srcdir)/lib/libsnap.la
 eval_modularity_spectral_SOURCES = drive_modularity_spectral.c
 eval_modularity_spectral_LDADD = $(top_srcdir)/lib/libsnap.la
+eval_modularity_betweenness_SOURCES = drive_modularity_edge_betweenness.c
+eval_modularity_betweenness_LDADD = $(top_srcdir)/lib/libsnap.la
 all: all-am
 
 .SUFFIXES:
@@ -286,6 +297,9 @@ eval_BFS$(EXEEXT): $(eval_BFS_OBJECTS) $(eval_BFS_DEPENDENCIES)
 eval_biconnected_components$(EXEEXT): $(eval_biconnected_components_OBJECTS) $(eval_biconnected_components_DEPENDENCIES) 
 	@rm -f eval_biconnected_components$(EXEEXT)
 	$(LINK) $(eval_biconnected_components_OBJECTS) $(eval_biconnected_components_LDADD) $(LIBS)
+eval_modularity_betweenness$(EXEEXT): $(eval_modularity_betweenness_OBJECTS) $(eval_modularity_betweenness_DEPENDENCIES) 
+	@rm -f eval_modularity_betweenness$(EXEEXT)
+	$(LINK) $(eval_modularity_betweenness_OBJECTS) $(eval_modularity_betweenness_LDADD) $(LIBS)
 eval_modularity_spectral$(EXEEXT): $(eval_modularity_spectral_OBJECTS) $(eval_modularity_spectral_DEPENDENCIES) 
 	@rm -f eval_modularity_spectral$(EXEEXT)
 	$(LINK) $(eval_modularity_spectral_OBJECTS) $(eval_modularity_spectral_LDADD) $(LIBS)
@@ -304,6 +318,7 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/drive_BFS.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/drive_biconnected_components.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/drive_modularity_edge_betweenness.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/drive_modularity_spectral.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/drive_vertex_betweenness.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/drive_vertex_cover.Po@am__quote@

@@ -81,6 +81,15 @@ typedef struct {
     attr_id_t comm_id;
 } c_vert_t;
 
+typedef struct {
+    attr_id_t p;
+    double a;
+    double e;
+    attr_id_t mbc_eid;
+    double mbc_val;
+    attr_id_t mbc_esrc;
+} comm_list_t;
+
 typedef struct struct_node
 {
     int id;

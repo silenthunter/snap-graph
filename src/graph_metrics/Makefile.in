@@ -48,7 +48,8 @@ CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libgraph_metrics_la_LIBADD =
-am_libgraph_metrics_la_OBJECTS = vertex_betweenness_centrality.lo
+am_libgraph_metrics_la_OBJECTS = vertex_betweenness_centrality.lo \
+	edge_betweenness_centrality.lo
 libgraph_metrics_la_OBJECTS = $(am_libgraph_metrics_la_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
@@ -178,7 +179,9 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AM_CPPFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)/include/sprng
 noinst_LTLIBRARIES = libgraph_metrics.la
-libgraph_metrics_la_SOURCES = vertex_betweenness_centrality.c 
+libgraph_metrics_la_SOURCES = vertex_betweenness_centrality.c \
+edge_betweenness_centrality.c 
+
 all: all-am
 
 .SUFFIXES:
@@ -230,6 +233,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/edge_betweenness_centrality.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/vertex_betweenness_centrality.Plo@am__quote@
 
 .c.o:

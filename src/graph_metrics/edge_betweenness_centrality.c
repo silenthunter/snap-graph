@@ -118,10 +118,6 @@ void evaluate_edge_centrality_bcpart(graph_t* g, attr_id_t* ebc_eval_data1,
 		assert(vLock != NULL);
 #endif
     }
-//#if DIAGNOSTIC
-    if (tid == 0) 
-        fprintf(stdout, "Size of S_info struct: %d\n", sizeof(S_info_t));
-//#endif
     
     /* Initialize RNG stream */
 	seed = SPRNG_SEED;
@@ -188,18 +184,13 @@ void evaluate_edge_centrality_bcpart(graph_t* g, attr_id_t* ebc_eval_data1,
         elapsed_time_part = get_seconds();
 #endif
     }
-
     /* Start timing code from here */
 
 	if (tid == 0) {
         elapsed_time = get_seconds();
     }
 
-#if VERIFYK4
-        MAX_NUM_PHASES = 2*sqrt(n);
-#else
-        MAX_NUM_PHASES = 50;
-#endif
+    MAX_NUM_PHASES = 1000;
 
 	if (tid == 0) {
 		/* Allocate memory for the data structures */
@@ -531,27 +522,10 @@ void evaluate_edge_centrality_bcpart(graph_t* g, attr_id_t* ebc_eval_data1,
 
     free_sprng(stream);
 
-    /* Initial run, update maxbc values of all the components */
-    if (tid == 0) {
-        if (curr_component1 == -1) {
-            for (i=0; i<n; i++) {        
-                comm_id = cvl[i].comm_id;
-                for (j=cvl[i].num_edges; j<cvl[i+1].num_edges; j++) {
-                    if (cel[j].cval > comm_list[comm_id].mbc_val) {
-                        comm_list[comm_id].mbc_val = cel[j].cval;
-                        comm_list[comm_id].mbc_esrc = i;
-                        comm_list[comm_id].mbc_eid = cel[j].eid;
-                    }
-                }
-
-            }
-        }   
-    }
-
 #ifdef _OPENMP
 #pragma omp barrier
 #endif
 }
-
+    
 }    
 

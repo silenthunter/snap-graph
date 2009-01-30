@@ -15,7 +15,6 @@ int aux_connected_components_init(graph_t* g) {
 
     S = (attr_id_t *) malloc(n * sizeof(attr_id_t));
     assert(S != NULL);
-    fprintf(stderr, "here, n is %d\n", n); 
 
     for (i=0; i<n; i++) {
         g->cvl[i].comm_id = -1;
@@ -32,7 +31,6 @@ int aux_connected_components_init(graph_t* g) {
         g->cvl[i].comm_id = num_components;
         while (vis_current != vis_count) {
             u = S[vis_current];
-            fprintf(stderr, "%d ", u);
             i_start_edge = g->cvl[u].num_edges;
             i_end_edge   = g->cvl[u+1].num_edges;
             for (j=i_start_edge; j<i_end_edge; j++) {
@@ -47,7 +45,6 @@ int aux_connected_components_init(graph_t* g) {
         num_components++;
     }
     free(S);
-    fprintf(stderr, "num components is %d\n", num_components);
     return num_components;
 }
 
@@ -84,7 +81,7 @@ int aux_connected_components_update(graph_t* g, attr_id_t num_components, attr_i
                 for (j=i_start_edge; j<i_end_edge; j++) {
                     if (g->cel[j].mask == 0) {
                         v = g->cel[j].dest;
-                        if (g->cvl[v].comm_id == -1) {
+                        if (g->cvl[v].comm_id == maxbc_component) {
                             g->cvl[v].comm_id = num_components;
                             S[vis_count++] = v;
                         }

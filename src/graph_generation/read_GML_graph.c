@@ -458,7 +458,7 @@ void network_to_graph(graph_t *G, NETWORK *N)
 	G->numEdges = (attr_id_t*) calloc(G->n+1, sizeof(attr_id_t));
     G->endV = (attr_id_t*) calloc(G->m, sizeof(attr_id_t));
     G->edge_id = (attr_id_t *) calloc(G->m, sizeof(attr_id_t));
-    G->dbl_weight_e = (double*) malloc(sizeof(double)* G->m  );
+    G->dbl_weight_e = (double*) malloc(sizeof(double)* G->m);
 	
     assert(G->numEdges != NULL);
     assert(G->endV != NULL);
@@ -483,13 +483,14 @@ void network_to_graph(graph_t *G, NETWORK *N)
 			count++;
 		}
 	}
+
 	free_network(N);
 	free(N);
 
 }
 
 void read_GML_graph(graph_t* G, char* filename) {
-	NETWORK *N = (NETWORK*)malloc(sizeof(NETWORK));;
+	NETWORK *N = (NETWORK*)malloc(sizeof(NETWORK));
 	FILE *ifile = fopen(filename, "r");
 	read_network(N,ifile);	//Note that readgml is hardcoded to read undirected graphs,even if the input graph is directed.
 	network_to_graph(G,N);

@@ -99,11 +99,6 @@ int main(int argc, char** argv) {
 
     /* Step 3: Run algorithm */
     
-    /* Fix in future version of code */    
-    if (g->undirected) {
-	    g->m /=2;
-    }
-    
     membership = (attr_id_t *) malloc(g->n * sizeof(attr_id_t));
     assert(membership != NULL);
 

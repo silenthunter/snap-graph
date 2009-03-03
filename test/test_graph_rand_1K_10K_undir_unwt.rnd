@@ -1,11 +1,11 @@
-# A sample configuration file for generating RMAT graphs
+# A sample configuration file for generating random graphs
 # (lines beginning with a # symbol indicate comments)
 
 # The number of vertices is given by n
-n 100000
+n 1000
 
 # The number of edges is denoted by m
-m 1000000
+m 10000
 
 # Set undirected to 1 for a undirected graph, 0 otherwise
 undirected 1
@@ -20,6 +20,3 @@ weight_type 0
 # Min edge weight
 # min_weight 0
 
-a 0.55
-b 0.15
-c 0.15

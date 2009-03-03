@@ -2,7 +2,8 @@ AM_CPPFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)/include/sprng
 AM_LDFLAGS = -L$(top_srcdir)/lib -lm
 
 bin_PROGRAMS = eval_BFS eval_biconnected_components eval_modularity_spectral \
-eval_vertex_cover eval_vertex_betweenness eval_modularity_betweenness
+eval_vertex_cover eval_vertex_betweenness eval_modularity_betweenness \
+eval_modularity_greedy_agglomerative
 
 eval_vertex_betweenness_SOURCES = drive_vertex_betweenness.c
 eval_vertex_betweenness_LDADD = $(top_srcdir)/lib/libsnap.la
@@ -21,6 +22,9 @@ eval_modularity_spectral_LDADD = $(top_srcdir)/lib/libsnap.la
 
 eval_modularity_betweenness_SOURCES = drive_modularity_edge_betweenness.c
 eval_modularity_betweenness_LDADD = $(top_srcdir)/lib/libsnap.la
+
+eval_modularity_greedy_agglomerative_SOURCES = drive_modularity_greedy_agglomerative.c
+eval_modularity_greedy_agglomerative_LDADD = $(top_srcdir)/lib/libsnap.la
 
 # Not building this code for now.
 #eval_dyn_ds_SOURCES = test_dyn_ds.c

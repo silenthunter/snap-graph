@@ -494,5 +494,6 @@ void read_GML_graph(graph_t* G, char* filename) {
 	FILE *ifile = fopen(filename, "r");
 	read_network(N,ifile);	//Note that readgml is hardcoded to read undirected graphs,even if the input graph is directed.
 	network_to_graph(G,N);
+    fclose(ifile);
 }	
 

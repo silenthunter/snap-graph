@@ -7,7 +7,7 @@
 #define NOSHARE(x) ((x)<<CACHELOG)
 
 void evaluate_edge_centrality_bcpart(graph_t* g, attr_id_t* ebc_eval_data1, 
-        double* ebc_eval_data2, comm_list_t* comm_list, attr_id_t num_components, 
+        double* ebc_eval_data2, comm_list_bc_t* comm_list, attr_id_t num_components, 
         attr_id_t curr_component1, attr_id_t curr_component2) {
 
 

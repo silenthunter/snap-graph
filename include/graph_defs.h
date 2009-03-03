@@ -50,25 +50,6 @@ void sorted_dyn_array_init(dyn_array_t* A);
 void sorted_dyn_array_clear(dyn_array_t* A);
 void sorted_dyn_array_free(dyn_array_t* A);
 
-typedef struct
-{
-    attr_id_t src;
-    attr_id_t dest;
-    attr_id_t eid;
-} edge_t;
-
-typedef struct
-{
-    dyn_array_t* neighbors;
-    attr_id_t degree;
-} vert_t;
-
-typedef struct {
-    attr_id_t* list;
-    attr_id_t count;
-    attr_id_t degree;
-} plist_t;
-
 typedef struct {
     attr_id_t dest;
     attr_id_t eid;
@@ -88,7 +69,27 @@ typedef struct {
     attr_id_t mbc_eid;
     double mbc_val;
     attr_id_t mbc_esrc;
-} comm_list_t;
+} comm_list_bc_t;
+
+
+typedef struct
+{
+    attr_id_t src;
+    attr_id_t dest;
+    attr_id_t eid;
+} edge_t;
+
+typedef struct
+{
+    dyn_array_t* neighbors;
+    attr_id_t degree;
+} vert_t;
+
+typedef struct {
+    attr_id_t* list;
+    attr_id_t count;
+    attr_id_t degree;
+} plist_t;
 
 typedef struct struct_node
 {

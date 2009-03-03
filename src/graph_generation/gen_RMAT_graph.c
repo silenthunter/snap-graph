@@ -311,7 +311,9 @@ void read_RMAT_config_file(graph_t* G, char* configfile, double* params) {
 		fprintf(stderr, "Unable to open config file:i %s\n",configfile);
 		exit(-1);
 	}
-
+    
+    /* default values */
+    params[0] = 0.45; params[1] = 0.25; params[2] = 0.15; params[3] = 1; 
 	while (fgets(line, sizeof (line), fp) != NULL) {
 		sscanf(line, "%s %lf", var, &val);
 		if (*var == '#') continue;  /* comment */

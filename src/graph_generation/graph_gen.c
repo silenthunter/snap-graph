@@ -43,6 +43,7 @@ void free_graph(graph_t* g) {
 
     if (g->m != 0) {
         free(g->endV);
+        free(g->edge_id);
     }
 
     if (g->weight_type != -1) {

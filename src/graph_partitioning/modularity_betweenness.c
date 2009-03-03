@@ -1,7 +1,7 @@
 #include "graph_partitioning.h"
 #include "graph_kernels.h"
 
-double comm_evaluate_modularity(graph_t* g, comm_list_t* comm_list, attr_id_t num_components) {
+double comm_evaluate_modularity(graph_t* g, comm_list_bc_t* comm_list, attr_id_t num_components) {
 
     attr_id_t u, v, j;
     attr_id_t n, m;
@@ -41,7 +41,7 @@ double comm_evaluate_modularity(graph_t* g, comm_list_t* comm_list, attr_id_t nu
     return mod;
 }
 
-void  remove_maxbc_edge(graph_t *g, comm_list_t *comm_list, 
+void  remove_maxbc_edge(graph_t *g, comm_list_bc_t *comm_list, 
         attr_id_t num_components, attr_id_t num_bc_runs, 
         edge_t* ebc_edge, attr_id_t* maxbc_component) {
 
@@ -153,7 +153,7 @@ void modularity_betweenness(graph_t *g, attr_id_t *membership,
     long i, j;    
     attr_id_t init_num_components, num_components, curr_component;
     double curr_modularity, prev_modularity;
-    comm_list_t* comm_list;
+    comm_list_bc_t* comm_list;
     int new_comp;
     edge_t ebc_edge;
     int num_bc_runs;
@@ -198,7 +198,7 @@ void modularity_betweenness(graph_t *g, attr_id_t *membership,
      * two variables to count the  */ 
     /* The max. number of communities is n, the number of vertices in the
      * network */
-    comm_list = (comm_list_t *) calloc(n, sizeof(comm_list_t));
+    comm_list = (comm_list_bc_t *) calloc(n, sizeof(comm_list_bc_t));
     curr_modularity = comm_evaluate_modularity(g, comm_list, num_components);
     prev_modularity = 0;
     max_modularity = 0;
@@ -228,8 +228,8 @@ void modularity_betweenness(graph_t *g, attr_id_t *membership,
             comm_list[num_components].p = maxbc_component;
             num_components++;
             curr_modularity = comm_evaluate_modularity(g, comm_list, num_components);
-            fprintf(stderr, "%lf %d %d\n", curr_modularity, num_bc_runs,
-                    num_components);
+            //fprintf(stderr, "%lf %d %d\n", curr_modularity, num_bc_runs,
+            //        num_components);
             if (curr_modularity > max_modularity) {
                 max_modularity = curr_modularity;
                 max_modularity_comp_num = num_components-1;

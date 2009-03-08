@@ -516,6 +516,7 @@ void evaluate_edge_centrality_bcpart(graph_t* g, attr_id_t* ebc_eval_data1,
         free(num_visited);
         free(visited_counts);
         free(child);
+        free(child_epos);
         elapsed_time = get_seconds() - elapsed_time;
         free(vis_srcs);
     }

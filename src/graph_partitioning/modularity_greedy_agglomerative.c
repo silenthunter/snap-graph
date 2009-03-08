@@ -6,7 +6,7 @@
 /* Community adjacency structure -- sorted array */
 typedef struct s_commpair_aggc_t {
     attr_id_t comm_id; /* the list is sorted by this value */  
-    long dq;           /* increase in modularity for this pair */
+    double dq;           /* increase in modularity for this pair */
 } commpair_aggc_t;
 
 /* Structure representing a community and its adjacencies */
@@ -14,8 +14,8 @@ typedef struct {
     commpair_aggc_t* adjcomm; /* communities adjacent to current comm */
     attr_id_t degree;         /* number of adjacent communities */
     attr_id_t max_dq_idx;     /* neighbor with max dq value */
-    long max_dq;              /* max dq value */
-    long a;                   /* a, sum of degrees of all vertices in community */
+    double max_dq;            /* max dq value */
+    double a;                 /* a, sum of degrees of all vertices in community */
     attr_id_t max_size;       /* max size of the adjcomm array, array needs to 
                                  be resized id degree = max_size */
     attr_id_t comm_size;      /* no. of vertices that belong to a community */
@@ -53,7 +53,7 @@ void aggc_maxheap_sift_up(aggc_maxheap_t *dq_maxheap, attr_id_t idx) {
     commpair_aggc_t *comm_list;
     attr_id_t *heap_pos;
     attr_id_t root, parent, u, v, n, pos;
-    long tmp;
+    double tmp;
 
     comm_list = dq_maxheap->heap;
     heap_pos  = dq_maxheap->index;
@@ -89,7 +89,7 @@ void aggc_maxheap_sift_down(aggc_maxheap_t *dq_maxheap, attr_id_t idx) {
     commpair_aggc_t *comm_list;
     attr_id_t *heap_pos;
     attr_id_t root, child, u, v, n, pos;
-    long tmp;
+    double tmp;
 
     comm_list = dq_maxheap->heap;
     heap_pos  = dq_maxheap->index;
@@ -127,7 +127,7 @@ void aggc_maxheap_remove(aggc_maxheap_t* dq_maxheap, attr_id_t comm_id) {
     commpair_aggc_t *comm_list;
     attr_id_t *heap_pos;
     attr_id_t idx, new_comm_id, n;
-    long old_dq, new_dq;
+    double old_dq, new_dq;
 
     comm_list = dq_maxheap->heap;
     heap_pos  = dq_maxheap->index;
@@ -215,16 +215,16 @@ void aggc_adjcomm_resize(aggc_comm_t *communities, attr_id_t comm_id,
 }
 
 void aggc_update_dq_p1(aggc_comm_t *communities, aggc_maxheap_t* dq_maxheap,
-        attr_id_t comm1, attr_id_t comm2, long new_dq_val) {
+        attr_id_t comm1, attr_id_t comm2, double new_dq_val) {
 
     attr_id_t i, comm_id, max_dq_idx, max_dq_commpair_id, new_idx, pos, degree;
     commpair_aggc_t *adjcomm, *dq_comm_list;
     attr_id_t *dq_index;
-    long max_dq, max_dq_old, dq_val;
+    double max_dq, max_dq_old, dq_val;
     attr_id_t heap_pos;
-    attr_id_t INFTY;
-
-    INFTY = 1<<30;
+    double INFTY;
+    
+    INFTY = 100000.0;
     dq_comm_list = dq_maxheap->heap;
     dq_index     = dq_maxheap->index;
 
@@ -286,14 +286,14 @@ void aggc_update_dq_p1(aggc_comm_t *communities, aggc_maxheap_t* dq_maxheap,
  
 void aggc_update_dq_p2(aggc_comm_t *communities, aggc_maxheap_t* dq_maxheap,
         attr_id_t comm1, attr_id_t comm2, attr_id_t new_comm_id, 
-        long new_dq_val) {
+        double new_dq_val) {
 
     attr_id_t i, comm_id, max_dq_idx, max_dq_commpair_id, new_idx, pos, degree;
     commpair_aggc_t *adjcomm, *dq_comm_list;
     attr_id_t *dq_index, heap_pos, INFTY;
-    long max_dq, dq_val, max_dq_old;
+    double max_dq, dq_val, max_dq_old;
 
-    INFTY = 1<<30;
+    INFTY = 100000.0;
     dq_comm_list = dq_maxheap->heap;
     dq_index     = dq_maxheap->index;
 
@@ -436,6 +436,18 @@ void aggc_update_dq_p2(aggc_comm_t *communities, aggc_maxheap_t* dq_maxheap,
             heap_pos = dq_index[comm1];
             dq_comm_list[heap_pos].dq = new_dq_val;
             aggc_maxheap_sift_up(dq_maxheap, heap_pos);
+        } else {
+            /* update local max_dq_idx */
+            max_dq_idx = communities[comm1].max_dq_idx;
+            if (new_comm_id > comm2) {
+                if ((max_dq_idx > pos) && (max_dq_idx <= i)) {
+                    communities[comm1].max_dq_idx = max_dq_idx - 1;
+                }
+            } else {
+                if ((max_dq_idx >= i) && (max_dq_idx < pos)) {
+                    communities[comm1].max_dq_idx = max_dq_idx + 1;
+                }
+            }
         }
     }
 }
@@ -446,12 +458,12 @@ void aggc_remove_commpair(aggc_comm_t *communities, aggc_maxheap_t *dq_maxheap,
 
     attr_id_t i, comm_id, max_dq_idx, max_dq_commpair_id, new_idx, pos, degree;
     commpair_aggc_t *adjcomm, *dq_comm_list;
-    long max_dq, dq_val;
+    double max_dq, dq_val;
     attr_id_t *dq_index;
     attr_id_t heap_pos;
-    attr_id_t INFTY;
+    double INFTY;
 
-    INFTY = 1<<30;
+    INFTY = 100000.0;
     dq_index = dq_maxheap->index;
     dq_comm_list = dq_maxheap->heap;
 
@@ -466,7 +478,7 @@ void aggc_remove_commpair(aggc_comm_t *communities, aggc_maxheap_t *dq_maxheap,
     adjcomm = communities[comm1].adjcomm;
 
     if (comm2 == max_dq_commpair_id) {
-        
+                
         /* we need to rescan to find new max_dq for comm1 */
         max_dq = -INFTY;
         max_dq_idx = -1;
@@ -492,9 +504,8 @@ void aggc_remove_commpair(aggc_comm_t *communities, aggc_maxheap_t *dq_maxheap,
             adjcomm[i].dq  = adjcomm[i+1].dq;
 
             if (adjcomm[i].dq > max_dq) {
-                max_dq = dq_val;
+                max_dq = adjcomm[i].dq;
                 max_dq_idx = i;
-
             }
         }
 
@@ -526,12 +537,13 @@ void aggc_remove_commpair(aggc_comm_t *communities, aggc_maxheap_t *dq_maxheap,
          
 void aggc_merge_communities_cnm(aggc_comm_t* communities, 
         aggc_maxheap_t* dq_maxheap, 
-        long *dq_increase_ptr, commpair_aggc_t* adj_buffer) {
+        double *dq_increase_ptr, commpair_aggc_t* adj_buffer) {
 
-        attr_id_t INFTY;
+        double INFTY;
+        attr_id_t HIGH_VID;
         attr_id_t p1, p2, comm1, comm2, from, to, i, j, from_size, to_size;
         commpair_aggc_t *from_adj, *to_adj, *dq_comm_list;
-        long max_dq, from_a, to_a, max_dq_old;
+        double max_dq, from_a, to_a, max_dq_old;
         attr_id_t ins_pos, heap_pos, max_dq_idx, max_dq_idx_comm2, curr_i_idx;
         attr_id_t new_neis;
         attr_id_t *dq_index;
@@ -539,7 +551,8 @@ void aggc_merge_communities_cnm(aggc_comm_t* communities,
         dq_index = dq_maxheap->index;
         dq_comm_list = dq_maxheap->heap;
 
-        INFTY = 1<<30;
+        INFTY = 100000.0;
+        HIGH_VID = 1<<30;
         comm1 = dq_comm_list[0].comm_id;
         max_dq = max_dq_old = dq_comm_list[0].dq;
 
@@ -551,8 +564,17 @@ void aggc_merge_communities_cnm(aggc_comm_t* communities,
 
         max_dq_idx = communities[comm1].max_dq_idx;
         comm2 = communities[comm1].adjcomm[max_dq_idx].comm_id;
-      
+ 
         max_dq_idx_comm2 = communities[comm2].max_dq_idx;
+        
+        if (comm1 != communities[comm2].adjcomm[max_dq_idx_comm2].comm_id) {
+            /* comm2 has an adjacency comm3 which has the same dq value 
+               as the pair comm1 -> comm2 */
+           /* Search to locate comm1 and modify comm2's max_dq_idx */
+          ins_pos = aggc_adjcomm_pos(communities[comm2].adjcomm, comm1, 
+                    communities[comm2].degree);
+          communities[comm2].max_dq_idx = ins_pos;
+        }
 
         if (communities[comm1].degree < communities[comm2].degree) {
             from = comm1;
@@ -586,7 +608,7 @@ void aggc_merge_communities_cnm(aggc_comm_t* communities,
 
             if (p1 == from) {
                 /* This community needs to be deleted */
-                to_adj[i].comm_id = INFTY;
+                to_adj[i].comm_id = HIGH_VID;
                 i++;
                 continue;
             }
@@ -620,6 +642,7 @@ void aggc_merge_communities_cnm(aggc_comm_t* communities,
                 }
                 aggc_update_dq_p1(communities, dq_maxheap, p1, to, to_adj[i].dq);
                 aggc_remove_commpair(communities, dq_maxheap, p2, from);
+               
                 i++;
                 j++;
                 curr_i_idx++;
@@ -653,7 +676,7 @@ void aggc_merge_communities_cnm(aggc_comm_t* communities,
             p1 = to_adj[i].comm_id;
             if (p1 == from) {
                 /* This community needs to be deleted */
-                to_adj[i].comm_id = INFTY;
+                to_adj[i].comm_id = HIGH_VID;
                 i++;
                 continue;
             }
@@ -716,7 +739,13 @@ void aggc_merge_communities_cnm(aggc_comm_t* communities,
             free(communities[from].adjcomm);
             communities[from].resized = 0;
         }
-        
+       
+        heap_pos = dq_index[from];
+        /*
+        if (max_dq_old != dq_comm_list[heap_pos].dq) {
+            fprintf(stderr, "%lf %lf\n", max_dq_old, dq_comm_list[heap_pos].dq);
+        }
+        */
         aggc_maxheap_remove(dq_maxheap, from);
 
         communities[to].max_dq = max_dq;
@@ -726,13 +755,10 @@ void aggc_merge_communities_cnm(aggc_comm_t* communities,
         assert(heap_pos != -1);
 
         dq_comm_list[heap_pos].dq = max_dq;
-       if (max_dq > max_dq_old)
+        if (max_dq > max_dq_old)
             aggc_maxheap_sift_up(dq_maxheap, heap_pos);
         else
             aggc_maxheap_sift_down(dq_maxheap, heap_pos);
-        if (to == 597)
-            fprintf(stderr, "[%d %ld %ld]\n", dq_index[to],
-                    dq_comm_list[dq_index[to]], max_dq);
 } 
 
 /* Greedy community detection algorithms that optimize modularity. These are 
@@ -753,7 +779,7 @@ void modularity_greedy_agglomerative(graph_t *g, char *alg_type,
 
     commpair_aggc_t *comm_memchunk;
     double mod_val;
-    long mod_val_l;
+    double mod_val_l;
     long num_uniq_edges;
     commpair_aggc_t *merged_adjcomm, *dq_comm_list;
     attr_id_t curr_pair;
@@ -763,18 +789,18 @@ void modularity_greedy_agglomerative(graph_t *g, char *alg_type,
     attr_id_t n, m;
     attr_id_t i, j, v;
     attr_id_t start_iter, end_iter, new_start_iter;
-    long max_dq, new_dq;
+    double max_dq, new_dq, num_uniq_edges_2inv, num_uniq_edges_inv;
     attr_id_t max_dq_idx, uniq_adj_count, v_degree_i, degree_i; 
     commpair_aggc_t *comm_adj_ptr, *adj_buffer;
     attr_id_t no_of_joins, total_joins;
     attr_id_t comm1, comm2, comm1_size, comm2_size;
-    attr_id_t INFTY;
+    double INFTY;
     attr_id_t num_comm_pairs;    /* No. of community pairs 
                                     is initially n, but keeps
                                     reducing. */
     attr_id_t parent_id, final_num_communities;
 
-    INFTY = 1<<30;
+    INFTY = 100000.0;
 
     n = g->n;
     m = g->m;        /* we store each undirected edge twice, 
@@ -850,15 +876,19 @@ void modularity_greedy_agglomerative(graph_t *g, char *alg_type,
         communities[i].a = uniq_adj_count;
         num_uniq_edges += uniq_adj_count;
     }
+    num_uniq_edges_2inv = 1.0/(num_uniq_edges * num_uniq_edges);
+    num_uniq_edges_inv  = 1.0/(num_uniq_edges);
 
     for (i=0; i<n; i++) {
         max_dq = -INFTY;
         max_dq_idx = -1;
         degree_i = communities[i].degree;
         comm_adj_ptr = communities[i].adjcomm;
+        communities[i].a = communities[i].a * num_uniq_edges_inv;
         for (j=0; j<degree_i; j++) {
             v = comm_adj_ptr[j].comm_id;
-            comm_adj_ptr[j].dq = num_uniq_edges - degree_i * communities[v].degree;
+            comm_adj_ptr[j].dq = 2 * (num_uniq_edges_inv - (degree_i *
+                    communities[v].degree) * num_uniq_edges_2inv);
             if (comm_adj_ptr[j].dq > max_dq) {
                 max_dq = comm_adj_ptr[j].dq;
                 max_dq_idx = j;
@@ -870,7 +900,8 @@ void modularity_greedy_agglomerative(graph_t *g, char *alg_type,
 
     /* DEBUG */
     
-    fprintf(stderr, "No. of unique edges: %d\n", num_uniq_edges/2); 
+    fprintf(stderr, "No. of edges after removing self loops"
+           " and duplicates: %d\n", num_uniq_edges/2); 
     /*
     for (i=0; i<n; i++) {
         fprintf(stderr, "Comm %d, max size %d, degree %d\n", i, 
@@ -887,8 +918,12 @@ void modularity_greedy_agglomerative(graph_t *g, char *alg_type,
     }
     */
 
+    /* Compute initial modularity */
     mod_val_l = 0;
     mod_val = 0.0;
+    for (i=0; i<n; i++) {
+        mod_val -= communities[i].a * communities[i].a;
+    }
 
     dq_maxheap = (aggc_maxheap_t *) malloc(sizeof(aggc_maxheap_t));
     assert(dq_maxheap != NULL);
@@ -919,28 +954,28 @@ void modularity_greedy_agglomerative(graph_t *g, char *alg_type,
         num_comm_pairs++;
      }
         
-        /*
-        fprintf(stderr, "No. of communities: %d\n", num_comm_pairs);
-        */
+     /*
+     fprintf(stderr, "No. of communities: %d\n", num_comm_pairs);
+     */
 
-        aggc_maxheap_check(dq_maxheap);
+     aggc_maxheap_check(dq_maxheap);
 
-        /* DEBUG */
-        /*   
-        for (i=0; i<num_comm_pairs; i++) {
-            fprintf(stderr, "%d -- %d\n", dq_maxheap->heap[i].dq, 
-            dq_maxheap->heap[i].comm_id);
-        }
+     /* DEBUG */
+     /*   
+     for (i=0; i<num_comm_pairs; i++) {
+         fprintf(stderr, "%d -- %d\n", dq_maxheap->heap[i].dq, 
+         dq_maxheap->heap[i].comm_id);
+     }
 
-        for (i=0; i<num_comm_pairs; i++) {
-            fprintf(stderr, "%d, %d\n", i, dq_maxheap->heap[dq_index[i]].comm_id);
-        }
-        */
+     for (i=0; i<num_comm_pairs; i++) {
+         fprintf(stderr, "%d, %d\n", i, dq_maxheap->heap[dq_index[i]].comm_id);
+     }
+     */
 
     total_joins = num_comm_pairs-1;
 
     no_of_joins = 0;
-
+    /*fprintf(stderr, "Initial modularity: %lf\n", mod_val); */
     while (no_of_joins < total_joins) {
 
         aggc_merge_communities_cnm(communities, dq_maxheap,
@@ -952,8 +987,7 @@ void modularity_greedy_agglomerative(graph_t *g, char *alg_type,
             break;
         }
 
-        mod_val_l += new_dq; 
-        mod_val = ((double) mod_val_l)/(num_uniq_edges * num_uniq_edges);
+        mod_val += new_dq;
         if ((no_of_joins % 10000) == 0)
             fprintf(stderr, "join: %d, mod %lf\n", no_of_joins, mod_val);
     }

@@ -113,10 +113,12 @@ int main(int argc, char** argv) {
     modularity_greedy_agglomerative(g, alg_type, membership, 
             &num_communities, &modularity);
 
+    mod_val = get_community_modularity(g, membership, num_communities);
     /* Step 4: Write output to file */
     fp = fopen(outfilename, "w");
     fprintf(fp, "Number of communities: %d\n", num_communities);
-    fprintf(fp, "Modularity score: %lf\n", modularity);
+    fprintf(fp, "Modularity score: %lf (full), %lf (w/o dup)\n", mod_val,
+            modularity);
     fprintf(fp, "\n<Vertex ID> <Community ID>\n\n");
     
     for (i=0; i<g->n; i++) {
@@ -126,9 +128,9 @@ int main(int argc, char** argv) {
             fprintf(fp, "%ld %ld\n", i+1, membership[i]);  
 
     }
-    /* To-Do: Fix the modularity estimation bug in routine */
-    mod_val = get_community_modularity(g, membership, num_communities);
-    fprintf(stderr, "Final modularity: %lf\n", mod_val);
+    fprintf(stderr, "Modularity: %lf (full), %lf (w/o dup)\n", mod_val,
+            modularity);
+    fprintf(stderr, "No. of communities: %d\n", num_communities);
     
     fclose(fp);
 

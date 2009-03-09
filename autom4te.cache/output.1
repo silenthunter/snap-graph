@@ -12416,9 +12416,10 @@ fi
 fi
 
 # checks for libraries
-{ $as_echo "$as_me:$LINENO: checking for log2 in -lm" >&5
-$as_echo_n "checking for log2 in -lm... " >&6; }
-if test "${ac_cv_lib_m_log2+set}" = set; then
+
+{ $as_echo "$as_me:$LINENO: checking for sin in -lm" >&5
+$as_echo_n "checking for sin in -lm... " >&6; }
+if test "${ac_cv_lib_m_sin+set}" = set; then
   $as_echo_n "(cached) " >&6
 else
   ac_check_lib_save_LIBS=$LIBS
@@ -12436,11 +12437,11 @@ cat >>conftest.$ac_ext <<_ACEOF
 #ifdef __cplusplus
 extern "C"
 #endif
-char log2 ();
+char sin ();
 int
 main ()
 {
-return log2 ();
+return sin ();
   ;
   return 0;
 }
@@ -12466,12 +12467,12 @@ $as_echo "$ac_try_echo") >&5
 	 test "$cross_compiling" = yes ||
 	 $as_test_x conftest$ac_exeext
        }; then
-  ac_cv_lib_m_log2=yes
+  ac_cv_lib_m_sin=yes
 else
   $as_echo "$as_me: failed program was:" >&5
 sed 's/^/| /' conftest.$ac_ext >&5
 
-	ac_cv_lib_m_log2=no
+	ac_cv_lib_m_sin=no
 fi
 
 rm -rf conftest.dSYM
@@ -12479,13 +12480,14 @@ rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
       conftest$ac_exeext conftest.$ac_ext
 LIBS=$ac_check_lib_save_LIBS
 fi
-{ $as_echo "$as_me:$LINENO: result: $ac_cv_lib_m_log2" >&5
-$as_echo "$ac_cv_lib_m_log2" >&6; }
-if test "x$ac_cv_lib_m_log2" = x""yes; then
-  
-cat >>confdefs.h <<\_ACEOF
-@%:@define HAVE_LOG2 1
+{ $as_echo "$as_me:$LINENO: result: $ac_cv_lib_m_sin" >&5
+$as_echo "$ac_cv_lib_m_sin" >&6; }
+if test "x$ac_cv_lib_m_sin" = x""yes; then
+  cat >>confdefs.h <<_ACEOF
+@%:@define HAVE_LIBM 1
 _ACEOF
+
+  LIBS="-lm $LIBS"
 
 fi
 
@@ -13610,16 +13612,12 @@ fi
 
 
 
-# ToDo
 
 
 
 
 
-
-
-
-for ac_func in floor gettimeofday gethrtime memset memalign sqrt drand48 pow
+for ac_func in gettimeofday gethrtime memset memalign drand48 log2
 do
 as_ac_var=`$as_echo "ac_cv_func_$ac_func" | $as_tr_sh`
 { $as_echo "$as_me:$LINENO: checking for $ac_func" >&5

@@ -63,7 +63,7 @@ if test "$enable_openmp" = "yes"; then
 fi
 
 # checks for libraries
-AC_CHECK_LIBS(m)
+AC_CHECK_LIB(m, sin)
 
 # header files
 AC_CHECK_HEADERS([stdarg.h], [AC_DEFINE([HAVE_STDARG_H],[1],[Define if your system has the header file 'stdarg.h'.])])
@@ -79,7 +79,7 @@ AC_STRUCT_TM
 
 # check functions
 AC_FUNC_MALLOC
-AC_CHECK_FUNCS([floor gettimeofday gethrtime memset memalign sqrt drand48 pow log2])
+AC_CHECK_FUNCS([gettimeofday gethrtime memset memalign drand48 log2])
 
 # list of config files
 AC_CONFIG_FILES([Makefile

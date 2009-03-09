@@ -483,10 +483,10 @@ m4trace:configure.ac:58: -1- AC_DEFINE_TRACE_LITERAL([USING_OPENMP_THREADS])
 m4trace:configure.ac:58: -1- m4_pattern_allow([^USING_OPENMP_THREADS$])
 m4trace:configure.ac:58: -1- AH_OUTPUT([USING_OPENMP_THREADS], [/* Define to 1 if we have and are using OpenMP multithreading directives */
 #undef USING_OPENMP_THREADS])
-m4trace:configure.ac:66: -1- AC_DEFINE_TRACE_LITERAL([HAVE_LOG2])
-m4trace:configure.ac:66: -1- m4_pattern_allow([^HAVE_LOG2$])
-m4trace:configure.ac:66: -1- AH_OUTPUT([HAVE_LOG2], [/* Define to 1 if your system has \'log2\'. */
-#undef HAVE_LOG2])
+m4trace:configure.ac:66: -1- AH_OUTPUT([HAVE_LIBM], [/* Define to 1 if you have the `m\' library (-lm). */
+#undef HAVE_LIBM])
+m4trace:configure.ac:66: -1- AC_DEFINE_TRACE_LITERAL([HAVE_LIBM])
+m4trace:configure.ac:66: -1- m4_pattern_allow([^HAVE_LIBM$])
 m4trace:configure.ac:69: -1- AH_OUTPUT([HAVE_STDARG_H], [/* Define to 1 if you have the <stdarg.h> header file. */
 #undef HAVE_STDARG_H])
 m4trace:configure.ac:69: -1- AC_DEFINE_TRACE_LITERAL([HAVE_STDARG_H])
@@ -543,23 +543,19 @@ m4trace:configure.ac:81: -1- AC_DEFINE_TRACE_LITERAL([malloc])
 m4trace:configure.ac:81: -1- m4_pattern_allow([^malloc$])
 m4trace:configure.ac:81: -1- AH_OUTPUT([malloc], [/* Define to rpl_malloc if the replacement function should be used. */
 #undef malloc])
-m4trace:configure.ac:84: -1- AH_OUTPUT([HAVE_FLOOR], [/* Define to 1 if you have the `floor\' function. */
-#undef HAVE_FLOOR])
-m4trace:configure.ac:84: -1- AH_OUTPUT([HAVE_GETTIMEOFDAY], [/* Define to 1 if you have the `gettimeofday\' function. */
+m4trace:configure.ac:82: -1- AH_OUTPUT([HAVE_GETTIMEOFDAY], [/* Define to 1 if you have the `gettimeofday\' function. */
 #undef HAVE_GETTIMEOFDAY])
-m4trace:configure.ac:84: -1- AH_OUTPUT([HAVE_GETHRTIME], [/* Define to 1 if you have the `gethrtime\' function. */
+m4trace:configure.ac:82: -1- AH_OUTPUT([HAVE_GETHRTIME], [/* Define to 1 if you have the `gethrtime\' function. */
 #undef HAVE_GETHRTIME])
-m4trace:configure.ac:84: -1- AH_OUTPUT([HAVE_MEMSET], [/* Define to 1 if you have the `memset\' function. */
+m4trace:configure.ac:82: -1- AH_OUTPUT([HAVE_MEMSET], [/* Define to 1 if you have the `memset\' function. */
 #undef HAVE_MEMSET])
-m4trace:configure.ac:84: -1- AH_OUTPUT([HAVE_MEMALIGN], [/* Define to 1 if you have the `memalign\' function. */
+m4trace:configure.ac:82: -1- AH_OUTPUT([HAVE_MEMALIGN], [/* Define to 1 if you have the `memalign\' function. */
 #undef HAVE_MEMALIGN])
-m4trace:configure.ac:84: -1- AH_OUTPUT([HAVE_SQRT], [/* Define to 1 if you have the `sqrt\' function. */
-#undef HAVE_SQRT])
-m4trace:configure.ac:84: -1- AH_OUTPUT([HAVE_DRAND48], [/* Define to 1 if you have the `drand48\' function. */
+m4trace:configure.ac:82: -1- AH_OUTPUT([HAVE_DRAND48], [/* Define to 1 if you have the `drand48\' function. */
 #undef HAVE_DRAND48])
-m4trace:configure.ac:84: -1- AH_OUTPUT([HAVE_POW], [/* Define to 1 if you have the `pow\' function. */
-#undef HAVE_POW])
-m4trace:configure.ac:87: -1- AC_CONFIG_FILES([Makefile
+m4trace:configure.ac:82: -1- AH_OUTPUT([HAVE_LOG2], [/* Define to 1 if you have the `log2\' function. */
+#undef HAVE_LOG2])
+m4trace:configure.ac:85: -1- AC_CONFIG_FILES([Makefile
                  src/Makefile
                  src/graph_generation/Makefile
                  src/graph_kernels/Makefile
@@ -570,20 +566,20 @@ m4trace:configure.ac:87: -1- AC_CONFIG_FILES([Makefile
                  lib/Makefile
                  test/Makefile
                 ])
-m4trace:configure.ac:98: -1- AC_SUBST([LIB@&t@OBJS], [$ac_libobjs])
-m4trace:configure.ac:98: -1- AC_SUBST_TRACE([LIB@&t@OBJS])
-m4trace:configure.ac:98: -1- m4_pattern_allow([^LIB@&t@OBJS$])
-m4trace:configure.ac:98: -1- AC_SUBST([LTLIBOBJS], [$ac_ltlibobjs])
-m4trace:configure.ac:98: -1- AC_SUBST_TRACE([LTLIBOBJS])
-m4trace:configure.ac:98: -1- m4_pattern_allow([^LTLIBOBJS$])
-m4trace:configure.ac:98: -1- AC_SUBST_TRACE([top_builddir])
-m4trace:configure.ac:98: -1- AC_SUBST_TRACE([top_build_prefix])
-m4trace:configure.ac:98: -1- AC_SUBST_TRACE([srcdir])
-m4trace:configure.ac:98: -1- AC_SUBST_TRACE([abs_srcdir])
-m4trace:configure.ac:98: -1- AC_SUBST_TRACE([top_srcdir])
-m4trace:configure.ac:98: -1- AC_SUBST_TRACE([abs_top_srcdir])
-m4trace:configure.ac:98: -1- AC_SUBST_TRACE([builddir])
-m4trace:configure.ac:98: -1- AC_SUBST_TRACE([abs_builddir])
-m4trace:configure.ac:98: -1- AC_SUBST_TRACE([abs_top_builddir])
-m4trace:configure.ac:98: -1- AC_SUBST_TRACE([INSTALL])
-m4trace:configure.ac:98: -1- AC_REQUIRE_AUX_FILE([ltmain.sh])
+m4trace:configure.ac:96: -1- AC_SUBST([LIB@&t@OBJS], [$ac_libobjs])
+m4trace:configure.ac:96: -1- AC_SUBST_TRACE([LIB@&t@OBJS])
+m4trace:configure.ac:96: -1- m4_pattern_allow([^LIB@&t@OBJS$])
+m4trace:configure.ac:96: -1- AC_SUBST([LTLIBOBJS], [$ac_ltlibobjs])
+m4trace:configure.ac:96: -1- AC_SUBST_TRACE([LTLIBOBJS])
+m4trace:configure.ac:96: -1- m4_pattern_allow([^LTLIBOBJS$])
+m4trace:configure.ac:96: -1- AC_SUBST_TRACE([top_builddir])
+m4trace:configure.ac:96: -1- AC_SUBST_TRACE([top_build_prefix])
+m4trace:configure.ac:96: -1- AC_SUBST_TRACE([srcdir])
+m4trace:configure.ac:96: -1- AC_SUBST_TRACE([abs_srcdir])
+m4trace:configure.ac:96: -1- AC_SUBST_TRACE([top_srcdir])
+m4trace:configure.ac:96: -1- AC_SUBST_TRACE([abs_top_srcdir])
+m4trace:configure.ac:96: -1- AC_SUBST_TRACE([builddir])
+m4trace:configure.ac:96: -1- AC_SUBST_TRACE([abs_builddir])
+m4trace:configure.ac:96: -1- AC_SUBST_TRACE([abs_top_builddir])
+m4trace:configure.ac:96: -1- AC_SUBST_TRACE([INSTALL])
+m4trace:configure.ac:96: -1- AC_REQUIRE_AUX_FILE([ltmain.sh])

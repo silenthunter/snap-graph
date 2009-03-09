@@ -135,7 +135,7 @@
 
 struct rngen {
 	  int rng_type;
-      char *gentype;
+      const char *gentype;
       unsigned *si;      /* sets next branch seed  */
       unsigned *r0;      /* pointer to the even generator */
       unsigned *r1;      /* pointer to the odd generator */
@@ -172,10 +172,10 @@ int NGENS = 0;
 /*************************************************************************/
 
 #ifdef __STDC__
-static void errprint(char *level, char *routine, char *error)
+static void errprint(const char *level, const char *routine, const char *error)
 #else
 static void errprint(level, routine, error)
-char *level,*routine,*error;
+const char *level,*routine,*error;
 #endif
 {
       fprintf(stderr,"%s from %s: %s\n",level,routine,error);
@@ -357,25 +357,25 @@ int *genptr;
 {
         unsigned new_val,*r0,*r1;
         int hptr,lptr,*hp = &((struct rngen *)genptr)->hptr;
-	int lval, kval;
+	int lvalt, kvalt;
 
-	lval = ((struct rngen *)genptr)->lval;
-	kval = ((struct rngen *)genptr)->kval;
+	lvalt = ((struct rngen *)genptr)->lval;
+	kvalt = ((struct rngen *)genptr)->kval;
         r0 = ((struct rngen *)genptr)->r0;
         r1 = ((struct rngen *)genptr)->r1;
         hptr = *hp;
-        lptr = hptr + kval;
-        if (lptr>=lval) lptr -= lval;
+        lptr = hptr + kvalt;
+        if (lptr>=lvalt) lptr -= lvalt;
 /*    INT_MOD_MASK causes arithmetic to be modular when integer size is  */
 /*         different from generator modulus                              */
         r0[hptr] = INT_MOD_MASK&(r0[hptr] + r0[lptr]);
         r1[hptr] = INT_MOD_MASK&(r1[hptr] + r1[lptr]);
         new_val = (r1[hptr]&(~1)) ^ (r0[hptr]>>1);
-        if (--hptr < 0) hptr = lval - 1; /* skip an element in the sequence */
-        if (--lptr < 0) lptr = lval - 1;
+        if (--hptr < 0) hptr = lvalt - 1; /* skip an element in the sequence */
+        if (--lptr < 0) lptr = lvalt - 1;
         r0[hptr] = INT_MOD_MASK&(r0[hptr] + r0[lptr]);
         r1[hptr] = INT_MOD_MASK&(r1[hptr] + r1[lptr]);
-        *hp = (--hptr < 0) ? lval-1 : hptr;
+        *hp = (--hptr < 0) ? lvalt-1 : hptr;
 
   
         return (new_val>>1);
@@ -392,25 +392,25 @@ int *genptr;
   unsigned long new_val; /* this cannot be unsigned int due to a bug in the SGI compiler */
   unsigned  *r0,*r1;	
   int hptr,lptr,*hp = &((struct rngen *)genptr)->hptr;
-  int lval, kval;
+  int lvalt, kvalt;
 	
-  lval = ((struct rngen *)genptr)->lval;
-  kval = ((struct rngen *)genptr)->kval;
+  lvalt = ((struct rngen *)genptr)->lval;
+  kvalt = ((struct rngen *)genptr)->kval;
   r0 = ((struct rngen *)genptr)->r0;
   r1 = ((struct rngen *)genptr)->r1;
   hptr = *hp;
-  lptr = hptr + kval;
-  if (lptr>=lval) lptr -= lval;
+  lptr = hptr + kvalt;
+  if (lptr>=lvalt) lptr -= lvalt;
 /*    INT_MOD_MASK causes arithmetic to be modular when integer size is  */
 /*         different from generator modulus                              */
   r0[hptr] = INT_MOD_MASK&(r0[hptr] + r0[lptr]);
   r1[hptr] = INT_MOD_MASK&(r1[hptr] + r1[lptr]);
   new_val = (r1[hptr]&(~1)) ^ (r0[hptr]>>1);
-  if (--hptr < 0) hptr = lval - 1; /* skip an element in the sequence */
-  if (--lptr < 0) lptr = lval - 1;
+  if (--hptr < 0) hptr = lvalt - 1; /* skip an element in the sequence */
+  if (--lptr < 0) lptr = lvalt - 1;
   r0[hptr] = INT_MOD_MASK&(r0[hptr] + r0[lptr]);
   r1[hptr] = INT_MOD_MASK&(r1[hptr] + r1[lptr]);
-  *hp = (--hptr<0) ? lval-1 : hptr;
+  *hp = (--hptr<0) ? lvalt-1 : hptr;
 
         return ((float) new_val*FLT_MULT);
 } 
@@ -427,26 +427,26 @@ int *genptr;
   unsigned long temp1,temp2; /* Due to a bug in the SGI compiler, this should not be unsigned int */
   int hptr,lptr,*hp = &((struct rngen *)genptr)->hptr;
   double new_val;
-  int lval, kval;
+  int lvalt, kvalt;
 	
-  lval = ((struct rngen *)genptr)->lval;
-  kval = ((struct rngen *)genptr)->kval;
+  lvalt = ((struct rngen *)genptr)->lval;
+  kvalt = ((struct rngen *)genptr)->kval;
   r0 = ((struct rngen *)genptr)->r0;
   r1 = ((struct rngen *)genptr)->r1;
   hptr = *hp;
-  lptr = hptr + kval;
-  if (lptr>=lval) lptr -= lval;
+  lptr = hptr + kvalt;
+  if (lptr>=lvalt) lptr -= lvalt;
   /*    INT_MOD_MASK causes arithmetic to be modular when integer size is  */
   /*         different from generator modulus                              */
   r0[hptr] = INT_MOD_MASK&(r0[hptr] + r0[lptr]);
   r1[hptr] = INT_MOD_MASK&(r1[hptr] + r1[lptr]);
   temp1 = (r1[hptr]&(~1)) ^ (r0[hptr]>>1);
-  if (--hptr < 0) hptr = lval - 1;
-  if (--lptr < 0) lptr = lval - 1;
+  if (--hptr < 0) hptr = lvalt - 1;
+  if (--lptr < 0) lptr = lvalt - 1;
   r0[hptr] = INT_MOD_MASK&(r0[hptr] + r0[lptr]);
   r1[hptr] = INT_MOD_MASK&(r1[hptr] + r1[lptr]);
   temp2 = (r1[hptr]&(~1)) ^ (r0[hptr]>>1);
-  *hp = (--hptr < 0) ? lval-1 : hptr;
+  *hp = (--hptr < 0) ? lvalt-1 : hptr;
 
         new_val = ((unsigned int) temp2*(double)FLT_MULT + (unsigned int) temp1)*FLT_MULT;
         return (new_val);
@@ -654,7 +654,7 @@ int rng_type,gennum,param,seed,total_gen;
   ((struct rngen *)(p[0]))->stream_number = gennum;
 /*      update si array to allow for future spawning of generators       */
   si = ((struct rngen *)(p[0]))->si;
-  while (si[0] < total_gen && !si[1]) 
+  while (((int)si[0] < total_gen) && !si[1]) 
     si_double(si,si,length);
 
   NGENS++;
@@ -916,7 +916,8 @@ char *p;
 {
   int i, found, length, k, param;
   struct rngen *q;
-  unsigned seed, lag1, lag2;
+  unsigned seed;
+  unsigned lag1, lag2;
   unsigned char *packed;
   int rng_type;
   
@@ -937,7 +938,7 @@ char *p;
   
 /*      check values of parameters for consistency                       */
   for(i=found=0; i<NPARAMS; i++)
-    if(lag1==valid[i].L && lag2==valid[i].K)
+    if(((int)lag1)==valid[i].L && ((int)lag2)==valid[i].K)
     {
       found = 1;
       break;
@@ -961,7 +962,7 @@ char *p;
   }
   else 
   {
-    if (seed!=gseed)
+    if (((int)seed)!=gseed)
     {
       errprint("WARNING","unpack_rng","different global seed value!");
       fprintf(stderr,"\t Independence of streams is not guaranteed\n");

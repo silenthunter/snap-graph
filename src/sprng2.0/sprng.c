@@ -59,7 +59,7 @@ struct rngen
  *  #define SPRNG_PMLCG 5
  */
 
-int *(*init_rng_tbl[])(int rng_type,int gennum,int total_gen,int seed,int mult)\
+int *(*init_rng_tbl[])(int rng_type,int gennum,int total_gen,int seed,int multval)\
 	= {	lfg_init_rng, \
 		lcg_init_rng, \
 		lcg64_init_rng, \
@@ -171,10 +171,10 @@ int (*print_rng_tbl[])( int *igen)\
 
 
 #ifdef __STDC__
-int *init_rng(int rng_type, int gennum,  int total_gen,  int seed, int mult)
+int *init_rng(int rng_type, int gennum,  int total_gen,  int seed, int multval)
 #else
-int *init_rng(rng_type,gennum,total_gen,seed,mult)
-int rng_type,gennum,mult,seed,total_gen;
+int *init_rng(rng_type,gennum,total_gen,seed,multval)
+int rng_type,gennum,multval,seed,total_gen;
 #endif
 {
 	if (rng_type==SPRNG_LFG 	|| \
@@ -187,7 +187,7 @@ int rng_type,gennum,mult,seed,total_gen;
 #endif
 		)
 	{
-		return init_rng_tbl[rng_type](rng_type,gennum,total_gen,seed,mult);
+		return init_rng_tbl[rng_type](rng_type,gennum,total_gen,seed,multval);
 	}else{
 		fprintf(stderr, \
 		"Error: in init_rng, invalid generator type: %d.\n", rng_type);

@@ -8,7 +8,7 @@
 #define NO  0
 #define NPRIMES 10000
 
-int primes[NPRIMES];
+int primes_long[NPRIMES];
 
 #ifdef __STDC__
 int init_prime_64(void)
@@ -23,17 +23,17 @@ int init_prime_64()
     isprime = YES;
     
     for(j=0; j < obtained; j++)
-      if(i%primes[j] == 0)
+      if(i%primes_long[j] == 0)
       {
 	isprime = NO;
 	break;
       }
-    else if(primes[j]*primes[j] > i)
+    else if(primes_long[j]*primes_long[j] > i)
       break;
 
     if(isprime == YES)
     {
-      primes[obtained] = i;
+      primes_long[obtained] = i;
       obtained++;
     }
   }
@@ -54,7 +54,7 @@ unsigned int *prime_array;
 {
   static int initiallized = NO, num_prime;
   unsigned int largest;
-  int i, isprime, index, obtained = 0;
+  int i, isprime, idx, obtained = 0;
   
   if(need <= 0)
   {
@@ -86,7 +86,7 @@ unsigned int *prime_array;
     initiallized = YES;
   }
   
-  if(offset > MAXPRIMEOFFSETLONG)
+  if(offset > (int) MAXPRIMEOFFSETLONG)
   {
     fprintf(stderr,"WARNING: generator has branched maximum number of times;\nindependence of generators no longer guaranteed");
     offset = offset % MAXPRIMEOFFSETLONG;
@@ -99,9 +99,9 @@ unsigned int *prime_array;
   }
   else
   {
-    index = (unsigned int) ((offset-PRIMELISTSIZE1+1)/STEP) + PRIMELISTSIZE1 -  1;
-    largest = prime_list_64[index] + 2;
-    offset -= (index-PRIMELISTSIZE1+1)*STEP + PRIMELISTSIZE1 - 1;
+    idx = (unsigned int) ((offset-PRIMELISTSIZE1+1)/STEP) + PRIMELISTSIZE1 -  1;
+    largest = prime_list_64[idx] + 2;
+    offset -= (idx-PRIMELISTSIZE1+1)*STEP + PRIMELISTSIZE1 - 1;
   }
   
   
@@ -110,7 +110,7 @@ unsigned int *prime_array;
     isprime = YES;
     largest -= 2;
     for(i=0; i<num_prime; i++)
-      if(largest%primes[i] == 0)
+      if(largest%primes_long[i] == 0)
       {
 	isprime = NO;
 	break;

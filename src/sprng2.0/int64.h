@@ -45,7 +45,7 @@ typedef unsigned LONG64 uint64;
 #define xor(a,b,c)      {c = (a)^(b);}
 #define notzero(a)      (a==0?0:1)
 #define lshift(a,b,c)   {c = (a)<<(b); c &= MASK64;} /* b is an int */
-#define rshift(a,b,c)   {c = (a)>>(b); c &= MASK64;} /* b is an int */
+/* #define rshift(a,b,c)   {c = (a)>>(b); c &= MASK64;} *//* b is an int */
 #define highword(a)     ((unsigned int)((a)>>32))
 #define lowword(a)      ((unsigned int)((a)&0xffffffff))
 #define set(a,b)        {b = (a)&MASK64;}
@@ -82,7 +82,7 @@ static void lshift(uint64 a,int b,uint64 c)
   else {c[1]=a[0]<<(b-32);c[0]=0;} 
   and(c,MASK64,c);
 } 
-
+/*
 static void rshift(uint64 a,int b,uint64 c)   
 {
   if(b<32)
@@ -90,7 +90,7 @@ static void rshift(uint64 a,int b,uint64 c)
   else {c[0]=a[1]>>(b-32);c[1]=0;} 
   and(c,MASK64,c);
 } 
-
+*/
 #define highword(a)     ((a)[1])
 #define lowword(a)      ((a)[0])
 #define set(a,b)        {b[0] = a[0];b[1]=a[1];and(b,MASK64,b);}

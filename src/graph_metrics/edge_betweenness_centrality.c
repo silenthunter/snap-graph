@@ -44,7 +44,6 @@ void evaluate_edge_centrality_bcpart(graph_t* g, attr_id_t* ebc_eval_data1,
     long* num_visited;
     long* visited_counts;
 	double elapsed_time;
-    attr_id_t l;
 #ifdef _OPENMP    
 #pragma omp parallel
 #endif
@@ -81,7 +80,6 @@ void evaluate_edge_centrality_bcpart(graph_t* g, attr_id_t* ebc_eval_data1,
 	int d_val;
     double incr;
     attr_id_t epos;
-    attr_id_t comm_id;
 
 #if DIAGNOSTIC
     double elapsed_time_part, elapsed_time_all;
@@ -338,8 +336,6 @@ void evaluate_edge_centrality_bcpart(graph_t* g, attr_id_t* ebc_eval_data1,
                                 vis_path_info_v->child_count++;
 								/* Add w to local stack */
                                 if (p_vis_count == p_vis_size) {
-								    //fprintf(stdout, "thread: %d, size: %d\n",
-                                    //        tid, 2*p_vis_size);
                                     /* Resize p_vis */
                                     p_vis_temp = (attr_id_t *)
                                         malloc(2*p_vis_size*sizeof(attr_id_t));
@@ -385,7 +381,8 @@ void evaluate_edge_centrality_bcpart(graph_t* g, attr_id_t* ebc_eval_data1,
             phase_num++;
 
             visited_counts[NOSHARE(tid+1)] = p_vis_count;
-			//fprintf(stdout, "s: %d, tid: %d, phase %d, count %d\n", s, tid, phase_num, p_vis_count);
+			/* fprintf(stdout, "s: %d, tid: %d, phase %d, count %d\n", s, tid,
+             * phase_num, p_vis_count); */
 #ifdef _OPENMP
 #pragma omp barrier
 #endif
@@ -469,7 +466,6 @@ void evaluate_edge_centrality_bcpart(graph_t* g, attr_id_t* ebc_eval_data1,
                     vis_path_info_v_delta += incr;
                 }
 				vis_path_info_v->delta = vis_path_info_v_delta;
-                //BC[v] += vis_path_info_v_delta;
             }
 
             phase_num--;

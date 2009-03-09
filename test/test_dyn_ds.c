@@ -1396,9 +1396,9 @@ void dyn_st_forest_construct(dyn_graph_t* G) {
     
         if (tid == 0) {
             elt = get_seconds() - elt;
-            fprintf(stderr, "No. of threads: %d, Time taken: %lf seconds\n",
+            fprintf(stderr, "Number of threads: %d, Time taken: %lf seconds\n",
                     nthreads, elt);
-            fprintf(stderr, "Search from vertex %ld, No. of vertices visited: %ld\n", src, count);
+            fprintf(stderr, "Search from vertex %ld, Number of vertices visited: %ld\n", src, count);
         }
 
 #ifdef _OPENMP    
@@ -1563,7 +1563,7 @@ void dyn_ds_init_malloc(dyn_graph_t* G, const attr_id_t* src, const attr_id_t* d
 
     if (tid == 0) {
         elt = get_seconds() - elt;
-        fprintf(stderr, "No. of threads: %ld, time: %lf sec, TEPS: %lf\n",
+        fprintf(stderr, "Number of threads: %ld, time: %lf sec, TEPS: %lf\n",
                 nthreads, elt, m/(elt*1000000));
     }
 
@@ -1766,7 +1766,7 @@ void dyn_epart_init_nomalloc(dyn_graph_t* G, const attr_id_t* src, const attr_id
         }
     }
 
-    fprintf(stderr, "No. of high degree vertices: %ld, adjacencies: %ld\n",
+    fprintf(stderr, "Number of high degree vertices: %ld, adjacencies: %ld\n",
             hd_count, hd_sum);
 
     mem_chunk = (attr_id_t *) malloc(G->m  * sizeof(attr_id_t));
@@ -1934,7 +1934,7 @@ void dyn_heap_init_nomalloc(dyn_graph_t* G, const attr_id_t* src, const attr_id_
         Hadj[i].vals = &Hval_mem_chunk[degree_thresh[i-1]];
     }
     
-    fprintf(stderr, "No. of heaps created: %ld, memory: %ld\n",
+    fprintf(stderr, "Number of heaps created: %ld, memory: %ld\n",
             hd_count, hd_sum);
 
     el_time = get_seconds() - el_time;
@@ -2105,7 +2105,7 @@ void dyn_hybrid_init_nomalloc(dyn_graph_t* G, const attr_id_t* src, const attr_i
 
     degree_thresh[first] = 1;
 
-    fprintf(stderr, "No. of high degree vertices: %ld, adjacencies: %ld\n",
+    fprintf(stderr, "Number of high degree vertices: %ld, adjacencies: %ld\n",
             hd_count, hd_sum);
 
     mem_chunk = (attr_id_t *) malloc(G->m  * sizeof(attr_id_t));
@@ -2304,7 +2304,7 @@ void dyn_hybrid_gr_init(dyn_graph_t* G, const attr_id_t* src, const attr_id_t* d
     Hadj[first].vals = Hval_mem_chunk; 
     degree_thresh[first] = 1;
     
-    fprintf(stderr, "No. of high degree vertices: %ld, adjacencies: %ld\n",
+    fprintf(stderr, "Number of high degree vertices: %ld, adjacencies: %ld\n",
             hd_count, hd_sum);
 
     mem_chunk = (attr_id_t *) malloc(G->m  * sizeof(attr_id_t));
@@ -2490,7 +2490,7 @@ void dyn_hybrid_gr_del(dyn_graph_t* G, const attr_id_t* src, const attr_id_t* de
     Hadj[first].vals = Hval_mem_chunk; 
     degree_thresh[first] = 1;
     
-    fprintf(stderr, "No. of high degree vertices: %ld, adjacencies: %ld\n",
+    fprintf(stderr, "Number of high degree vertices: %ld, adjacencies: %ld\n",
             hd_count, hd_sum);
 
 

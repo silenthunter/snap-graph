@@ -11,7 +11,6 @@ int main(int argc, char** argv) {
     graph_t* g;
 
     int curArgIndex;
-    long i, j;
     
     attr_id_t* component_num;
 
@@ -29,7 +28,7 @@ int main(int argc, char** argv) {
     outfilename = (char *) calloc(500, sizeof(char));
     graph_type = (char *) calloc(500, sizeof(char));
 
-    strcpy(outfilename, "/tmp/results.out");
+    strcpy(outfilename, "output.txt");
 
     while (curArgIndex < argc) {
 
@@ -71,9 +70,12 @@ int main(int argc, char** argv) {
     g = (graph_t *) malloc(sizeof(graph_t));
     graph_gen(g, infilename, graph_type);
    
-    fprintf(stdout, "No. of vertices     : %ld\n", g->n);
-    fprintf(stdout, "No. of edges        : %ld\n\n", g->m);
-
+    fprintf(stdout, "Number of vertices     : %ld\n", g->n);
+    if (g->undirected)
+        fprintf(stdout, "Number of edges        : %ld\n\n", g->m/2);
+    else
+        fprintf(stdout, "Number of edges        : %ld\n\n", g->m);
+        
     /* Step 3: Run algorithm */ 
 
     component_num = (attr_id_t *) malloc(g->m*sizeof(attr_id_t));

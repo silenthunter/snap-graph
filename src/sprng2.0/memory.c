@@ -3,12 +3,12 @@
 #include "memory.h"
 
 #ifdef __STDC__
-void *_mymalloc(long size, int line, char *message)
+void *_mymalloc(long size, int line, const char *message)
 #else
 void *_mymalloc(size, line, message)
 long size;
 int line;
-char *message;
+const char *message;
 #endif
 {
   char *temp;

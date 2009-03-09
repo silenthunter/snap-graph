@@ -1,6 +1,20 @@
 #include "graph_partitioning.h"
+#include "utils.h"
 
-void computeEigen(graph_t *G, double *eigenVectorOld, double *eigenVectorNew, attr_id_t *v2C, attr_id_t *v2pos, attr_id_t* degree, attr_id_t *vertex, attr_id_t *toSplit, attr_id_t currCommunity, attr_id_t communitySize, attr_id_t degreeSum);
+typedef struct
+{
+        double *dist;   /* stores the value */
+        int *vertex;    /* map from the index of dist to vertex */
+        int *map;       /* map from vertex to index of dist */
+        int *from;      /* map from vertex to its parents in djkstra */
+        int size;
+}heap;
+
+void computeEigen(graph_t *G, double *eigenVectorOld, 
+        double *eigenVectorNew, attr_id_t *v2C, attr_id_t *v2pos, 
+        attr_id_t* degree, attr_id_t *vertex, attr_id_t *toSplit, 
+        attr_id_t currCommunity, attr_id_t communitySize, 
+        attr_id_t degreeSum);
 
 void computeModularityValue(graph_t *G, attr_id_t *membership, attr_id_t numCommunities, double *modularity)
 {
@@ -37,7 +51,7 @@ void computeModularityValue(graph_t *G, attr_id_t *membership, attr_id_t numComm
     attr_id_t *v2C, *degree, *vertex, *v2pos;
     attr_id_t u,v,curCommunity=0, newCommunity,toSplit;
     attr_id_t sumV1,sumV2,comm,count1,count2;
-    attr_id_t i,j,communitySize,degreeSum,start;
+    attr_id_t i,j,communitySize,degreeSum;
     list_t *Q;
     node_t *first;
     double *eigenVectorOld,*eigenVectorNew;
@@ -50,10 +64,16 @@ void computeModularityValue(graph_t *G, attr_id_t *membership, attr_id_t numComm
     m = G->m;
     *numCommunities = 1;
 
-    v2C = membership;         //v2C is a map from vertex to the community it belongs.
-    vertex = (attr_id_t *) malloc(sizeof(attr_id_t)*n);  //vertex is an array of vertices belonging to a particular community.
-    v2pos  = (attr_id_t *) malloc(sizeof(attr_id_t)*n);  //v2pos is a map from vertex to its respective position in the community.
-    degree =  (attr_id_t *) malloc(sizeof(attr_id_t)*n); //degree is a map from vertex to its degree in its respective community.
+    v2C = membership;         /* v2C is a map from vertex to the 
+                                 community it belongs. */
+    vertex = (attr_id_t *) malloc(sizeof(attr_id_t)*n);  
+    /* vertex is an array of vertices belonging to a particular community.*/
+    
+    v2pos  = (attr_id_t *) malloc(sizeof(attr_id_t)*n);  
+    /* v2pos is a map from vertex to its respective position in the community.*/
+    
+    degree =  (attr_id_t *) malloc(sizeof(attr_id_t)*n); 
+    /* degree is a map from vertex to its degree in its respective community.*/
     
     eigenVectorOld=(double*)malloc(sizeof(double)*n);
     eigenVectorNew=(double*)malloc(sizeof(double)*n);
@@ -70,11 +90,11 @@ void computeModularityValue(graph_t *G, attr_id_t *membership, attr_id_t numComm
         v2pos[i] = i;
         degree[i] = G->numEdges[i+1] - G->numEdges[i];
     }
-    //print_attr_id_t_Vector(vertex,0,n);
-    //Making a queue. This queue will store all the communities that are yet to be processed.
+    /* Making a queue. This queue will store all the 
+       communities that are yet to be processed. */
     Q=(list_t*)makeList();
     append(Q, makeNode(curCommunity));
-    //printList(Q);
+    /* printList(Q); */
     
 
     while(Q->size > 0)
@@ -82,7 +102,6 @@ void computeModularityValue(graph_t *G, attr_id_t *membership, attr_id_t numComm
         first = (node_t*) getFirst(Q);
         curCommunity = first->id;
         deleteFirst(Q);
-        //printf("\n\nEvaluating Community:%d\n",curCommunity);
         continue_flag = 0;
 #ifdef _OPENMP
         #pragma omp parallel for
@@ -93,10 +112,11 @@ void computeModularityValue(graph_t *G, attr_id_t *membership, attr_id_t numComm
         }
         degreeSum=0;
         communitySize=-1;
-        //Checking which all vertices belong to this community and updating the vertex Vector accordingly.
+        /* Checking which all vertices belong to this community 
+           and updating the vertex Vector accordingly. */
         for(i=0; i<G->n; i++)
         {
-            contribution[i] = 0.0;        //added later for klin
+            contribution[i] = 0.0;        /* added later for klin */
             if(v2C[i] == curCommunity)
             {
                 {
@@ -109,10 +129,9 @@ void computeModularityValue(graph_t *G, attr_id_t *membership, attr_id_t numComm
         }
         
         communitySize ++;
-        //printf("community Size =%d, degree Sum =%d\n",communitySize, degreeSum);
         if(communitySize == 1)    continue;
         
-        //Calculating modularity by the current Community.    
+        /* Calculating modularity by the current Community. */   
         modularity = 0.0;
 #ifdef _OPENMP
         #pragma omp parallel for private(j) reduction(+:modularity)
@@ -131,7 +150,7 @@ void computeModularityValue(graph_t *G, attr_id_t *membership, attr_id_t numComm
         }
         modularity /=(2.0*G->m);
 
-        //Computing eigen vector.
+        /* Computing eigen vector. */
         computeEigen(G,eigenVectorOld, eigenVectorNew, v2C,v2pos,degree,vertex,&toSplit,curCommunity,communitySize,degreeSum);
         if(toSplit == 0)
             continue;
@@ -148,11 +167,11 @@ void computeModularityValue(graph_t *G, attr_id_t *membership, attr_id_t numComm
             if(eigenVectorOld[i] > 0) count1++;
             else count2++;
         }
-        //printf("count1=%d, count2=%d\n",count1,count2);
         if(count1 == 0 || count2 == 0)
-            continue;                //All eigen values are of same size and hence no division is required.
+            continue;          /* All eigen values are of same size 
+                                  and hence no division is required. */
     
-        //Now, we actually divide the community to new communities.
+        /* Now, we actually divide the community to new communities. */
 #ifdef _OPENMP
         #pragma omp parallel if (communitySize>100) 
 #endif
@@ -171,7 +190,7 @@ void computeModularityValue(graph_t *G, attr_id_t *membership, attr_id_t numComm
                     sumV2++;
             }
 
-            //Calculating new degree sums.
+            /* Calculating new degree sums. */
 #ifdef _OPENMP
             #pragma omp for reduction(+:degreeSum1, degreeSum2) private(comm)
 #endif
@@ -184,7 +203,7 @@ void computeModularityValue(graph_t *G, attr_id_t *membership, attr_id_t numComm
                     degreeSum2 += G->numEdges[vertex[i]+1] - G->numEdges[vertex[i]];
             }
 
-            //Calculating new modularity value.
+            /* Calculating new modularity value. */
 #ifdef _OPENMP
             #pragma omp for private(u,v,degree_u, degree_v, comm) reduction(+:new_modularity)
 #endif
@@ -226,7 +245,7 @@ void computeModularityValue(graph_t *G, attr_id_t *membership, attr_id_t numComm
                 v2C[vertex[i]] = curCommunity;
             continue;
         }
-        //Now updating the degree Vectors
+        /* Now updating the degree Vectors */
 #ifdef _OPENMP
         #pragma omp parallel for private(j,comm) if (communitySize>100)
 #endif
@@ -241,7 +260,7 @@ void computeModularityValue(graph_t *G, attr_id_t *membership, attr_id_t numComm
             }
         }
         
-        /////////////// KL - improvement//
+        /* KL - improvement */
         if(use_improvement == 1)
         {
         max_contrib = -999999;
@@ -263,18 +282,20 @@ void computeModularityValue(graph_t *G, attr_id_t *membership, attr_id_t numComm
                 flag = 1;
             else
             {
-                //swap communities.
+                /* swap communities. */
                 if(v2C[maxv] == curCommunity)
                     v2C[maxv] = newCommunity;
                 else
                     v2C[maxv] = curCommunity;
-                //now update the neighbours
+                /* now update the neighbours */
                 for(j=G->numEdges[maxv]; j<G->numEdges[maxv+1]; j++)
                 {
                     if(v2C[G->endV[j]] == v2C[maxv])
-                        contribution[G->endV[j]] -= 1.0;    //now they are in same community
+                        contribution[G->endV[j]] -= 1.0;    
+                    /* now they are in same community */
                     else if(v2C[G->endV[j]] == newCommunity || v2C[G->endV[j]] == curCommunity)
-                        contribution[G->endV[j]] += 1.0;     //not they are in different community but earlier same.
+                        contribution[G->endV[j]] += 1.0;     
+                    /* not they are in different community but earlier same. */
                 }
                 degree_u = G->numEdges[maxv+1] - G->numEdges[maxv]; 
 #ifdef _OPENMP
@@ -284,9 +305,9 @@ void computeModularityValue(graph_t *G, attr_id_t *membership, attr_id_t numComm
                 {
                     v = vertex[j];
                     degree_v = G->numEdges[v+1] - G->numEdges[v];
-                    if(v2C[v] == v2C[maxv])            //same community now
+                    if(v2C[v] == v2C[maxv])            /*same community now */
                         contribution[v] += (degree_v*degree_u)/(2.0*G->m);
-                    else                    //different community earlier same.
+                    else              /* different community earlier same. */
                         contribution[v] -= (degree_v*degree_u)/(2.0*G->m);
                 }
             }
@@ -305,12 +326,16 @@ void computeModularityValue(graph_t *G, attr_id_t *membership, attr_id_t numComm
 
 void computeEigen(graph_t *G, double *eigenVectorOld, double *eigenVectorNew, attr_id_t *v2C, attr_id_t *v2pos, attr_id_t* degree, attr_id_t *vertex, attr_id_t *toSplit, attr_id_t currCommunity, attr_id_t communitySize, attr_id_t degreeSum)
 {
-    attr_id_t i,j,k;
-    attr_id_t iterCount,count=0, niter = communitySize > 100?communitySize:100;
+    attr_id_t i,j;
+    attr_id_t iterCount,count, niter;
+    double eigenValue,degree_u;
+    double normalizedSum,ktx,mneg;
+    attr_id_t numThreads;
+
+    niter = (communitySize > 100) ? communitySize:100;
+    mneg = 0.0;
     niter = 10*log(communitySize);
-    double eigenValue,degree_u,degree_v;
-    double normalizedSum,ktx,mneg=0.0;
-    attr_id_t numThreads,tid;
+    count = 0;
 
     while(1)
     {
@@ -327,10 +352,9 @@ void computeEigen(graph_t *G, double *eigenVectorOld, double *eigenVectorNew, at
 #endif
             for(i=0; i<communitySize; i++)
             {
-                eigenVectorOld[i] = 2.0f *((float)rand()/(float)RAND_MAX) -1.0f;
-                //eigenVectorOld[i]= 2.0f * (float)drand48() -1.0f;
+                eigenVectorOld[i] = 2.0 *((double)rand()/(double)RAND_MAX) 
+                    -1.0;
                 normalizedSum += eigenVectorOld[i] * eigenVectorOld[i];
-                //printf("Eigenvector [%d]= %f\n", i,eigenVectorOld[i]);
             }
 #ifdef _OPENMP    
             #pragma omp single
@@ -444,7 +468,7 @@ void computeEigen(graph_t *G, double *eigenVectorOld, double *eigenVectorNew, at
                 eigenValue -= ((double)(G->numEdges[vertex[i]+1]- G->numEdges[vertex[i]])) *ktx *eigenVectorOld[i];
 
         }    
-        //printf("The eigenValue is %f\n",eigenValue);
+        /* printf("The eigenValue is %f\n",eigenValue); */
             {
                 if(eigenValue <0.0000001)
                 {
@@ -468,13 +492,13 @@ void computeEigen(graph_t *G, double *eigenVectorOld, double *eigenVectorNew, at
 
 
 
-//SImplist_tic mod without klin
+/* Simplistic mod without klin */
  void modularity_spectral_wo_klin(graph_t *G, attr_id_t *membership, attr_id_t *numCommunities)
  {
      attr_id_t *v2C, *degree, *vertex, *v2pos;
     attr_id_t curCommunity=0, newCommunity,toSplit;
     attr_id_t n=G->n,sumV1,sumV2,comm,count1,count2;
-    attr_id_t i,j,communitySize,degreeSum,start;
+    attr_id_t i,j,communitySize,degreeSum;
     list_t *Q;
     node_t *first;
     double *eigenVectorOld,*eigenVectorNew;
@@ -482,10 +506,14 @@ void computeEigen(graph_t *G, double *eigenVectorOld, double *eigenVectorNew, at
 
     *numCommunities = 1;
 
-    v2C = membership;         //v2C is a map from vertex to the community it belongs.
-    vertex = (attr_id_t *) malloc(sizeof(attr_id_t)*n);  //vertex is an array of vertices belonging to a particular community.
-    v2pos  = (attr_id_t *) malloc(sizeof(attr_id_t)*n);  //v2pos is a map from vertex to its respective position in the community.
-    degree =  (attr_id_t *) malloc(sizeof(attr_id_t)*n); //degree is a map from vertex to its degree in its respective community.
+    v2C = membership;         /* v2C is a map from vertex to the 
+                                 community it belongs. */
+    vertex = (attr_id_t *) malloc(sizeof(attr_id_t)*n);  /* vertex is an 
+                    array of vertices belonging to a particular community. */
+    v2pos  = (attr_id_t *) malloc(sizeof(attr_id_t)*n);  
+    /* v2pos is a map from vertex to its respective position in the community.*/
+    degree =  (attr_id_t *) malloc(sizeof(attr_id_t)*n); 
+    /* degree is a map from vertex to its degree in its respective community.*/
     
     eigenVectorOld=(double*)malloc(sizeof(double)*n);
     eigenVectorNew=(double*)malloc(sizeof(double)*n);
@@ -499,10 +527,10 @@ void computeEigen(graph_t *G, double *eigenVectorOld, double *eigenVectorNew, at
         degree[i] = G->numEdges[i+1] - G->numEdges[i];
     }
     
-    //Making a queue. This queue will store all the communities that are yet to be processed.
+    /* Making a queue. This queue will store all the 
+       communities that are yet to be processed. */
     Q=(list_t*)makeList();
     append(Q, makeNode(curCommunity));
-    //printList(Q);
     
     while(Q->size > 0)
     {
@@ -516,16 +544,18 @@ void computeEigen(graph_t *G, double *eigenVectorOld, double *eigenVectorNew, at
             vertex[i] = -1;
         }
 
-        //printf("\n\nEvaluating Community:%d\n",curCommunity);
+        /* printf("\n\nEvaluating Community:%d\n",curCommunity); */
         degreeSum=0;
         communitySize=-1;
-        //Checking which all vertices belong to this community and updating the vertex Vector accordingly.
-        //#pragma omp parallel for shared(communitySize) reduction(+:degreeSum)
+        
+        /* Checking which all vertices belong to this community 
+           and updating the vertex Vector accordingly. */
+        /* #pragma omp parallel for shared(communitySize) 
+           reduction(+:degreeSum) */
         for(i=0; i<G->n; i++)
         {
             if(v2C[i] == curCommunity)
             {
-                //#pragma omp critical
                 {
                     communitySize++;
                     vertex[communitySize] = i;
@@ -535,13 +565,11 @@ void computeEigen(graph_t *G, double *eigenVectorOld, double *eigenVectorNew, at
             }
         }
         communitySize ++;
-        //printf("community Size =%d, degree Sum =%d\n",communitySize, degreeSum);
+        /* printf("community Size =%d, degree Sum =%d\n"
+           ,communitySize, degreeSum); */
         if(communitySize == 1)    continue;
-        //printf("Calling compute eigen\n");
         computeEigen(G,eigenVectorOld, eigenVectorNew, v2C,v2pos,degree,vertex,&toSplit,curCommunity,communitySize,degreeSum);
         
-        //printf("tosplit=%d\n",toSplit);
-
         if(toSplit == 0)
             continue;
 
@@ -557,7 +585,8 @@ void computeEigen(graph_t *G, double *eigenVectorOld, double *eigenVectorNew, at
         }
         if(count1 == 0 || count2 == 0)
         {
-            continue;                //All eigen values are of same size and hence no division is required.
+            continue;     /*All eigen values are of same size and 
+                            hence no division is required. */
         }
 #ifdef _OPENMP
         #pragma omp parallel if (communitySize>100)
@@ -576,7 +605,7 @@ void computeEigen(graph_t *G, double *eigenVectorOld, double *eigenVectorNew, at
                 else
                     sumV2++;
             }
-            //Now updating the degree Vectors
+            /* Now updating the degree Vectors */
 #ifdef _OPENMP
             #pragma omp for private(j,comm)
 #endif

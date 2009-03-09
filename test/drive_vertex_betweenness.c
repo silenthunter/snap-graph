@@ -16,7 +16,7 @@ int main(int argc, char** argv) {
     int curArgIndex;
     long numSrcs;
 
-    long i, j;
+    long i;
 
     /* Step 1: Parse command line arguments */
     if (argc < 3) {
@@ -37,7 +37,7 @@ int main(int argc, char** argv) {
     graph_type = (char *) calloc(500, sizeof(char));
 
     sampling_val = 100.0;
-    strcpy(outfilename, "/tmp/results.out");
+    strcpy(outfilename, "output.txt");
 
     run_approx_BC = 0;
 
@@ -86,18 +86,18 @@ int main(int argc, char** argv) {
        fprintf(stderr, "Error! Sampling percentage should be between 0 and 100. Exiting ...\n"); 
        exit(-1);
     }
-    fprintf(stdout, "Sampling percentage : %lf\n\n", sampling_val);
+    fprintf(stdout, "Sampling percentage : %f\n\n", sampling_val);
 
 
     /* Step 2: Generate graph */
     g = (graph_t *) malloc(sizeof(graph_t));
     graph_gen(g, infilename, graph_type);
    
-    fprintf(stdout, "No. of vertices     : %ld\n", g->n);
+    fprintf(stdout, "Number of vertices     : %ld\n", g->n);
     if (g->undirected)
-        fprintf(stdout, "No. of edges        : %ld\n\n", g->m/2);
+        fprintf(stdout, "Number of edges        : %ld\n\n", g->m/2);
     else
-        fprintf(stdout, "No. of edges        : %ld\n\n", g->m);
+        fprintf(stdout, "Number of edges        : %ld\n\n", g->m);
         
     /* Step 3: Run algorithm */
     vBC = (double *) calloc(g->n, sizeof(double));
@@ -117,9 +117,9 @@ int main(int argc, char** argv) {
     fprintf(fp, "\n<Vertex ID> <BC score>\n\n");
     for (i=0; i<g->n; i++) {
         if (g->zero_indexed)
-            fprintf(fp, "%ld %lf\n", i, vBC[i]);  
+            fprintf(fp, "%ld %f\n", i, vBC[i]);  
         else
-            fprintf(fp, "%ld %lf\n", i+1, vBC[i]);  
+            fprintf(fp, "%ld %f\n", i+1, vBC[i]);  
 
     }
     fclose(fp);

@@ -1,5 +1,6 @@
 #include "graph_partitioning.h"
 #include "graph_kernels.h"
+#include "graph_metrics.h"
 
 double comm_evaluate_modularity(graph_t* g, comm_list_bc_t* comm_list, attr_id_t num_components) {
 
@@ -151,17 +152,15 @@ void modularity_betweenness(graph_t *g, attr_id_t *membership,
 
     attr_id_t n, m;
     long i, j;    
-    attr_id_t init_num_components, num_components, curr_component;
+    attr_id_t num_components;
     double curr_modularity, prev_modularity;
     comm_list_bc_t* comm_list;
-    int new_comp;
     edge_t ebc_edge;
     int num_bc_runs;
     attr_id_t curr_component1, curr_component2, maxbc_component;
     int split;
     attr_id_t* ebc_eval_data1;
     double* ebc_eval_data2;
-    attr_id_t comm_id;
     double max_modularity;
     attr_id_t max_modularity_comp_num;
 
@@ -190,8 +189,6 @@ void modularity_betweenness(graph_t *g, attr_id_t *membership,
     fprintf(stderr, "The network has %d connected components.\n",
             num_components);
 
-    init_num_components = num_components;
-    
     /* We store the community splits to reconstruct the hierarchical 
        community dendrogram */
     /* Every community stores the ID of its parent, and also 
@@ -228,8 +225,6 @@ void modularity_betweenness(graph_t *g, attr_id_t *membership,
             comm_list[num_components].p = maxbc_component;
             num_components++;
             curr_modularity = comm_evaluate_modularity(g, comm_list, num_components);
-            //fprintf(stderr, "%lf %d %d\n", curr_modularity, num_bc_runs,
-            //        num_components);
             if (curr_modularity > max_modularity) {
                 max_modularity = curr_modularity;
                 max_modularity_comp_num = num_components-1;

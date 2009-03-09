@@ -28,8 +28,9 @@ void usage_graph_options() {
     fprintf(stdout, "rmat    (.rmat)       a synthetic scale-free graph generator is invoked."
             " The input file specifies the generator parameters.\n");
    fprintf(stdout, "\n");
-    fprintf(stdout, "The default output filename is \"results.out\"."
-            " Specify an alternate file name with the -outfile option.\n");
+    fprintf(stdout, "The default output filename is \"results.PID.txt\"."
+            " (PID is the process ID). "
+            "Specify an alternate file name with the -outfile option.\n");
 }
 
 void graph_ext_check(char* filename, char* graph_type) {
@@ -148,31 +149,100 @@ void print_graph(graph_t* G)
     attr_id_t i,j;
     attr_id_t degree,start;
 
-    fprintf(stdout, "\n Printing graph\n");
+    fprintf(stdout, "\n Printing graph to stdout\n");
+    
     fprintf(stdout, "Number of vertices: %ld, edges: %ld\n", G->n, G->m);
     if(G->undirected) 
         fprintf(stdout, "Graph is undirected\n");
     else
         fprintf(stdout, "Graph is directed\n");
 
-    fprintf(stdout, "Graph weight type is %ld\n",G->weight_type);
+    fprintf(stdout, "Graph weight type is %d\n",G->weight_type);
 
+#if ENABLE_64BIT_VID
 
     for(i = 0; i < G->n; i++) {
         degree = G->numEdges[i+1] - G->numEdges[i];
         start = G->numEdges[i];
-        fprintf(stdout, "Degree of vertex i %ld is %ld. Its neighbours are:", i, degree);
+        fprintf(stdout, "Degree of vertex i %ld is %ld." 
+                "Its neighbours are:", i, degree);
 
         for(j=0;j<degree;j++) {
             if(G->weight_type == 1)
-                fprintf(stdout, "%ld [%d], ",G->endV[start+j], G->int_weight_e[start+j]);
+                fprintf(stdout, "%ld [%d], ",G->endV[start+j], 
+                        G->int_weight_e[start+j]);
             else if(G->weight_type == 2) 
-                fprintf(stdout, "%ld [%ld], ",G->endV[start+j], G->l_weight_e[start+j]);
+                fprintf(stdout, "%ld [%ld], ",G->endV[start+j], 
+                        G->l_weight_e[start+j]);
             else if(G->weight_type == 3) 
-                fprintf(stdout, "%ld [%f], ",G->endV[start+j], G->fl_weight_e[start+j]);
+                fprintf(stdout, "%ld [%f], ",G->endV[start+j], 
+                        G->fl_weight_e[start+j]);
             else if(G->weight_type == 4) 
-                fprintf(stdout, "%ld [%lf], ",G->endV[start+j], G->dbl_weight_e[start+j]);
+                fprintf(stdout, "%ld [%f], ",G->endV[start+j], 
+                        G->dbl_weight_e[start+j]);
         }
         fprintf(stdout, "\n");
     }
+
+#else
+
+    for(i = 0; i < G->n; i++) {
+        degree = G->numEdges[i+1] - G->numEdges[i];
+        start = G->numEdges[i];
+        fprintf(stdout, "Degree of vertex i %d is %d." 
+                "Its neighbours are:", i, degree);
+
+        for(j=0;j<degree;j++) {
+            if(G->weight_type == 1)
+                fprintf(stdout, "%d [%d], ",G->endV[start+j], 
+                        G->int_weight_e[start+j]);
+            else if(G->weight_type == 2) 
+                fprintf(stdout, "%d [%ld], ",G->endV[start+j], 
+                        G->l_weight_e[start+j]);
+            else if(G->weight_type == 3) 
+                fprintf(stdout, "%d [%f], ",G->endV[start+j], 
+                        G->fl_weight_e[start+j]);
+            else if(G->weight_type == 4) 
+                fprintf(stdout, "%d [%f], ",G->endV[start+j], 
+                        G->dbl_weight_e[start+j]);
+        }
+        fprintf(stdout, "\n");
+    }
+#endif
+}
+
+void print_snap_header(FILE *outfile) {
+    fprintf(outfile, "\n"
+                     "************************************************\n");
+    fprintf(outfile, "  SNAP Complex Network Analysis Framework v0.3\n");
+    fprintf(outfile, "  Authors: Kamesh Madduri, David A. Bader  \n");
+    fprintf(outfile, "  Last Updated: March 2009\n");
+    fprintf(outfile, "  http://snap-graph.sourceforge.net\n");
+    fprintf(outfile, "************************************************\n");
+}
+
+
+void print_graph_header(FILE *outfile, graph_t *g, const char *problem_type) {
+    fprintf(outfile, "  Number of vertices : %ld\n", g->n);
+    if (g->undirected) {
+        fprintf(outfile, "  Number of edges    : %ld\n", g->m/2);
+        fprintf(outfile, "  Undirected network.\n");
+    } else {
+        fprintf(outfile, "  Number of edges    : %ld\n", g->m);
+        fprintf(outfile, "  Directed network.\n");
+    }
+    /*
+    if (g->weight_type == 0)
+        fprintf(outfile, "  Unweighted network.\n");
+    else if (g->weight_type == 1)
+        fprintf(outfile, "  32-bit integer weight.\n");
+    else if (g->weight_type == 2)
+        fprintf(outfile, "  Long integer (%d bytes) weights.\n", sizeof(long));
+    else if (g->weight_type == 3)
+        fprintf(outfile, "  Single-precision float weights.\n");
+    else if (g->weight_type == 4)
+        fprintf(outfile, "  Double-precision float weights.\n");
+    */ 
+    fprintf(outfile, "------------------------------------------------\n");
+    fprintf(outfile, "  Problem type       : %s\n", problem_type); 
 }

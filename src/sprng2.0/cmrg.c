@@ -88,7 +88,7 @@ unsigned int PARAMLIST[NPARAMS][2] = {{0x87b0b0fdU, 0x27bb2ee6U},
 struct rngen
 {
   int rng_type;
-  char *gentype;
+  const char *gentype;
   int stream_number;
   int nstreams;
   int init_seed;
@@ -330,9 +330,10 @@ int *igenptr;
 #define MSB 0
 #endif
 #define LSB (1-MSB)
-  double ans;
   unsigned int ist0, ist1, ist2, tempi, tempi2;
+#if defined(HP) || defined(SUN) || defined(SOLARIS) || defined(GENERIC)
   static double temp[1] = {0.0};
+#endif
 
   advance_cmrg(genptr);
   ist0 = genptr->state[0];
@@ -583,7 +584,7 @@ char *packed;
 {
   struct rngen *q;
 #ifndef LONG64
-  unsigned int i, m[2];
+  unsigned int m[2];
 #endif
   unsigned char *p;
 

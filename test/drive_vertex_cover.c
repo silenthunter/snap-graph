@@ -11,10 +11,7 @@ int main(int argc, char** argv) {
     graph_t* g;
 
     int curArgIndex;
-    long numSrcs;
-    int est_diameter;
-    long i, j;
-    long num_vertices_visited;
+    long i;
     int vc_weighted_size, vc_unweighted_size;
 
     /* Step 1: Parse command line arguments */
@@ -32,7 +29,7 @@ int main(int argc, char** argv) {
     outfilename = (char *) calloc(500, sizeof(char));
     graph_type = (char *) calloc(500, sizeof(char));
 
-    strcpy(outfilename, "/tmp/results.out");
+    strcpy(outfilename, "output.txt");
 
     while (curArgIndex < argc) {
         
@@ -74,11 +71,11 @@ int main(int argc, char** argv) {
     g = (graph_t *) malloc(sizeof(graph_t));
     graph_gen(g, infilename, graph_type);
    
-    fprintf(stdout, "No. of vertices     : %ld\n", g->n);
+    fprintf(stdout, "Number of vertices     : %ld\n", g->n);
     if (g->undirected)
-        fprintf(stdout, "No. of edges        : %ld\n\n", g->m/2);
+        fprintf(stdout, "Number of edges        : %ld\n\n", g->m/2);
     else 
-        fprintf(stdout, "No. of edges        : %ld\n\n", g->m);
+        fprintf(stdout, "Number of edges        : %ld\n\n", g->m);
 
     if (g->undirected == 0) {
         fprintf(stderr, "Error: the graph has to be undirected.\n");
@@ -103,8 +100,8 @@ int main(int argc, char** argv) {
 
     /* Step 4: Write output to file */
     fp = fopen(outfilename, "w");
-    fprintf(fp, "Vertex cover size (weighted): %ld\n", vc_weighted_size);
-    fprintf(fp, "Vertex cover size (unweighted): %ld\n", vc_unweighted_size);
+    fprintf(fp, "Vertex cover size (weighted): %d\n", vc_weighted_size);
+    fprintf(fp, "Vertex cover size (unweighted): %d\n", vc_unweighted_size);
     
     /* Step 5: Clean up */
     free(g->dbl_weight_v);

@@ -18,7 +18,3 @@ void adj_bheap_insert(adj_bheap_t *h, attr_id_t val)
 }
 
 
-void adj_bheap_delete(adj_bheap_t *h, attr_id_t val)
-{
-}
-

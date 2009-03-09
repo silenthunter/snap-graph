@@ -4,14 +4,14 @@
 
 void gen_random_graph(graph_t* G, char* filename) {
 
-    long i, j;
+    long i;
     long undirected, weight_type;
     long n, m; 
     long offset;
-    int int_wt, *int_weight;
-    long l_wt, *l_weight;
-    float fl_wt, *fl_weight;
-    double dbl_wt, *dbl_weight;
+    int *int_weight;
+    long *l_weight;
+    float *fl_weight;
+    double *dbl_weight;
     double min_weight, max_weight;
     long u, v;
     int* stream, seed;

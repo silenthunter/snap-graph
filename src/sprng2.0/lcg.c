@@ -149,7 +149,7 @@ struct rngen
   int prime;
   int prime_position;
   int prime_next;
-  char *gentype;
+  const char *gentype;
   int parameter;
   unsigned LONG64 multiplier;
 };
@@ -166,7 +166,7 @@ struct rngen
   int prime;
   int prime_position;
   int prime_next;
-  char *gentype;
+  const char *gentype;
   int parameter;
   int *multiplier;
 };
@@ -206,10 +206,10 @@ int n;
 
 
 #ifdef __STDC__
-void errprint(char *level, char *routine, char *error)
+void errprint(const char *level, const char *routine, const char *error)
 #else
 void errprint(level, routine, error)
-char *level,*routine,*error;
+const char *level,*routine,*error;
 #endif
 {
 #ifdef CRAY
@@ -242,10 +242,10 @@ int n;
 
 
 #ifdef __STDC__
-int *init_rng(int rng_type, int gennum,  int total_gen,  int seed, int mult)
+int *init_rng(int rng_type, int gennum,  int total_gen,  int seed, int multval)
 #else
-int *init_rng(rng_type,gennum,total_gen,seed,mult)
-int rng_type,gennum,mult,seed,total_gen;
+int *init_rng(rng_type,gennum,total_gen,seed,multval)
+int rng_type,gennum,multval,seed,total_gen;
 #endif
 {
 /*      gives back one generator (node gennum) with updated spawning     */
@@ -272,23 +272,23 @@ int rng_type,gennum,mult,seed,total_gen;
 
   seed &= 0x7fffffff;		/* Only 31 LSB of seed considered */
   
-  if (mult < 0 || mult >= NPARAMS) 
+  if (multval < 0 || multval >= NPARAMS) 
   {
     errprint("WARNING","init_rng","multiplier not valid. Using Default param");
-    mult = 0;
+    multval = 0;
   }
 
 #ifdef LONG64
   if(multiplier == 0)
-    multiplier = mults[mult];
+    multiplier = mults[multval];
   /*  else
-    if(multiplier != mults[mult]) 
+    if(multiplier != mults[multval]) 
       fprintf(stderr,"WARNING: init_rng_d: Proposed multiplier does not agree with current multiplier.\n\t Independence of streams is not guaranteed\n");*/
 #else
   if(multiplier == NULL)
-    multiplier = mults[mult];
+    multiplier = mults[multval];
   /*else
-    if(strxncmp((char *) multiplier,(char *) mults[mult],4*sizeof(int)) != 0) 
+    if(strxncmp((char *) multiplier,(char *) mults[multval],4*sizeof(int)) != 0) 
       fprintf(stderr,"WARNING: init_rng_d: Proposed multiplier does not agree with current multiplier.\n\t Independence of streams is not guaranteed\n");*/
 #endif
     
@@ -302,18 +302,18 @@ int rng_type,gennum,mult,seed,total_gen;
   getprime_32(1, &(genptr->prime), gennum);
   genptr->prime_position = gennum;
   genptr->prime_next = total_gen;
-  genptr->parameter = mult;
+  genptr->parameter = multval;
   
 #ifdef LONG64
   genptr->seed = INIT_SEED;	/* initialize generator */
   genptr->seed ^= ((unsigned LONG64) seed)<<16;	
-  genptr->multiplier = mults[mult];
+  genptr->multiplier = mults[multval];
   if (genptr->prime == 0) 
     genptr->seed |= 1;
 #else
   genptr->seed[1] = 16651885^((seed<<16)&(0xff0000));/* initialize generator */
   genptr->seed[0] = 2868876^((seed>>8)&(0xffffff));
-  genptr->multiplier = mults[mult];
+  genptr->multiplier = mults[multval];
   if (genptr->prime == 0) 
     genptr->seed[1] |= 1;
 #endif
@@ -397,12 +397,15 @@ int *igenptr;
 #endif
 
 #else
-
+    
+#if defined(HP) || defined(SUN) || defined(SOLARIS) || defined(GENERIC)
     static double equiv[1];
 #define iran ((int *)equiv)
 #define ran (equiv)
+    int expo;
+#endif
 
-    int expo, s[4], res[4];
+    int s[4], res[4];
     
 
     multiply(genptr,genptr->multiplier,s,res);
@@ -742,7 +745,7 @@ char **buffer;
   unsigned char *p, *initp;
   unsigned int size;
 #ifndef LONG64
-  unsigned int m[2], i;
+  unsigned int m[2];
 #endif
   struct rngen *q;
   
@@ -816,7 +819,7 @@ char *packed;
   struct rngen *q;
   unsigned char *p;
 #ifndef LONG64
-  unsigned int m[4], m2[2], i;
+  unsigned int m[4], m2[2];
 #endif
 
   p = (unsigned char *) packed;
@@ -832,7 +835,7 @@ char *packed;
     return NULL; 
   }
   else
-    q->gentype = GENTYPE;
+    q->gentype = (const char *) GENTYPE;
   p += strlen(q->gentype)+1;
 
 #ifdef LONG64

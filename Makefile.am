@@ -3,6 +3,8 @@ SUBDIRS = src lib test
 EXTRA_DIST = include
 lib_LTLIBRARIES = libsnap.la
 
+include_HEADERS = include/graph_defs.h include/graph_kernels.h
+
 libsnap_la_SOURCES = 
 
 libsnap_la_LIBADD = \

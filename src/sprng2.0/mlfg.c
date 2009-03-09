@@ -58,7 +58,7 @@ int MAX_STREAMS = 0x7fffffff;  /* Maximum number streams to init_sprng */
 struct rngen
 {
   int rng_type;
-  char *gentype;
+  const char *gentype;
   int stream_number;
   int nstreams;
   int init_seed;
@@ -493,7 +493,7 @@ int rng_type,gennum,param,seed,total_gen;
   
 /*      update si array to allow for future spawning of generators       */
   si = genptr->si;
-  while (lowword(si[0]) < total_gen && !highword(si[0])) 
+  while (((int)lowword(si[0])) < total_gen && !highword(si[0])) 
     si_double(si,si,length);
 
   NGENS++;

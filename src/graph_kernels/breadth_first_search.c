@@ -11,7 +11,9 @@ long BFS_parallel_frontier_expansion(graph_t* G, long src, long diameter) {
     long *start;
     char* visited;
     long *pSCount;
-
+#ifdef DIAGNOSTIC
+    double elapsed_time;
+#endif
 #ifdef _OPENMP
     omp_lock_t* vLock;
 #endif
@@ -19,11 +21,6 @@ long BFS_parallel_frontier_expansion(graph_t* G, long src, long diameter) {
     long phase_num, numPhases;
     long count;
 
-#ifdef DIAGNOSTIC    
-    double elapsed_time = get_seconds();
-#endif
-
-    numPhases = diameter + 1;
         
 #ifdef _OPENMP 
 
@@ -37,6 +34,9 @@ long BFS_parallel_frontier_expansion(graph_t* G, long src, long diameter) {
     int tid, nthreads;
     long start_iter, end_iter;    
     long j, k, vert, n;
+#ifdef _OPENMP
+    int myLock;
+#endif
 
 #ifdef _OPENMP    
     long i;
@@ -46,7 +46,15 @@ long BFS_parallel_frontier_expansion(graph_t* G, long src, long diameter) {
     tid = 0;
     nthreads = 1;
 #endif
-    
+   
+
+#ifdef DIAGNOSTIC    
+    if (tid == 0)
+        elapsed_time = get_seconds();
+#endif
+
+    if (tid == 0)  
+        numPhases = diameter + 1;
     n = G->n;
     
     pS_size = n/nthreads + 1;
@@ -107,7 +115,7 @@ long BFS_parallel_frontier_expansion(graph_t* G, long src, long diameter) {
                     if (v == w)
                         continue;
 #ifdef _OPENMP
-                    int myLock = omp_test_lock(&vLock[w]);
+                    myLock = omp_test_lock(&vLock[w]);
                     if (myLock) {
 #endif
                         if (visited[w] != (char) 1) { 
@@ -204,7 +212,7 @@ long BFS_parallel_frontier_expansion(graph_t* G, long src, long diameter) {
 
 
 
-void BFS_path_limited_search(graph_t* G, long src, long graph_diameter) {
+void BFS_path_limited_search(graph_t* G, long src, long max_graph_dia) {
 
 }
 

@@ -3,15 +3,25 @@
 int vertex_cover_weighted(graph_t *G)
 {    
 
-    double *wp_v;                    //weight associated with each vertex.
-    double *delta_e;                //Delta of each edge as mentioned in the algorithm
-    attr_id_t *degree_v;                //Degree of each vertex
-    attr_id_t *visited_e, *visited_v;        //Whether that edge has been visited or not. Ditto for vertex. Visited_v is the final cover.
-    attr_id_t *position_e;                //Position stores the corresponding position of the undirected edge for each edge.
+    double *wp_v;                /* weight associated with each vertex. */
+    double *delta_e;             /* Delta of each edge as mentioned in 
+                                    the algorithm */
+    attr_id_t *degree_v;                /* Degree of each vertex */
+    attr_id_t *visited_e, *visited_v;   /* Whether that edge has been 
+                    visited or not. Ditto for vertex. Visited_v is the 
+                    final cover. */
+    attr_id_t *position_e;       /* Position stores the corresponding 
+                                    position of the undirected edge for 
+                                    each edge.
+                                    */
     attr_id_t i,j,u,v,n,k, edge_counter;
 
     double *memblock;
     attr_id_t *memblock1;
+    double val1,val2;
+    int count;
+    double sum;
+
     memblock = (double*) malloc(sizeof(double)*(G->n+2*G->m));
     wp_v = memblock;
     delta_e = memblock + G->n;
@@ -38,7 +48,8 @@ int vertex_cover_weighted(graph_t *G)
             delta_e[j] = 0;
             visited_e[j] = 0;
             if(v < u )
-                continue;        // we have already covered this case when we visited v.
+                continue;        /* we have already covered this case 
+                                    when we visited v. */
             for (k=G->numEdges[v]; k<G->numEdges[v+1]; k++)
             {
                 if(G->endV[k] == u)
@@ -50,8 +61,7 @@ int vertex_cover_weighted(graph_t *G)
     }
 
     edge_counter = 2*G->m;
-    double val1,val2;
-    int count =0;
+    count =0;
     while(edge_counter > 0)
     {
         count ++;
@@ -82,7 +92,7 @@ int vertex_cover_weighted(graph_t *G)
         {
             if (visited_v[i] == 1)
                 continue;
-            double sum = 0.0;
+            sum = 0.0;
             for(j=G->numEdges[i]; j<G->numEdges[i+1]; j++)
             {
                 if(visited_e[j] == 1)
@@ -90,10 +100,13 @@ int vertex_cover_weighted(graph_t *G)
                 sum += delta_e[j];
             }
             wp_v[i] -= sum;
-            if(wp_v[i] <= 0.00001)    //aka this vertex is in VC.
+            if(wp_v[i] <= 0.00001)    /* aka this vertex is in VC. */
             {
                 visited_v[i] = 1;
-                edge_counter -= degree_v[i]*2;    //It is multiplied by because it is an undirected graph.
+                edge_counter -= degree_v[i]*2;  /* It is multiplied by 
+                                                   because it is an 
+                                                   undirected graph.
+                                                 */
                 for(j=G->numEdges[i]; j<G->numEdges[i+1]; j++)
                 {
                     if(visited_e[j] == 1)
@@ -132,7 +145,10 @@ int vertex_cover_unweighted(graph_t *G)
     
     attr_id_t *visited_v, *visited_e;
     attr_id_t * degree_v;
+    attr_id_t count;
     attr_id_t *memblock;
+
+
     memblock = (attr_id_t*) malloc(sizeof(attr_id_t)*(2*G->m + 2*G->n));
     visited_v = memblock;
     degree_v = memblock + G->n;
@@ -191,7 +207,7 @@ int vertex_cover_unweighted(graph_t *G)
         visited_v[max_v] = 1;
 
     }
-    attr_id_t count = 0;
+    count = 0;
     for(i=0; i<G->n; i++)
     {
         if(visited_v[i] == 1)

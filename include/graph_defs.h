@@ -11,13 +11,17 @@
 #include <omp.h>
 #endif
 
-#ifdef ENABLE_64BIT
+#if ENABLE_64BIT_VID
     typedef long attr_id_t;
 #else
     typedef int attr_id_t;
 #endif
 
 #define ARRAY_INIT_SIZE 8
+
+#if !HAVE_LOG2
+#define log2(d) (log(d)/log(2.0))
+#endif
 
 typedef struct {
     attr_id_t* vals;
@@ -34,8 +38,6 @@ typedef struct {
 } adj_bheap_t;
 
 void adj_bheap_insert(adj_bheap_t* h, attr_id_t val);
-void adj_bheap_delete(adj_bheap_t* h, attr_id_t val);
-void adj_bheap_siftup(adj_bheap_t* h, attr_id_t val);
 
 
 void dyn_array_insert(dyn_array_t* A, attr_id_t val);

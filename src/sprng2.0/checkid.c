@@ -37,7 +37,7 @@ int *ptr;
     
   }
   
-  fprintf(stderr,"ERROR: Invalid generator ID %p\n", ptr);
+  fprintf(stderr,"ERROR: Invalid generator ID %p\n", (void *)ptr);
   return NULL;
 }
 
@@ -75,7 +75,7 @@ int *ptr;
     }
   
 
-  fprintf(stderr,"ERROR: Invalid generator ID %p\n", ptr);
+  fprintf(stderr,"ERROR: Invalid generator ID %p\n", (void *)ptr);
   return NULL;
 }
 

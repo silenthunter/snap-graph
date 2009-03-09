@@ -3,6 +3,7 @@
 
 long graph_diameter(graph_t* G) {
 
+#if 0
     long i, j, n;
     long tid, nthreads;
     long* S;          /* The BFS queue */ 
@@ -11,7 +12,6 @@ long graph_diameter(graph_t* G) {
     long *local_dia, dia;
     long v, w;
     double running_time;
-#if 0
     /* The outer loop is parallelized in this case. Each thread does a BFS 
     from a vertex, and the closeness centrality value is computed */   
 #ifdef _OPENMP

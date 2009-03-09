@@ -8,5 +8,5 @@
 #endif
 #endif
 
-void *_mymalloc ANSI_ARGS((long size, int line, char *message));
+void *_mymalloc ANSI_ARGS((long size, int line, const char *message));
 

@@ -18,7 +18,7 @@ node_t* makeNode(int id)
     return new;
 }
 
-//note append will append at the last.
+/* note append will append at the last. */
 void append(list_t *L, node_t *n)
 {
     if(L->size==0)

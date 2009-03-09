@@ -25,8 +25,10 @@ void vertex_betweenness_centrality_parBFS(graph_t* G, double* BC, long numSrcs) 
     omp_lock_t* vLock;
     long chunkSize;
 #endif
-    int seed = 2387;
+#ifdef DIAGNOSTIC
     double elapsed_time;
+#endif
+    int seed = 2387;
 
 #ifdef _OPENMP    
 #pragma omp parallel firstprivate(G)
@@ -316,7 +318,7 @@ void vertex_betweenness_centrality_parBFS(graph_t* G, double* BC, long numSrcs) 
             phase_num++; 
             if (tid == 0) {
                 if (phase_num >= MAX_NUM_PHASES) {
-                    fprintf(stderr, "Error: Max num phases set to %d\n",
+                    fprintf(stderr, "Error: Max num phases set to %ld\n",
                         MAX_NUM_PHASES);
                     fprintf(stderr, "Diameter of input network greater than"
                         " this value. Increase MAX_NUM_PHASES"
@@ -467,9 +469,10 @@ void vertex_betweenness_centrality_simple(graph_t* G, double* BC, long numSrcs) 
     omp_lock_t* vLock;
     long chunkSize;
 #endif
-    int seed = 2387;
+#ifdef DIAGNOSTIC
     double elapsed_time;
-
+#endif
+    int seed = 2387;
 
     /* The outer loop is parallelized in this case. Each thread does a BFS 
     and the vertex BC values are incremented atomically */   
@@ -488,7 +491,7 @@ void vertex_betweenness_centrality_simple(graph_t* G, double* BC, long numSrcs) 
     attr_id_t *start, *end;
     long MAX_NUM_PHASES;
 
-    long i, j, k, p, count, myCount;
+    long i, j, k, p, count;
     long v, w, vert;
     long numV, n, m, phase_num;
     long tid, nthreads;
@@ -643,9 +646,11 @@ void vertex_betweenness_centrality_simple(graph_t* G, double* BC, long numSrcs) 
         
     start = (attr_id_t *) malloc(MAX_NUM_PHASES*sizeof(attr_id_t));
     end = (attr_id_t *) malloc(MAX_NUM_PHASES*sizeof(attr_id_t));
-   
+
+#ifdef _OPENMP   
     #pragma omp barrier
- 
+#endif
+
     for (i=0; i<n; i++) {
         d[i] = -1;
     }

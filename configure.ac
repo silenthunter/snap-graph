@@ -2,7 +2,8 @@
 AC_PREREQ(2.59)
 
 # initialize
-AC_INIT(snap, 0.3, kmadduri@lbl.gov)
+AC_INIT(snap, 0.3, snap-graph-support@sourceforge.net)
+AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_SRCDIR(src/graph_kernels/breadth_first_search.c)
 AM_CONFIG_HEADER(config.h)
 AM_INIT_AUTOMAKE
@@ -15,7 +16,7 @@ AC_ARG_ENABLE(debug,
         [build library and binaries with extra runtime checks for debugging])], 
         enable_debug=$enableval, enable_debug=no)
 if test "$enable_debug" = "yes"; then
-    AC_DEFINE(SNAP_DEBUG,1,[Define to build snap with debug flags])
+    AC_DEFINE(SNAP_DEBUG,1,[Define to 1 to build snap with debug flags])
 fi
 
 # check for C compiler
@@ -50,22 +51,24 @@ AC_ARG_ENABLE(openmp,
             [use OpenMP directives for parallelism])],
         enable_openmp=$enableval, enable_openmp=no)
 if test "$enable_openmp" = "yes"; then
-    AC_DEFINE(HAVE_OPENMP,1,[Define to enable OpenMP])
+    AC_DEFINE(HAVE_OPENMP,1,[Define to 1 to enable OpenMP])
 fi
 
 if test "$enable_openmp" = "yes"; then
    AX_OPENMP([THREADLIBS=" "
-     AC_DEFINE(USING_OPENMP_THREADS, 1, [Define if we have and are using OpenMP multithreading directives])
+     AC_DEFINE(USING_OPENMP_THREADS, 1, [Define to 1 if we have and are using OpenMP multithreading directives])
      CFLAGS="$CFLAGS $OPENMP_CFLAGS"],
      [AC_MSG_ERROR([Unable to determine the appropriate OpenMP flag for your compiler.
          Please set the CFLAGS variable manually for OpenMP support.])])
 fi
 
 # checks for libraries
-AC_CHECK_LIB(m, log2, [], [])
+AC_CHECK_LIBS(m)
 
 # header files
-AC_CHECK_HEADERS([stdarg.h limits.h])
+AC_CHECK_HEADERS([stdarg.h], [AC_DEFINE([HAVE_STDARG_H],[1],[Define if your system has the header file 'stdarg.h'.])])
+AC_CHECK_HEADERS([limits.h], [AC_DEFINE([HAVE_LIMITS_H],[1],[Define if your system has the header file 'limits.h'.])])
+AC_CHECK_HEADERS([unistd.h], [AC_DEFINE([HAVE_UNISTD_H],[1],[Define if your system has the header file 'unistd.h'.])])
 
 # typedefs, structures, and compiler characteristics
 AC_C_CONST
@@ -76,7 +79,7 @@ AC_STRUCT_TM
 
 # check functions
 AC_FUNC_MALLOC
-AC_CHECK_FUNCS([floor gettimeofday gethrtime memset memalign sqrt drand48 pow])
+AC_CHECK_FUNCS([floor gettimeofday gethrtime memset memalign sqrt drand48 pow log2])
 
 # list of config files
 AC_CONFIG_FILES([Makefile

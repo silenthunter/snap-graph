@@ -1,3 +1,4 @@
+#include <unistd.h>
 #include "graph_defs.h"
 #include "graph_gen.h"
 #include "graph_kernels.h"
@@ -12,11 +13,11 @@ int main(int argc, char** argv) {
 
     long src;
     int curArgIndex;
-    long numSrcs;
     int est_diameter;
-    long i, j;
     long num_vertices_visited;
-
+    
+    int proc_pid;
+    
     /* Step 1: Parse command line arguments */
     if (argc < 3) {
         fprintf(stdout, "\nUsage: %s (-src <vertex ID (0 to n-1)>) -infile <graph filename>"
@@ -33,7 +34,8 @@ int main(int argc, char** argv) {
     outfilename = (char *) calloc(500, sizeof(char));
     graph_type = (char *) calloc(500, sizeof(char));
 
-    strcpy(outfilename, "/tmp/results.out");
+    proc_pid = getpid();
+    sprintf(outfilename, "results.%d.txt", proc_pid);
 
     src = -1;
 
@@ -57,6 +59,8 @@ int main(int argc, char** argv) {
         curArgIndex++; 
     }
 
+    print_snap_header(stdout);
+    
     fp = fopen(infilename, "r");
     if (fp == NULL) {
         fprintf(stderr, "Error! Could not open input file. Exiting ...\n");
@@ -69,30 +73,32 @@ int main(int argc, char** argv) {
         fprintf(stderr, "Error! Could not write to output file. Exiting ...\n");   
         exit(-1);
     }
-    fclose(fp);
+
+    print_snap_header(fp);
 
     graph_ext_check(infilename, graph_type);
 
-    fprintf(stdout, "\n");
-    fprintf(stdout, "Input Graph File    : %s\n", infilename);
-    fprintf(stdout, "Output Graph File   : %s\n\n", outfilename);
+    fprintf(stdout, "  Input Graph File   : %s\n", infilename);
+    fprintf(stdout, "  Output Graph File  : %s\n", outfilename);
 
+    fprintf(fp, "  Input Graph File    : %s\n", infilename);
+    fprintf(fp, "  Output Graph File   : %s\n", outfilename);
+    
     /* Step 2: Generate graph */
     g = (graph_t *) malloc(sizeof(graph_t));
     graph_gen(g, infilename, graph_type);
    
-    fprintf(stdout, "No. of vertices     : %ld\n", g->n);
-    if (g->undirected)
-        fprintf(stdout, "No. of edges        : %ld\n\n", g->m/2);
-    else 
-        fprintf(stdout, "No. of edges        : %ld\n\n", g->m);
-
+    print_graph_header(stdout, g, "BFS");
+    print_graph_header(fp, g, "BFS");
+    
     if (src == -1)
        src = lrand48() % g->n;
 
     assert((src >= 0) && (src < g->n));
-    fprintf(stdout, "Source vertex       : %ld\n\n", src);
 
+    fprintf(stdout, "  Source vertex      : %ld\n\n", src);
+    fprintf(fp    , "  Source vertex      : %ld\n\n", src);
+    
     /* Step 3: Run algorithm */
 
     /* Assuming a low diameter graph */
@@ -101,9 +107,11 @@ int main(int argc, char** argv) {
     num_vertices_visited = BFS_parallel_frontier_expansion(g, src, est_diameter);
 
     /* Step 4: Write output to file */
-    fp = fopen(outfilename, "w");
-    fprintf(fp, "Breadth-first search from vertex %ld\n", src); 
-    fprintf(fp, "No. of vertices visited: %ld\n", num_vertices_visited);
+    fprintf(fp, "  Breadth-first search from vertex %ld\n", src); 
+    fprintf(fp, "  Number of vertices visited: %ld\n\n", num_vertices_visited);
+    fprintf(stdout, "  Breadth-first search from vertex %ld\n", src); 
+    fprintf(stdout, "  Number of vertices visited: %ld\n\n", 
+            num_vertices_visited);
     
     /* Step 5: Clean up */
     free(infilename);
@@ -112,6 +120,6 @@ int main(int argc, char** argv) {
 
     free_graph(g);
     free(g);
-
+    fclose(fp);
     return 0;
 }

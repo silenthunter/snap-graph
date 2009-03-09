@@ -5,18 +5,20 @@
 /* utils.c */
 double get_seconds(void);
 void prefix_sums(attr_id_t*, attr_id_t*, attr_id_t*, attr_id_t);
-void usage_graph_options();
+void usage_graph_options(void);
 void graph_ext_check(char*, char*);
 void print_graph(graph_t*);
+void print_snap_header(FILE*);
+void print_graph_header(FILE*, graph_t*, const char*);
 
-//vectorUtils.c
+/* vectorUtils.c */
 
 void printDoubleVector(double*,int,int);
 void printIntVector(int*,int,int);
 void print_attr_id_t_Vector(attr_id_t*,attr_id_t,attr_id_t);
 
-//list.c
-list_t* makeList();
+/* list.c */
+list_t* makeList(void);
 node_t* makeNode(int);
 void append(list_t*,node_t*);
 node_t *getFirst(list_t*);

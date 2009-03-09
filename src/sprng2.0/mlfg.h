@@ -18,7 +18,7 @@ int mlfg_get_rn_int ANSI_ARGS((int *igenptr));
 float mlfg_get_rn_flt ANSI_ARGS((int *igenptr));
 double mlfg_get_rn_dbl ANSI_ARGS((int *igenptr));
 int *mlfg_init_rng ANSI_ARGS((int rng_type,  int gennum, int total_gen,  int seed,
-			  int mult));
+			  int multval));
 int mlfg_spawn_rng ANSI_ARGS((int *igenptr, int nspawned, int ***newgens, int checkid) );
 int mlfg_get_seed_rng ANSI_ARGS((int *genptr));
 int mlfg_free_rng ANSI_ARGS((int *genptr));

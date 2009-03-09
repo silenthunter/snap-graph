@@ -84,7 +84,7 @@ unsigned int PARAMLIST[NPARAMS][2] = {{0x87b0b0fdU, 0x27bb2ee6U},
 struct rngen
 {
   int rng_type;
-  char *gentype;
+  const char *gentype;
   int stream_number;
   int nstreams;
   int init_seed;
@@ -95,7 +95,7 @@ struct rngen
   int spawn_offset;
   /*** declare other variables here ***/
   unsigned int prime;
-  
+    
 #ifdef LONG64			/* 64 bit integer types */
   unsigned LONG64 state, multiplier;
 #else  /* No 64 bit type available, so use array of floats */
@@ -294,9 +294,10 @@ int *igenptr;
 #define MSB 0
 #endif
 #define LSB (1-MSB)
-  double ans;
   unsigned int ist0, ist1, ist2;
+#if defined(HP) || defined(SUN) || defined(SOLARIS) || defined(GENERIC)
   static double temp[1] = {0.0};
+#endif
 
   advance_state(genptr);	/* next state in sequence */
 
@@ -370,12 +371,14 @@ int *igenptr;
 int spawn_rng(int *igenptr, int nspawned, int ***newgens, int checkid)
 #else
 int spawn_rng(igenptr,nspawned, newgens, checkid)
-int *igenptr,nspawned, ***newgens, checkid;
+int *igenptr;
+int nspawned, ***newgens, checkid;
 #endif
 {
-  struct rngen **genptr, *tempptr = (struct rngen *) igenptr;
+  struct rngen **genptr, *tempptr;
   int i;
   
+  tempptr = (struct rngen *) igenptr;
   if (nspawned <= 0) /* is nspawned valid ? */
   {
     nspawned = 1;
@@ -529,7 +532,7 @@ char *packed;
   struct rngen *q;
   unsigned char *p;
 #ifndef LONG64
-  unsigned int i, m[2];
+  unsigned int m[2];
 #endif
 
   p = (unsigned char *) packed;

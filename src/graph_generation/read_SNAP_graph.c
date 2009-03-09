@@ -6,7 +6,7 @@ void read_SNAP_graph(graph_t* G, char* filename) {
     char *buf;
     FILE *fp;
     
-    long i, j;
+    long i;
     long undirected, repeated, zero_indexed, weight_type;
     char udc, zic, wtc;
     long n, m; 

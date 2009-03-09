@@ -15,7 +15,6 @@ int main(int argc, char** argv) {
     int num_communities;
     double modularity, mod_val;
     long i;
-    double sampling_val;
     int run_approxBC;
 
     /* Step 1: Parse command line arguments */
@@ -27,11 +26,11 @@ int main(int argc, char** argv) {
         fprintf(stdout, "Algorithm type can be one of the following:\n"
                 "CNM         -- greedy agglomerative strategy of "
                 "Clauset, Newman and Moore.\n\n"
-                //"WT1/WT2/WT3 -- Wakita and Tsurami's consolidation ratio heuristics.\n"
-                //"DDA         -- Normalized modularity heuristics by Danon, "
-                //"Diaz-Guilera, and Arenas.\n"
-                //"CCA         -- An agglomerative clustering heuristic based "
-                //"on local clustering coefficient.\n"
+                /*"WT1/WT2/WT3 -- Wakita and Tsurami's consolidation ratio heuristics.\n"
+                "DDA         -- Normalized modularity heuristics by Danon, "
+                "Diaz-Guilera, and Arenas.\n"
+                "CCA         -- An agglomerative clustering heuristic based "
+                "on local clustering coefficient.\n" */
                 );
         usage_graph_options();
         exit(-1);
@@ -44,7 +43,7 @@ int main(int argc, char** argv) {
     graph_type = (char *) calloc(500, sizeof(char));
     alg_type = (char *) calloc(500, sizeof(char));
 
-    strcpy(outfilename, "/tmp/results.out");
+    strcpy(outfilename, "output.txt");
 
     while (curArgIndex < argc) {
         
@@ -92,11 +91,11 @@ int main(int argc, char** argv) {
     g = (graph_t *) malloc(sizeof(graph_t));
     graph_gen(g, infilename, graph_type);
    
-    fprintf(stdout, "No. of vertices     : %ld\n", g->n);
+    fprintf(stdout, "Number of vertices     : %ld\n", g->n);
     if (g->undirected)
-        fprintf(stdout, "No. of edges        : %ld\n\n", g->m/2);
+        fprintf(stdout, "Number of edges        : %ld\n\n", g->m/2);
     else 
-        fprintf(stdout, "No. of edges        : %ld\n\n", g->m);
+        fprintf(stdout, "Number of edges        : %ld\n\n", g->m);
 
     if (g->undirected == 0) {
         fprintf(stderr, "Error: the graph has to be undirected.\n");
@@ -117,20 +116,20 @@ int main(int argc, char** argv) {
     /* Step 4: Write output to file */
     fp = fopen(outfilename, "w");
     fprintf(fp, "Number of communities: %d\n", num_communities);
-    fprintf(fp, "Modularity score: %lf (full), %lf (w/o dup)\n", mod_val,
+    fprintf(fp, "Modularity score: %f (full), %f (w/o dup)\n", mod_val,
             modularity);
     fprintf(fp, "\n<Vertex ID> <Community ID>\n\n");
     
     for (i=0; i<g->n; i++) {
         if (g->zero_indexed)
-            fprintf(fp, "%ld %ld\n", i, membership[i]);  
+            fprintf(fp, "%ld %d\n", i, membership[i]);  
         else
-            fprintf(fp, "%ld %ld\n", i+1, membership[i]);  
+            fprintf(fp, "%ld %d\n", i+1, membership[i]);  
 
     }
-    fprintf(stderr, "Modularity: %lf (full), %lf (w/o dup)\n", mod_val,
+    fprintf(stderr, "Modularity: %f (full), %f (w/o dup)\n", mod_val,
             modularity);
-    fprintf(stderr, "No. of communities: %d\n", num_communities);
+    fprintf(stderr, "Number of communities: %d\n", num_communities);
     
     fclose(fp);
 

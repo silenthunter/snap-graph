@@ -6,7 +6,7 @@ void read_DIMACS_graph(graph_t* G, char* filename) {
     char *buf;
     FILE *fp;
     
-    long i, j;
+    long i;
     long n, m;
     long count, offset;
     int int_wt, *int_weight;

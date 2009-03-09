@@ -39,8 +39,8 @@ void biconnected_components(graph_t* G, attr_id_t* component_num) {
 
 void find_articulation_points(graph_t* G, attr_id_t* art_point_map) {
 
-    long i;
-    long n, m;
+    long n;
+    n = G->n;
 
     color = (attr_id_t *) calloc(n, sizeof(attr_id_t));
     art   = (attr_id_t *) calloc(n, sizeof(attr_id_t));
@@ -95,7 +95,7 @@ void art_points_recursive(graph_t* G, attr_id_t u) {
 
 void biconnected_components_recursive(graph_t* G, attr_id_t v, attr_id_t u) {
 
-	attr_id_t i,j,w,a,b;
+	attr_id_t i,w,a,b;
 
 	lastdfsnumber++;
 	dfsnumber[v]=lastdfsnumber;

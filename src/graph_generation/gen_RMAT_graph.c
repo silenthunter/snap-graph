@@ -13,10 +13,10 @@ void gen_RMAT_graph(graph_t* G, char* filename) {
     int SCALE;
     double var;
     long step;
-    int int_wt, *int_weight;
-    long l_wt, *l_weight;
-    float fl_wt, *fl_weight;
-    double dbl_wt, *dbl_weight;
+    int *int_weight;
+    long *l_weight;
+    float *fl_weight;
+    double *dbl_weight;
     double min_weight, max_weight;
     long permute_vertices;
     attr_id_t* permV, tmpVal;

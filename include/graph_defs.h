@@ -20,7 +20,9 @@
 #define ARRAY_INIT_SIZE 8
 
 #if !HAVE_LOG2
+#ifndef log2
 #define log2(d) (log(d)/log(2.0))
+#endif
 #endif
 
 typedef struct {

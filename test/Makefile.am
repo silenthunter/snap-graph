@@ -1,9 +1,13 @@
-AM_CPPFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)/include/sprng
+AM_CPPFLAGS = -I$(top_srcdir)/include
 AM_LDFLAGS = -L$(top_srcdir)/lib -lm
 
 bin_PROGRAMS = eval_BFS eval_biconnected_components eval_modularity_spectral \
 eval_vertex_cover eval_vertex_betweenness eval_modularity_betweenness \
 eval_modularity_greedy_agglomerative
+
+EXTRA_DIST = test_graph_dimacs_5_8.dim test_graph_karate.gml \
+test_graph_rand_100K_1M_undir_unwt.rnd test_graph_rand_1K_10K_undir_unwt.rnd \
+test_graph_rmat_100K_1M_undir_unwt.rmat test_graph_snap_5_8_undir_unwt.gr
 
 eval_vertex_betweenness_SOURCES = drive_vertex_betweenness.c
 eval_vertex_betweenness_LDADD = $(top_srcdir)/lib/libsnap.la

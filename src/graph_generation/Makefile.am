@@ -1,4 +1,4 @@
-AM_CPPFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)/include/sprng
+AM_CPPFLAGS = -I$(top_srcdir)/include
 
 noinst_LTLIBRARIES = libgraph_gen.la
 libgraph_gen_la_SOURCES = graph_gen.c read_SNAP_graph.c \

@@ -1,4 +1,4 @@
-AM_CPPFLAGS = -I$(top_srcdir)/include/sprng2.0
+AM_CPPFLAGS = -I$(top_srcdir)/include
 noinst_LTLIBRARIES = libsprng.la
 
 libsprng_la_SOURCES = primes_32.c primes_64.c cputime.c makeseed.c \

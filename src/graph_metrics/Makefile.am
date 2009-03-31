@@ -1,4 +1,4 @@
-AM_CPPFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)/include/sprng
+AM_CPPFLAGS = -I$(top_srcdir)/include
 
 noinst_LTLIBRARIES = libgraph_metrics.la
 

@@ -1,6 +1,11 @@
 #ifndef _GRAPH_DEFS_H
 #define _GRAPH_DEFS_H
 
+#if HAVE_CONFIG_H
+#include "config.h"
+#endif
+
+#include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>

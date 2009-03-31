@@ -18,7 +18,7 @@
 /* Define to 1 if you have the `m' library (-lm). */
 #undef HAVE_LIBM
 
-/* Define if your system has the header file 'limits.h'. */
+/* Define to 1 if you have the <limits.h> header file. */
 #undef HAVE_LIMITS_H
 
 /* Define to 1 if you have the `log2' function. */
@@ -27,6 +27,9 @@
 /* Define to 1 if your system has a GNU libc compatible `malloc' function, and
    to 0 otherwise. */
 #undef HAVE_MALLOC
+
+/* Define to 1 if you have the <math.h> header file. */
+#undef HAVE_MATH_H
 
 /* Define to 1 if you have the `memalign' function. */
 #undef HAVE_MEMALIGN
@@ -37,10 +40,10 @@
 /* Define to 1 if you have the `memset' function. */
 #undef HAVE_MEMSET
 
-/* Define to 1 to enable OpenMP */
+/* Define to 1 to enable OpenMP. */
 #undef HAVE_OPENMP
 
-/* Define if your system has the header file 'stdarg.h'. */
+/* Define to 1 if you have the <stdarg.h> header file. */
 #undef HAVE_STDARG_H
 
 /* Define to 1 if you have the <stdint.h> header file. */
@@ -61,7 +64,7 @@
 /* Define to 1 if you have the <sys/types.h> header file. */
 #undef HAVE_SYS_TYPES_H
 
-/* Define if your system has the header file 'unistd.h'. */
+/* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H
 
 /* Define to the sub-directory in which libtool stores uninstalled libraries.
@@ -86,7 +89,7 @@
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
 
-/* Define to 1 to build snap with debug flags */
+/* Define to 1 to build snap with debug flags. */
 #undef SNAP_DEBUG
 
 /* Define to 1 if you have the ANSI C header files. */
@@ -98,7 +101,8 @@
 /* Define to 1 if your <sys/time.h> declares `struct tm'. */
 #undef TM_IN_SYS_TIME
 
-/* Define to 1 if we have and are using OpenMP multithreading directives */
+/* Define to 1 if there is a valid OpenMP flag and the compiler supports it.
+   */
 #undef USING_OPENMP_THREADS
 
 /* Version number of package */

@@ -1,19 +1,18 @@
 # run autoconf to produce the configure script
-AC_PREREQ(2.59)
+AC_PREREQ(2.63)
 
 # initialize
-AC_INIT(snap, 0.3, snap-graph-support@sourceforge.net)
+AC_INIT([snap],[0.3],[snap-graph-support@sourceforge.net])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_SRCDIR(src/graph_kernels/breadth_first_search.c)
-AM_CONFIG_HEADER(config.h)
+AC_CONFIG_HEADERS([config.h])
 AM_INIT_AUTOMAKE
 
 # get platform information
 AC_CANONICAL_HOST
 
 AC_ARG_ENABLE(debug,
-        [AC_HELP_STRING([--enable-debug],
-        [build library and binaries with extra runtime checks for debugging])], 
+        [AS_HELP_STRING([--enable-debug],[build library and binaries with extra runtime checks for debugging])], 
         enable_debug=$enableval, enable_debug=no)
 if test "$enable_debug" = "yes"; then
     AC_DEFINE(SNAP_DEBUG,1,[Define to 1 to build snap with debug flags.])
@@ -26,7 +25,7 @@ AC_PROG_CC
 AX_COMPILER_VENDOR
 
 # check for libtool
-AC_PROG_LIBTOOL
+LT_INIT
 
 # macro for determining optimization flags
 AX_CC_MAXOPT
@@ -39,7 +38,7 @@ fi
 # add more warning flags for gcc, in debug/maintainer mode only
 if test "$enable_debug" = "yes" || test "$USE_MAINTAINER_MODE" = "yes"; then
 if test "${ac_test_CFLAGS}" != "set"; then
-    if test "${ac_cv_prog_gcc}" = "yes"; then
+    if test "${ac_cv_c_compiler_gnu}" = "yes"; then
         CFLAGS="$CFLAGS -Wall -W -Wcast-qual -Wpointer-arith -Wcast-align -pedantic -Wno-long-long -Wshadow -Wbad-function-cast -Wwrite-strings -Wstrict-prototypes -Wredundant-decls -Wnested-externs" # -Wundef -Wconversion -Wmissing-prototypes -Wmissing-declarations
     fi
 fi
@@ -47,8 +46,7 @@ fi
 
 # check for OpenMP flags
 AC_ARG_ENABLE(openmp,
-        [AC_HELP_STRING([--enable-openmp],
-            [use OpenMP directives for parallelism])],
+        [AS_HELP_STRING([--enable-openmp],[use OpenMP directives for parallelism])],
         enable_openmp=$enableval, enable_openmp=no)
 if test "$enable_openmp" = "yes"; then
     AC_DEFINE(HAVE_OPENMP,1,[Define to 1 to enable OpenMP.])

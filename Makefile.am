@@ -1,9 +1,11 @@
 ACLOCAL_AMFLAGS = -I m4
-SUBDIRS = src lib test
-EXTRA_DIST = include
+SUBDIRS = src include lib test 
 lib_LTLIBRARIES = libsnap.la
 
-include_HEADERS = include/graph_defs.h include/graph_kernels.h
+include_HEADERS = include/graph_defs.h include/graph_kernels.h \
+	include/graph_metrics.h include/graph_partitioning.h \
+	include/utils.h include/sprng.h include/sprng_interface.h \
+	include/sprng_f.h
 
 libsnap_la_SOURCES = 
 

@@ -1,5 +1,5 @@
 ACLOCAL_AMFLAGS = -I m4
-SUBDIRS = src lib test 
+SUBDIRS = src include lib test 
 lib_LTLIBRARIES = libsnap.la
 
 include_HEADERS = include/graph_defs.h include/graph_kernels.h \

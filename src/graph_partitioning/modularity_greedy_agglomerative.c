@@ -458,7 +458,7 @@ void aggc_remove_commpair(aggc_comm_t *communities, aggc_maxheap_t *dq_maxheap,
 
     attr_id_t i, comm_id, max_dq_idx, max_dq_commpair_id, pos, degree;
     commpair_aggc_t *adjcomm, *dq_comm_list;
-    double max_dq, dq_val;
+    double max_dq, max_dq_old, dq_val;
     attr_id_t *dq_index;
     attr_id_t heap_pos;
     double INFTY;
@@ -468,11 +468,8 @@ void aggc_remove_commpair(aggc_comm_t *communities, aggc_maxheap_t *dq_maxheap,
     dq_comm_list = dq_maxheap->heap;
 
     max_dq_idx = communities[comm1].max_dq_idx;
-    if (max_dq_idx < 0) {
-        /* fprintf(stderr, "comm %d, max_dq_idx %d, degree %d, dqi %d\n", 
-                comm1, max_dq_idx, dq_index[comm1]); */
-        assert(max_dq_idx >= 0);
-    }
+    max_dq_old = communities[comm1].max_dq;
+
     max_dq_commpair_id = communities[comm1].adjcomm[max_dq_idx].comm_id;
     degree = communities[comm1].degree;
     adjcomm = communities[comm1].adjcomm;
@@ -515,8 +512,11 @@ void aggc_remove_commpair(aggc_comm_t *communities, aggc_maxheap_t *dq_maxheap,
        /* Sift down value in max-heap */
        heap_pos = dq_index[comm1];
        dq_comm_list[heap_pos].dq = max_dq;
-       aggc_maxheap_sift_up(dq_maxheap, heap_pos);
-    
+       if (max_dq > max_dq_old) 
+           aggc_maxheap_sift_up(dq_maxheap, heap_pos);
+       else
+           aggc_maxheap_sift_down(dq_maxheap, heap_pos);
+
     } else {
 
         /* do a binary search to locate the pair in adjcomm, delete it,
@@ -979,6 +979,7 @@ void modularity_greedy_agglomerative(graph_t *g, char *alg_type,
         aggc_merge_communities_cnm(communities, dq_maxheap,
                 &new_dq, adj_buffer);
         
+        aggc_maxheap_check(dq_maxheap);
         no_of_joins++;
         
         if (new_dq < 0) {

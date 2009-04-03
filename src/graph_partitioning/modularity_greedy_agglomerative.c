@@ -939,7 +939,7 @@ void modularity_greedy_agglomerative(graph_t *g, char *alg_type,
     
     /* heapify */
     for (i=0; i<n; i++) {
-        if (communities[i].max_dq == -1) {
+        if (communities[i].max_dq == -INFTY) {
             dq_index[i] = -1;
             continue;
         }

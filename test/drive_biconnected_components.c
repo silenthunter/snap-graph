@@ -13,6 +13,9 @@ int main(int argc, char** argv) {
     int curArgIndex;
     
     attr_id_t* component_num;
+    attr_id_t i, bcc_num;
+    int digits;
+    char *forstr;
 
     /* Step 1: Parse command line arguments */
     if (argc < 3) {
@@ -79,7 +82,38 @@ int main(int argc, char** argv) {
     /* Step 3: Run algorithm */ 
 
     component_num = (attr_id_t *) malloc(g->m*sizeof(attr_id_t));
-    biconnected_components(g, component_num);
+    bcc_num = biconnected_components(g, component_num);
+
+    /* Write output to file */
+    fp = fopen(outfilename, "w");
+    fprintf(fp, "Number of biconnected components: %d\n", bcc_num);
+    fprintf(fp, "\n<Vertex ID> <Biconnected Component ID>\n\n");
+
+    if (g->n > 1)
+      digits =  1 + (int)floor(log ((double)g->n) / log (10.0));
+    else
+      digits = 1;
+
+    forstr = (char *)malloc(256*sizeof(char));
+    assert(forstr != NULL);
+
+    assert(digits < 32);
+
+    sprintf(forstr, "%%%dld %%%dd\n", digits, digits);
+
+    for (i=0; i<g->n; i++) {
+      if (g->numEdges[i+1] - g->numEdges[i] > 0) {
+        if (g->zero_indexed)
+	  fprintf(fp, forstr, i, component_num[i]);  
+        else
+	  fprintf(fp, forstr, i+1, component_num[i]);  
+      }
+
+    }
+    fflush(fp);
+    fclose(fp);
+    free(forstr);
+
  
     /* Step 4: Clean up */
     free(component_num);

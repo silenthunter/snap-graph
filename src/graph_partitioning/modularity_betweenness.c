@@ -2,7 +2,8 @@
 #include "graph_kernels.h"
 #include "graph_metrics.h"
 
-double comm_evaluate_modularity(graph_t* g, comm_list_bc_t* comm_list, attr_id_t num_components) {
+double comm_evaluate_modularity(graph_t* g, comm_list_bc_t* comm_list, 
+        attr_id_t num_components) {
 
     attr_id_t u, v, j;
     attr_id_t n, m;
@@ -15,7 +16,7 @@ double comm_evaluate_modularity(graph_t* g, comm_list_bc_t* comm_list, attr_id_t
     m = g->m; 
     m2_inv = 1.0/(g->m);
     mod = 0.0;
-    
+
     for (j=0; j<num_components; j++) {
         comm_list[j].a = 0.0;
         comm_list[j].e = 0.0;
@@ -71,18 +72,18 @@ void  remove_maxbc_edge(graph_t *g, comm_list_bc_t *comm_list,
         }
     } else {
 
-         prev_maxbc_component = *maxbc_component;
-         /* Two components are updated in prev BC iteration, num_components-1
+        prev_maxbc_component = *maxbc_component;
+        /* Two components are updated in prev BC iteration, num_components-1
            and prev_maxbc_component. Update the max centrality scores of these
            components.
          */
-         comm_list[prev_maxbc_component].mbc_val = -1;
-         comm_list[num_components-1].mbc_val = -1;
-         for (i=0; i<n; i++) {        
+        comm_list[prev_maxbc_component].mbc_val = -1;
+        comm_list[num_components-1].mbc_val = -1;
+        for (i=0; i<n; i++) {        
             comm_id = g->cvl[i].comm_id;
             if ((comm_id != prev_maxbc_component) && (comm_id !=
-                    num_components-1))
-               continue; 
+                        num_components-1))
+                continue; 
             for (j=g->cvl[i].num_edges; j<g->cvl[i+1].num_edges; j++) {
                 if (g->cel[j].cval > comm_list[comm_id].mbc_val) {
                     comm_list[comm_id].mbc_val = g->cel[j].cval;
@@ -92,7 +93,7 @@ void  remove_maxbc_edge(graph_t *g, comm_list_bc_t *comm_list,
             }
         }
     }
-    
+
     /* find edge with max edge bc value */ 
     mbc_val = comm_list[0].mbc_val;
     mbc_eid = comm_list[0].mbc_eid;
@@ -132,18 +133,18 @@ void  remove_maxbc_edge(graph_t *g, comm_list_bc_t *comm_list,
         } 
     }
     /* 
-    for (i=0; i<n; i++) {        
-        for (j=g->cvl[i].num_edges; j<g->cvl[i+1].num_edges; j++) {
-            fprintf(stderr, "%5.5lf %4d (%2d %2d) %d\n",
-                    g->cel[j].cval, g->cel[j].eid,
-                    i, g->cel[j].dest, g->cel[j].mask);
-        }
-    }
-    */
+       for (i=0; i<n; i++) {        
+       for (j=g->cvl[i].num_edges; j<g->cvl[i+1].num_edges; j++) {
+       fprintf(stderr, "%5.5lf %4d (%2d %2d) %d\n",
+       g->cel[j].cval, g->cel[j].eid,
+       i, g->cel[j].dest, g->cel[j].mask);
+       }
+       }
+     */
     *maxbc_component = mbc_component;
 
 }
-     
+
 /* Community detection algorithm that optimizes modularity, and is based on 
    iterative removal of edges with high betweenness in the network */
 void modularity_betweenness(graph_t *g, attr_id_t *membership, 
@@ -166,7 +167,7 @@ void modularity_betweenness(graph_t *g, attr_id_t *membership,
 
     n = g->n;
     m = g->m;
-  
+
     /* Initialize the graph representation we will use in this algorithm */ 
     g->cvl = (c_vert_t *) calloc(n + 1, sizeof(c_vert_t));
     g->cel = (c_edge_t *) calloc(m, sizeof(c_edge_t));
@@ -180,7 +181,7 @@ void modularity_betweenness(graph_t *g, attr_id_t *membership,
             g->cel[j].eid  = g->edge_id[j];
         }
     }
-    
+
     g->cvl[n].num_edges = g->numEdges[n];
     /* Initially, all vertices belong to one giant community */
 
@@ -210,13 +211,14 @@ void modularity_betweenness(graph_t *g, attr_id_t *membership,
     /* start the iterative edge-betweenness based partitioning */
     while (1) {
 
-        evaluate_edge_centrality_bcpart(g, ebc_eval_data1, ebc_eval_data2, comm_list, num_components, curr_component1, curr_component2);
+        evaluate_edge_centrality_bcpart(g, ebc_eval_data1, ebc_eval_data2, 
+                comm_list, num_components, curr_component1, curr_component2);
 
         num_bc_runs++;
 
         remove_maxbc_edge(g, comm_list, num_components, num_bc_runs, &ebc_edge, 
                 &maxbc_component);
-    
+
         split = aux_connected_components_update(g, num_components,
                 maxbc_component);
         if (split) {
@@ -224,7 +226,8 @@ void modularity_betweenness(graph_t *g, attr_id_t *membership,
             curr_component2 = num_components;
             comm_list[num_components].p = maxbc_component;
             num_components++;
-            curr_modularity = comm_evaluate_modularity(g, comm_list, num_components);
+            curr_modularity = comm_evaluate_modularity(g, comm_list, 
+                    num_components);
             if (curr_modularity > max_modularity) {
                 max_modularity = curr_modularity;
                 max_modularity_comp_num = num_components-1;

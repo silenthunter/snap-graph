@@ -48,7 +48,8 @@ int aux_connected_components_init(graph_t* g) {
     return num_components;
 }
 
-int aux_connected_components_update(graph_t* g, attr_id_t num_components, attr_id_t maxbc_component) {
+int aux_connected_components_update(graph_t* g, attr_id_t num_components, 
+        attr_id_t maxbc_component) {
 
     int split;
     attr_id_t i, j, v, u;

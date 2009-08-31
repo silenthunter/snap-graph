@@ -1,6 +1,5 @@
 #include "utils.h"
 
-
 list_t* makeList()
 {
     list_t *l  = (list_t*)malloc(sizeof(list_t));
@@ -32,7 +31,7 @@ void append(list_t *L, node_t *n)
         L->tail = n;
     }
     L->size++;
-    
+
 }
 
 node_t* getFirst(list_t *L)

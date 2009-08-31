@@ -47,7 +47,7 @@ void gen_random_graph(graph_t* G, char* filename) {
         dbl_weight = (double *) malloc(m * sizeof(double));
         assert(dbl_weight != NULL);
     }
-    
+
     /* Initialize RNG stream */
     seed = 2387;
     stream = init_sprng(0, 0, 1, seed, SPRNG_DEFAULT);
@@ -69,7 +69,8 @@ void gen_random_graph(graph_t* G, char* filename) {
     /* Generate edge weights */
     if (weight_type == 1) {
         for (i=0; i<m; i++) {
-            int_weight[i]  = min_weight + (int) ((max_weight-min_weight)*sprng(stream));
+            int_weight[i]  = min_weight + 
+                (int) ((max_weight-min_weight)*sprng(stream));
         }
     } else if (weight_type == 2) {
         for (i=0; i<m; i++) {
@@ -131,7 +132,7 @@ void gen_random_graph(graph_t* G, char* filename) {
         }
 
     }
-    
+
     G->numEdges[0] = 0; 
     for (i=1;i<=G->n;i++) {
         G->numEdges[i] = G->numEdges[i-1] + degree[i-1];
@@ -157,7 +158,7 @@ void gen_random_graph(graph_t* G, char* filename) {
                 G->dbl_weight_e[G->numEdges[u]+offset-1] = dbl_weight[i];
             }
         }
-           
+
         if (undirected) {
             offset = degree[v]--;
             G->endV[G->numEdges[v]+offset-1] = u;
@@ -180,6 +181,7 @@ void gen_random_graph(graph_t* G, char* filename) {
         }
     }
     G->zero_indexed = 1;
+    
     /*
     for (i=0; i<G->n; i++) {
         for (j=G->numEdges[i]; j<G->numEdges[i+1]; j++) {
@@ -213,7 +215,7 @@ void read_random_config_file(graph_t* G, char* configfile) {
 
     fp = fopen(configfile,"r");
     if (fp == NULL) {
-        fprintf(stderr, "Unable to open config file:i %s\n",configfile);
+        fprintf(stderr, "Unable to open config file: %s\n",configfile);
         exit(-1);
     }
 

@@ -20,7 +20,8 @@ void graph_gen(graph_t* g, char* filename, char* graph_type) {
     } else if (strcmp(graph_type, "lm") == 0) {
         gen_lmesh_graph(g, filename);
     } else {
-        fprintf(stderr, "Error! Invalid graph format (%s). Exiting ...\n", graph_type);
+        fprintf(stderr, "Error! Invalid graph format (%s). Exiting ...\n", 
+                graph_type);
         exit(-1);
     }
 

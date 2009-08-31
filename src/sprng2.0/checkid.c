@@ -4,7 +4,7 @@
 #include "checkid.h"
 
 #define CHECK_MASK 0x1c		/* Assumes exactly last two bits are 0 ... */
-                                /* ... If not, change checklist dimension  */
+/* ... If not, change checklist dimension  */
 
 Checklisttype checklist[(CHECK_MASK>>2)+1] = {{NULL,NULL},{NULL,NULL},{NULL,NULL},{NULL,NULL}};
 
@@ -12,33 +12,33 @@ Checklisttype checklist[(CHECK_MASK>>2)+1] = {{NULL,NULL},{NULL,NULL},{NULL,NULL
 int *checkID( int *ptr)
 #else
 int *checkID(ptr)
-int *ptr;
+    int *ptr;
 #endif
 {
-  int bucket;
-  Checklisttype *next;
-  
-  if(ptr == NULL)
+    int bucket;
+    Checklisttype *next;
+
+    if(ptr == NULL)
+        return NULL;
+
+    bucket = (((long) ptr)&CHECK_MASK)>>2;
+    next = checklist[bucket].next;
+
+    while(next != NULL)
+    {
+        if(next->ID == ptr)
+        {
+            return (int *) ptr;
+        }
+        else
+        {
+            next = next->next;
+        }
+
+    }
+
+    fprintf(stderr,"ERROR: Invalid generator ID %p\n", (void *)ptr);
     return NULL;
-  
-  bucket = (((long) ptr)&CHECK_MASK)>>2;
-  next = checklist[bucket].next;
-  
-  while(next != NULL)
-  {
-    if(next->ID == ptr)
-    {
-      return (int *) ptr;
-    }
-    else
-    {
-      next = next->next;
-    }
-    
-  }
-  
-  fprintf(stderr,"ERROR: Invalid generator ID %p\n", (void *)ptr);
-  return NULL;
 }
 
 
@@ -47,36 +47,36 @@ int *ptr;
 int *deleteID( int *ptr)
 #else
 int *deleteID(ptr)
-int *ptr;
+    int *ptr;
 #endif
 {
-  int bucket;
-  Checklisttype *next, *temp;
-  
-  
-  if(ptr == NULL)
-    return NULL;
-  
-  bucket = (((long) ptr)&CHECK_MASK)>>2;
-  next = &checklist[bucket];
-  
-  while(next->next != NULL)
-    if(next->next->ID == ptr)
-    {
-      temp = next->next;
-      next->next = next->next->next;
-      
-      free(temp);
-      return (int *) ptr;
-    }
-    else
-    {
-      next = next->next;
-    }
-  
+    int bucket;
+    Checklisttype *next, *temp;
 
-  fprintf(stderr,"ERROR: Invalid generator ID %p\n", (void *)ptr);
-  return NULL;
+
+    if(ptr == NULL)
+        return NULL;
+
+    bucket = (((long) ptr)&CHECK_MASK)>>2;
+    next = &checklist[bucket];
+
+    while(next->next != NULL)
+        if(next->next->ID == ptr)
+        {
+            temp = next->next;
+            next->next = next->next->next;
+
+            free(temp);
+            return (int *) ptr;
+        }
+        else
+        {
+            next = next->next;
+        }
+
+
+    fprintf(stderr,"ERROR: Invalid generator ID %p\n", (void *)ptr);
+    return NULL;
 }
 
 
@@ -84,32 +84,32 @@ int *ptr;
 int *addID( int *ptr)
 #else
 int *addID(ptr)
-int *ptr;
+    int *ptr;
 #endif
 {
-  int bucket;
-  Checklisttype *temp;
-  
-  if(ptr == NULL)
-    return NULL;
- 
-  
-  bucket = (((long) ptr)&CHECK_MASK)>>2;
-  
-  temp = (Checklisttype *) mymalloc(sizeof(Checklisttype));
-  if(temp == NULL)
-    return NULL;
-  
-  temp->ID = (int *) ptr;
-  temp->next = checklist[bucket].next;
-  checklist[bucket].next = temp;
-  
-  
-  return (int *) ptr;
+    int bucket;
+    Checklisttype *temp;
+
+    if(ptr == NULL)
+        return NULL;
+
+
+    bucket = (((long) ptr)&CHECK_MASK)>>2;
+
+    temp = (Checklisttype *) mymalloc(sizeof(Checklisttype));
+    if(temp == NULL)
+        return NULL;
+
+    temp->ID = (int *) ptr;
+    temp->next = checklist[bucket].next;
+    checklist[bucket].next = temp;
+
+
+    return (int *) ptr;
 }
 
 
 
-  
-  
+
+
 

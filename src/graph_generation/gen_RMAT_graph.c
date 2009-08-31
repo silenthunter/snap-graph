@@ -33,7 +33,7 @@ void gen_RMAT_graph(graph_t* G, char* filename) {
     c = params[2];
     assert(a+b+c < 1);
     d = 1  - (a+b+c);
-    
+
     permute_vertices = (long) params[3];
 
     undirected = G->undirected;
@@ -44,7 +44,7 @@ void gen_RMAT_graph(graph_t* G, char* filename) {
     src = (attr_id_t *) malloc (m * sizeof(attr_id_t));
     dest = (attr_id_t *) malloc(m * sizeof(attr_id_t));
     degree = (attr_id_t *) calloc(n, sizeof(attr_id_t));
-        
+
     assert(src != NULL);
     assert(dest != NULL);
     assert(degree != NULL);
@@ -62,10 +62,10 @@ void gen_RMAT_graph(graph_t* G, char* filename) {
         dbl_weight = (double *) malloc(m * sizeof(double));
         assert(dbl_weight != NULL);
     }
-    
+
     /* Initialize RNG stream */
     seed = 2387;
-	stream = init_sprng(0, 0, 1, seed, SPRNG_DEFAULT);
+    stream = init_sprng(0, 0, 1, seed, SPRNG_DEFAULT);
     SCALE = log2(n);
     fprintf(stderr, "Scale: %d\n", SCALE);
 
@@ -92,7 +92,7 @@ void gen_RMAT_graph(graph_t* G, char* filename) {
             u += step;
             v += step;
         }
-        
+
         for (j=1; j<SCALE; j++) {
             step = step/2;
 
@@ -108,7 +108,7 @@ void gen_RMAT_graph(graph_t* G, char* filename) {
             bv = bv/S;
             cv = cv/S;
             dv = dv/S;
-            
+
             /* Choose partition */
             p = sprng(stream);
             if (p < av) {
@@ -122,7 +122,7 @@ void gen_RMAT_graph(graph_t* G, char* filename) {
                 v += step;
             }
         }
-        
+
         src[i] = u-1;
         dest[i] = v-1;
     }
@@ -146,7 +146,7 @@ void gen_RMAT_graph(graph_t* G, char* filename) {
         for (i=0; i<m; i++) {
             src[i]  = permV[src[i]];
             dest[i] = permV[dest[i]];
-       }
+        }
 
     }
 
@@ -162,7 +162,8 @@ void gen_RMAT_graph(graph_t* G, char* filename) {
     /* Generate edge weights */
     if (weight_type == 1) {
         for (i=0; i<m; i++) {
-            int_weight[i]  = min_weight + (int) ((max_weight-min_weight)*sprng(stream));
+            int_weight[i]  = min_weight + 
+                (int) ((max_weight-min_weight)*sprng(stream));
         }
     } else if (weight_type == 2) {
         for (i=0; i<m; i++) {
@@ -201,7 +202,7 @@ void gen_RMAT_graph(graph_t* G, char* filename) {
         G->m = 2*m;
     else
         G->m = m;
-    
+
     if (weight_type) {
 
         if (weight_type == 1) {
@@ -225,7 +226,7 @@ void gen_RMAT_graph(graph_t* G, char* filename) {
         }
 
     }
-    
+
     G->numEdges[0] = 0; 
     for (i=1;i<=G->n;i++) {
         G->numEdges[i] = G->numEdges[i-1] + degree[i-1];
@@ -251,7 +252,7 @@ void gen_RMAT_graph(graph_t* G, char* filename) {
                 G->dbl_weight_e[G->numEdges[u]+offset-1] = dbl_weight[i];
             }
         }
-           
+
         if (undirected) {
             offset = degree[v]--;
             G->endV[G->numEdges[v]+offset-1] = u;
@@ -270,10 +271,11 @@ void gen_RMAT_graph(graph_t* G, char* filename) {
                     G->dbl_weight_e[G->numEdges[v]+offset-1] = dbl_weight[i];
                 }
             }
-            
+
         }
     } 
     G->zero_indexed = 1;
+
     /*
     for (i=0; i<G->n; i++) {
         for (j=G->numEdges[i]; j<G->numEdges[i+1]; j++) {
@@ -301,36 +303,36 @@ void gen_RMAT_graph(graph_t* G, char* filename) {
 
 void read_RMAT_config_file(graph_t* G, char* configfile, double* params) {
 
-	/* read parameters from config file */
-	FILE *fp;
-	char line[128], var[32];
-	double val;
+    /* read parameters from config file */
+    FILE *fp;
+    char line[128], var[32];
+    double val;
 
-	fp = fopen(configfile,"r");
-	if (fp == NULL) {
-		fprintf(stderr, "Unable to open config file:i %s\n",configfile);
-		exit(-1);
-	}
-    
+    fp = fopen(configfile,"r");
+    if (fp == NULL) {
+        fprintf(stderr, "Unable to open config file:i %s\n",configfile);
+        exit(-1);
+    }
+
     /* default values */
     params[0] = 0.45; params[1] = 0.25; params[2] = 0.15; params[3] = 1; 
-	while (fgets(line, sizeof (line), fp) != NULL) {
-		sscanf(line, "%s %lf", var, &val);
-		if (*var == '#') continue;  /* comment */
-		if (strcmp(var, "n") == 0) {
-			G->n = (long) val;
+    while (fgets(line, sizeof (line), fp) != NULL) {
+        sscanf(line, "%s %lf", var, &val);
+        if (*var == '#') continue;  /* comment */
+        if (strcmp(var, "n") == 0) {
+            G->n = (long) val;
             assert(G->n > 0);
         } else if (strcmp(var, "m") == 0) {
-			G->m = (long) val;
+            G->m = (long) val;
             assert(G->m > 0);
         } else if (strcmp(var, "a") == 0) {
-			params[0] = val;
+            params[0] = val;
             assert((val > 0) && (val < 1));
         } else if (strcmp(var, "b") == 0) {
-			params[1] = val;
+            params[1] = val;
             assert((val > 0) && (val < 1));
         } else if (strcmp(var, "c") == 0) {
-		    params[2] = val;
+            params[2] = val;
             assert((val > 0) && (val < 1)); 
         } else if (strcmp(var, "permute_vertices") == 0) {
             params[3] = val;
@@ -345,10 +347,10 @@ void read_RMAT_config_file(graph_t* G, char* configfile, double* params) {
             G->max_weight = val;
         } else if (strcmp(var, "min_weight") == 0) {
             G->min_weight = val;
-	    } else {
-			fprintf(stderr,"Unknown parameter: %s\n", line);
-		}
-	}
+        } else {
+            fprintf(stderr,"Unknown parameter: %s\n", line);
+        }
+    }
 
     fclose(fp);
 

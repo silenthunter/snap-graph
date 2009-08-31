@@ -5,7 +5,7 @@ void read_SNAP_graph(graph_t* G, char* filename) {
 
     char *buf;
     FILE *fp;
-    
+
     long i;
     long undirected, repeated, zero_indexed, weight_type;
     char udc, zic, wtc;
@@ -20,13 +20,13 @@ void read_SNAP_graph(graph_t* G, char* filename) {
     attr_id_t *dest;
     attr_id_t *degree;
     count=0;
-    
+
     fp = fopen(filename, "r");
     if (fp == NULL) {
         fprintf(stderr, "Error: Cannot open input file. Exiting ...\n");
         exit(1);
     }
-   
+
     /* assuming no line is longer than 500 characters */ 
     buf = (char *) malloc(500*sizeof(char));
     if (buf == NULL) {
@@ -34,16 +34,16 @@ void read_SNAP_graph(graph_t* G, char* filename) {
                 " in file read routine."
                 " Exiting ...\n");
     }
-    
+
     while (fgets(buf, 500, fp) != NULL)  {
-   
+
         /* Skip all lines until we reach the problem line */
         if (buf[0] != 'p')
-           continue;
-        
+            continue;
+
         sscanf(buf, "%*c %ld %ld %c %c %c", &n, &m, &udc, &wtc,
                 &zic);
-        
+
         assert(n>0);
         assert(m>0);
         assert((udc == 'u') || (udc == 'd') || (udc == 'r'));
@@ -81,11 +81,11 @@ void read_SNAP_graph(graph_t* G, char* filename) {
 
         break;
     }
- 
+
     src = (attr_id_t *) malloc (m * sizeof(attr_id_t));
     dest = (attr_id_t *) malloc(m * sizeof(attr_id_t));
     degree = (attr_id_t *) calloc(n, sizeof(attr_id_t));
-        
+
     assert(src != NULL);
     assert(dest != NULL);
     assert(degree != NULL);
@@ -103,13 +103,14 @@ void read_SNAP_graph(graph_t* G, char* filename) {
         dbl_weight = (double *) malloc(m * sizeof(double));
         assert(dbl_weight != NULL);
     }
-    
+
     count = 0;
 
     if ((zero_indexed == 1) && (undirected == 0)) {
         if (weight_type == 0) {
             while (fgets(buf, 500, fp) != NULL)  {
                 sscanf(buf, "%ld %ld", &u, &v);
+                assert((u>=0)&&(u<n)&&(v>=0)&&(v<n));
                 src[count] = u;
                 dest[count] = v;
                 degree[u]++;
@@ -120,6 +121,7 @@ void read_SNAP_graph(graph_t* G, char* filename) {
         if (weight_type == 1) {
             while (fgets(buf, 500, fp) != NULL)  {
                 sscanf(buf, "%ld %ld %d", &u, &v, &int_wt);
+                assert((u>=0)&&(u<n)&&(v>=0)&&(v<n));
                 src[count] = u;
                 dest[count] = v;
                 degree[u]++;
@@ -131,6 +133,7 @@ void read_SNAP_graph(graph_t* G, char* filename) {
         if (weight_type == 2) {
             while (fgets(buf, 500, fp) != NULL)  {
                 sscanf(buf, "%ld %ld %ld", &u, &v, &l_wt);
+                assert((u>=0)&&(u<n)&&(v>=0)&&(v<n));
                 src[count] = u;
                 dest[count] = v;
                 degree[u]++;
@@ -142,6 +145,7 @@ void read_SNAP_graph(graph_t* G, char* filename) {
         if (weight_type == 3) {
             while (fgets(buf, 500, fp) != NULL)  {
                 sscanf(buf, "%ld %ld %f", &u, &v, &fl_wt);
+                assert((u>=0)&&(u<n)&&(v>=0)&&(v<n));
                 src[count] = u;
                 dest[count] = v;
                 degree[u]++;
@@ -153,6 +157,7 @@ void read_SNAP_graph(graph_t* G, char* filename) {
         if (weight_type == 4) {
             while (fgets(buf, 500, fp) != NULL)  {
                 sscanf(buf, "%ld %ld %lf", &u, &v, &dbl_wt);
+                assert((u>=0)&&(u<n)&&(v>=0)&&(v<n));
                 src[count] = u;
                 dest[count] = v;
                 degree[u]++;
@@ -162,11 +167,12 @@ void read_SNAP_graph(graph_t* G, char* filename) {
         }
     }
 
- 
+
     if ((zero_indexed == 0) && (undirected == 0)) {
         if (weight_type == 0) {
             while (fgets(buf, 500, fp) != NULL)  {
                 sscanf(buf, "%ld %ld", &u, &v);
+                assert((u>0)&&(u<=n)&&(v>0)&&(v<=n));
                 src[count] = u-1;
                 dest[count] = v-1;
                 degree[u-1]++;
@@ -177,6 +183,7 @@ void read_SNAP_graph(graph_t* G, char* filename) {
         if (weight_type == 1) {
             while (fgets(buf, 500, fp) != NULL)  {
                 sscanf(buf, "%ld %ld %d", &u, &v, &int_wt);
+                assert((u>0)&&(u<=n)&&(v>0)&&(v<=n));
                 src[count] = u-1;
                 dest[count] = v-1;
                 degree[u-1]++;
@@ -188,6 +195,7 @@ void read_SNAP_graph(graph_t* G, char* filename) {
         if (weight_type == 2) {
             while (fgets(buf, 500, fp) != NULL)  {
                 sscanf(buf, "%ld %ld %ld", &u, &v, &l_wt);
+                assert((u>0)&&(u<=n)&&(v>0)&&(v<=n));
                 src[count] = u-1;
                 dest[count] = v-1;
                 degree[u-1]++;
@@ -199,6 +207,7 @@ void read_SNAP_graph(graph_t* G, char* filename) {
         if (weight_type == 3) {
             while (fgets(buf, 500, fp) != NULL)  {
                 sscanf(buf, "%ld %ld %f", &u, &v, &fl_wt);
+                assert((u>0)&&(u<=n)&&(v>0)&&(v<=n));
                 src[count] = u-1;
                 dest[count] = v-1;
                 degree[u-1]++;
@@ -210,6 +219,7 @@ void read_SNAP_graph(graph_t* G, char* filename) {
         if (weight_type == 4) {
             while (fgets(buf, 500, fp) != NULL)  {
                 sscanf(buf, "%ld %ld %lf", &u, &v, &dbl_wt);
+                assert((u>0)&&(u<=n)&&(v>0)&&(v<=n));
                 src[count] = u-1;
                 dest[count] = v-1;
                 degree[u-1]++;
@@ -219,11 +229,12 @@ void read_SNAP_graph(graph_t* G, char* filename) {
         }
     }
 
- 
+
     if ((zero_indexed == 1) && (undirected == 1)) {
         if (weight_type == 0) {
             while (fgets(buf, 500, fp) != NULL)  {
                 sscanf(buf, "%ld %ld", &u, &v);
+                assert((u>=0)&&(u<n)&&(v>=0)&&(v<n));
                 if ((repeated) && (u > v)) continue;
                 src[count] = u;
                 dest[count] = v;
@@ -236,6 +247,7 @@ void read_SNAP_graph(graph_t* G, char* filename) {
         if (weight_type == 1) {
             while (fgets(buf, 500, fp) != NULL)  {
                 sscanf(buf, "%ld %ld %d", &u, &v, &int_wt);
+                assert((u>=0)&&(u<n)&&(v>=0)&&(v<n));
                 if ((repeated) && (u > v)) continue;
                 src[count] = u;
                 dest[count] = v;
@@ -249,6 +261,7 @@ void read_SNAP_graph(graph_t* G, char* filename) {
         if (weight_type == 2) {
             while (fgets(buf, 500, fp) != NULL)  {
                 sscanf(buf, "%ld %ld %ld", &u, &v, &l_wt);
+                assert((u>=0)&&(u<n)&&(v>=0)&&(v<n));
                 if ((repeated) && (u > v)) continue;
                 src[count] = u;
                 dest[count] = v;
@@ -262,6 +275,7 @@ void read_SNAP_graph(graph_t* G, char* filename) {
         if (weight_type == 3) {
             while (fgets(buf, 500, fp) != NULL)  {
                 sscanf(buf, "%ld %ld %f", &u, &v, &fl_wt);
+                assert((u>=0)&&(u<n)&&(v>=0)&&(v<n));
                 if ((repeated) && (u > v)) continue;
                 src[count] = u;
                 dest[count] = v;
@@ -275,6 +289,7 @@ void read_SNAP_graph(graph_t* G, char* filename) {
         if (weight_type == 4) {
             while (fgets(buf, 500, fp) != NULL)  {
                 sscanf(buf, "%ld %ld %lf", &u, &v, &dbl_wt);
+                assert((u>=0)&&(u<n)&&(v>=0)&&(v<n));
                 if ((repeated) && (u > v)) continue;
                 src[count] = u;
                 dest[count] = v;
@@ -286,11 +301,12 @@ void read_SNAP_graph(graph_t* G, char* filename) {
         }
     }
 
- 
+
     if ((zero_indexed == 0) && (undirected == 1)) {
         if (weight_type == 0) {
             while (fgets(buf, 500, fp) != NULL)  {
                 sscanf(buf, "%ld %ld", &u, &v);
+                assert((u>0)&&(u<=n)&&(v>0)&&(v<=n));
                 if ((repeated) && (u > v)) continue;
                 src[count] = u-1;
                 dest[count] = v-1;
@@ -303,6 +319,7 @@ void read_SNAP_graph(graph_t* G, char* filename) {
         if (weight_type == 1) {
             while (fgets(buf, 500, fp) != NULL)  {
                 sscanf(buf, "%ld %ld %d", &u, &v, &int_wt);
+                assert((u>0)&&(u<=n)&&(v>0)&&(v<=n));
                 if ((repeated) && (u > v)) continue;
                 src[count] = u-1;
                 dest[count] = v-1;
@@ -316,6 +333,7 @@ void read_SNAP_graph(graph_t* G, char* filename) {
         if (weight_type == 2) {
             while (fgets(buf, 500, fp) != NULL)  {
                 sscanf(buf, "%ld %ld %ld", &u, &v, &l_wt);
+                assert((u>0)&&(u<=n)&&(v>0)&&(v<=n));
                 if ((repeated) && (u > v)) continue;
                 src[count] = u-1;
                 dest[count] = v-1;
@@ -329,6 +347,7 @@ void read_SNAP_graph(graph_t* G, char* filename) {
         if (weight_type == 3) {
             while (fgets(buf, 500, fp) != NULL)  {
                 sscanf(buf, "%ld %ld %f", &u, &v, &fl_wt);
+                assert((u>0)&&(u<=n)&&(v>0)&&(v<=n));
                 if ((repeated) && (u > v)) continue;
                 src[count] = u-1;
                 dest[count] = v-1;
@@ -342,6 +361,7 @@ void read_SNAP_graph(graph_t* G, char* filename) {
         if (weight_type == 4) {
             while (fgets(buf, 500, fp) != NULL)  {
                 sscanf(buf, "%ld %ld %lf", &u, &v, &dbl_wt);
+                assert((u>0)&&(u<=n)&&(v>0)&&(v<=n));
                 if ((repeated) && (u > v)) continue;
                 src[count] = u-1;
                 dest[count] = v-1;
@@ -352,22 +372,22 @@ void read_SNAP_graph(graph_t* G, char* filename) {
             }
         }
     }
-    
+
     fclose(fp);
 
     if ((repeated == 0) && (count != m)) {
         fprintf(stderr, "Error! Number of edges specified in problem line (%ld)" 
-                " does not match the total number of edges (%ld) in file. Please check"
+                " does not match the total number of edges (%ld) in file." 
+                " Please check"
                 " the graph input file. Exiting ...\n", m, count);
         exit(1);
     }
-
 
     /*
     for (i=0; i<m; i++) {
         fprintf(stderr, "[%d %d] ", src[i], dest[i]);
     }
-    */
+     */
     if (repeated) m = count;
 
     if (undirected) {
@@ -418,7 +438,7 @@ void read_SNAP_graph(graph_t* G, char* filename) {
         }
 
     }
-    
+
     /* ToDo: parallelize this step */
     G->numEdges[0] = 0; 
     for (i=1;i<=G->n;i++) {
@@ -445,7 +465,7 @@ void read_SNAP_graph(graph_t* G, char* filename) {
                 G->dbl_weight_e[G->numEdges[u]+offset-1] = dbl_weight[i];
             }
         }
-           
+
         if (undirected) {
             offset = degree[v]--;
             G->endV[G->numEdges[v]+offset-1] = u;
@@ -465,7 +485,7 @@ void read_SNAP_graph(graph_t* G, char* filename) {
                     G->dbl_weight_e[G->numEdges[v]+offset-1] = dbl_weight[i];
                 }
             }
-            
+
         }
     } 
 

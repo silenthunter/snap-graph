@@ -27,7 +27,7 @@ void usage_graph_options() {
             " The input file specifies the generator parameters.\n");
     fprintf(stdout, "rmat    (.rmat)       a synthetic scale-free graph generator is invoked."
             " The input file specifies the generator parameters.\n");
-   fprintf(stdout, "\n");
+    fprintf(stdout, "\n");
     fprintf(stdout, "The default output filename is \"results.PID.txt\"."
             " (PID is the process ID). "
             "Specify an alternate file name with the -outfile option.\n");
@@ -38,7 +38,7 @@ void graph_ext_check(char* filename, char* graph_type) {
     char *ptr, *tmp; 
 
     ptr = filename;
-    
+
     /* Find the last "." in the file name */
     do {
         tmp = strstr(ptr+1, ".");
@@ -100,7 +100,7 @@ void prefix_sums(attr_id_t *input, attr_id_t* result, attr_id_t* p, attr_id_t n)
 
     result[0] = 0;
 
-    #pragma omp for
+#pragma omp for
     for (i=1; i<n+1; i++)
         result[i] = input[i-1];
 
@@ -115,14 +115,14 @@ void prefix_sums(attr_id_t *input, attr_id_t* result, attr_id_t* p, attr_id_t n)
 
     p[tid] = result[end-1];
 
-    #pragma omp barrier
+#pragma omp barrier
 
     if (tid == 0) {
         for (j=1; j<nthreads; j++)
             p[j] += p[j-1];
     }
 
-    #pragma omp barrier
+#pragma omp barrier
 
     if (tid>0) {
         add_value=p[tid-1];
@@ -130,7 +130,7 @@ void prefix_sums(attr_id_t *input, attr_id_t* result, attr_id_t* p, attr_id_t n)
             result[j] += add_value;
     }
 
-    #pragma omp barrier
+#pragma omp barrier
 #else
 
     attr_id_t i;
@@ -139,7 +139,7 @@ void prefix_sums(attr_id_t *input, attr_id_t* result, attr_id_t* p, attr_id_t n)
         result[i] = result[i-1] + input[i-1];
     }
 #endif
-    
+
 }
 
 
@@ -150,7 +150,7 @@ void print_graph(graph_t* G)
     attr_id_t degree,start;
 
     fprintf(stdout, "\n Printing graph to stdout\n");
-    
+
     fprintf(stdout, "Number of vertices: %ld, edges: %ld\n", G->n, G->m);
     if(G->undirected) 
         fprintf(stdout, "Graph is undirected\n");
@@ -213,7 +213,7 @@ void print_graph(graph_t* G)
 
 void print_snap_header(FILE *outfile) {
     fprintf(outfile, "\n"
-                     "************************************************\n");
+            "************************************************\n");
     fprintf(outfile, "  SNAP Complex Network Analysis Framework v0.3\n");
     fprintf(outfile, "  Authors: Kamesh Madduri, David A. Bader  \n");
     fprintf(outfile, "  Last Updated: March 2009\n");
@@ -232,17 +232,17 @@ void print_graph_header(FILE *outfile, graph_t *g, const char *problem_type) {
         fprintf(outfile, "  Directed network.\n");
     }
     /*
-    if (g->weight_type == 0)
-        fprintf(outfile, "  Unweighted network.\n");
-    else if (g->weight_type == 1)
-        fprintf(outfile, "  32-bit integer weight.\n");
-    else if (g->weight_type == 2)
-        fprintf(outfile, "  Long integer (%d bytes) weights.\n", sizeof(long));
-    else if (g->weight_type == 3)
-        fprintf(outfile, "  Single-precision float weights.\n");
-    else if (g->weight_type == 4)
-        fprintf(outfile, "  Double-precision float weights.\n");
-    */ 
+       if (g->weight_type == 0)
+       fprintf(outfile, "  Unweighted network.\n");
+       else if (g->weight_type == 1)
+       fprintf(outfile, "  32-bit integer weight.\n");
+       else if (g->weight_type == 2)
+       fprintf(outfile, "  Long integer (%d bytes) weights.\n", sizeof(long));
+       else if (g->weight_type == 3)
+       fprintf(outfile, "  Single-precision float weights.\n");
+       else if (g->weight_type == 4)
+       fprintf(outfile, "  Double-precision float weights.\n");
+     */ 
     fprintf(outfile, "------------------------------------------------\n");
     fprintf(outfile, "  Problem type       : %s\n", problem_type); 
 }

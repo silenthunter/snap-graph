@@ -4,12 +4,43 @@
 #include "graph_metrics.h"
 #include "utils.h"
 
+typedef struct {
+  double val;
+  long   idx;
+} vBC_t;
+
+int compare_vBC(const void *v1, const void *v2) {
+
+  const vBC_t *p1, *p2;
+  p1 = (vBC_t *)v1;
+  p2 = (vBC_t *)v2;
+
+  if (p1->val == p2->val) {
+    if (p1->idx == p2->idx) 
+      return 0;
+    else 
+      if (p1->idx < p2->idx) 
+	return -1;
+      else
+	return 1;
+  }
+
+  if (p1->val > p2->val) 
+    return -1;
+  else
+    return 1;
+}
+
+
 int main(int argc, char** argv) {
 
     char *infilename, *outfilename, *graph_type;
     FILE* fp;    
     graph_t* g;
     double* vBC;
+
+    vBC_t *vBetArray;
+    
 
     int run_approx_BC;
     double sampling_val;
@@ -114,15 +145,34 @@ int main(int argc, char** argv) {
     else 
         fprintf(fp, "n: %ld, m: %ld\n", g->n, g->m);
     fprintf(fp, "numSrcs: %ld\n", numSrcs);
-    fprintf(fp, "\n<Vertex ID> <BC score>\n\n");
-    for (i=0; i<g->n; i++) {
-        if (g->zero_indexed)
-            fprintf(fp, "%ld %f\n", i, vBC[i]);  
-        else
-            fprintf(fp, "%ld %f\n", i+1, vBC[i]);  
+    fprintf(fp, "\n<BC score> <Vertex ID>\n\n");
 
+    vBetArray = (vBC_t *)malloc(g->n * sizeof(vBC_t));
+    assert(vBetArray != NULL);
+
+    for (i=0; i<g->n; i++) {
+      vBetArray[i].val = vBC[i];
+      if (g->zero_indexed) {
+	fprintf(fp, "%15.7f %ld\n", vBC[i], i);
+	vBetArray[i].idx = i;
+	
+      }
+      else {
+	fprintf(fp, "%15.7f %ld\n", vBC[i], i+1);  
+	vBetArray[i].idx = i+1;
+      }
     }
+
+    qsort(vBetArray, g->n, sizeof(vBC_t), compare_vBC);
+
+    for (i=0; i<g->n; i++) {
+      fprintf(fp, "BC %ld %15.7f\n", vBetArray[i].idx, vBetArray[i].val);
+    }
+
     fclose(fp);
+
+
+    free (vBetArray);
 
     /* Step 5: Clean up */
     free(infilename);

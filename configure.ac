@@ -2,7 +2,7 @@
 AC_PREREQ(2.63)
 
 # initialize
-AC_INIT([snap],[0.3],[snap-graph-support@sourceforge.net])
+AC_INIT([snap],[0.4],[snap-graph-support@sourceforge.net])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_SRCDIR(src/graph_kernels/breadth_first_search.c)
 AC_CONFIG_HEADERS([config.h])

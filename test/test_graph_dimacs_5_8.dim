@@ -6,7 +6,7 @@ c problem_type can be some string without spaces.
 c It is not used in the SNAP internal graph representation
 c n indicates the number of vertices.
 c m denotes the number of edges.
-c The graph is assumed to be undirected, zero-indexed, and 
+c The graph is assumed to be undirected, one-indexed, and 
 c edges have integer weights.
 p sp 5 8 
 e 1 5 5

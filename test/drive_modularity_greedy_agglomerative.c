@@ -22,7 +22,7 @@ int main(int argc, char** argv) {
         fprintf(stdout, "\nUsage: %s -infile <graph filename>"
                 " -graph <graph type> -outfile <output filename>)"
                 " -alg <algorithm type>\n\n",
-                "eval_modularity_betweenness");
+                "eval_modularity_greedy_agglomerative");
         fprintf(stdout, "Algorithm type can be one of the following:\n"
                 "CNM         -- greedy agglomerative strategy of "
                 "Clauset, Newman and Moore.\n\n"

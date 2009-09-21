@@ -25,7 +25,7 @@ void usage_graph_options() {
 #endif    
     fprintf(stdout, "rand    (.rnd)      a synthetic random graph generator is invoked."
             " The input file specifies the generator parameters.\n");
-    fprintf(stdout, "rmat    (.rmat)       a synthetic scale-free graph generator is invoked."
+    fprintf(stdout, "rmat    (.rmat)     a synthetic scale-free graph generator is invoked."
             " The input file specifies the generator parameters.\n");
     fprintf(stdout, "\n");
     fprintf(stdout, "The default output filename is \"results.PID.txt\"."

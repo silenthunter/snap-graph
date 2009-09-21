@@ -78,11 +78,11 @@ int main(int argc, char** argv) {
 
     graph_ext_check(infilename, graph_type);
 
-    fprintf(stdout, "  Input Graph File   : %s\n", infilename);
-    fprintf(stdout, "  Output Graph File  : %s\n", outfilename);
+    fprintf(stdout, "Input graph file   : %s\n", infilename);
+    fprintf(stdout, "Output file  : %s\n", outfilename);
 
-    fprintf(fp, "  Input Graph File    : %s\n", infilename);
-    fprintf(fp, "  Output Graph File   : %s\n", outfilename);
+    fprintf(fp, "Input graph file    : %s\n", infilename);
+    fprintf(fp, "Output file   : %s\n", outfilename);
     
     /* Step 2: Generate graph */
     g = (graph_t *) malloc(sizeof(graph_t));

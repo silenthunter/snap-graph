@@ -64,10 +64,31 @@ fi
 AC_CHECK_LIB(m, sin)
 
 # header files
-AC_CHECK_HEADERS([stdarg.h], [AC_DEFINE([HAVE_STDARG_H],[1],[Define to 1 if you have the <stdarg.h> header file.])])
-AC_CHECK_HEADERS([limits.h], [AC_DEFINE([HAVE_LIMITS_H],[1],[Define to 1 if you have the <limits.h> header file.])])
-AC_CHECK_HEADERS([unistd.h], [AC_DEFINE([HAVE_UNISTD_H],[1],[Define to 1 if you have the <unistd.h> header file.])])
-AC_CHECK_HEADERS([math.h], [AC_DEFINE([HAVE_MATH_H],[1],[Define to 1 if you have the <math.h> header file.])])
+AC_CHECK_HEADERS([stdarg.h], [AC_DEFINE([HAVE_STDARG_H],[1],[Define to 1 if you
+            have the <stdarg.h> header file.])], [], 
+            [[#ifdef HAVE_STDARG_H
+            #include <stdarg.h>
+            #endif
+            ]])
+AC_CHECK_HEADERS([limits.h], [AC_DEFINE([HAVE_LIMITS_H],[1],[Define to 1 if you
+            have the <limits.h> header file.])], [],
+            [[#ifdef HAVE_LIMITS_H
+            #include <limits.h>
+            #endif
+            ]])
+AC_CHECK_HEADERS([unistd.h], [AC_DEFINE([HAVE_UNISTD_H],[1],[Define to 1 if you
+            have the <unistd.h> header file.])], [],
+            [[#ifdef HAVE_UNISTD_H
+            #include <unistd.h>
+            #endif
+            ]])
+AC_CHECK_HEADERS([math.h], [AC_DEFINE([HAVE_MATH_H],[1],[Define to 1 if you have
+            the <math.h> header file.])], [], 
+            [[#ifdef HAVE_MATH_H
+            #include <math.h>
+            #endif
+            ]])
+
 
 # typedefs, structures, and compiler characteristics
 AC_C_CONST

@@ -3,7 +3,7 @@
 #include "graph_kernels.h"
 #include "graph_kernels.h"
 
-#define VERBOSE
+#undef VERBOSE
 
 #undef DEBUG
 

@@ -35,7 +35,7 @@ int main(int argc, char** argv) {
                 "MBRAT       -- normalize McCloskey-Bader by size ratios.\n"
                 "LIN         -- McCloskey and Bader: weighted graphs "
                 "with linear model.\n"
-#if 1
+#if 0
                 "WT1/WT2/WT3 -- Wakita and Tsurami's"
                 "consolidation ratio heuristics.\n"
                 "DDA         -- Normalized modularity heuristics "

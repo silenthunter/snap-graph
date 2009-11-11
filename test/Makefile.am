@@ -3,7 +3,7 @@ AM_LDFLAGS = -L$(top_srcdir)/lib -lm
 
 bin_PROGRAMS = eval_BFS eval_biconnected_components eval_modularity_spectral \
 eval_vertex_cover eval_vertex_betweenness eval_modularity_betweenness \
-eval_modularity_greedy_agglomerative
+eval_modularity_greedy_agglomerative eval_seed_community_detection
 
 EXTRA_DIST = test_graph_dimacs_5_8.dim test_graph_karate.gml \
 test_graph_rand_100K_1M_undir_unwt.rnd test_graph_rand_1K_10K_undir_unwt.rnd \
@@ -29,6 +29,9 @@ eval_modularity_betweenness_LDADD = $(top_srcdir)/lib/libsnap.la
 
 eval_modularity_greedy_agglomerative_SOURCES = drive_modularity_greedy_agglomerative.c
 eval_modularity_greedy_agglomerative_LDADD = $(top_srcdir)/lib/libsnap.la
+
+eval_seed_community_detection_SOURCES = drive_seed_community_detection.c
+eval_seed_community_detection_LDADD = $(top_srcdir)/lib/libsnap.la
 
 # Not building this code for now.
 #eval_dyn_ds_SOURCES = test_dyn_ds.c

@@ -12,4 +12,9 @@ void modularity_betweenness(graph_t *g, attr_id_t *membership,
         double sampling_val);
 void modularity_greedy_agglomerative(graph_t *g, char *alg_type, 
         attr_id_t *membership, attr_id_t *num_communities, double *modularity);
+void single_seed_community_detection (graph_t *g, char *alg_type, attr_id_t seed, 
+        attr_id_t *membership, attr_id_t *num_communities, double *modularity);
+void seed_set_community_detection (graph_t *g, char *alg_type, attr_id_t* seeds, 
+        int uniform, attr_id_t n_seeds, attr_id_t *membership, attr_id_t *num_communities,
+		double *modularity);
 #endif

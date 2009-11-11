@@ -1261,7 +1261,7 @@ void aggc_compute_dqnorm_stats(aggc_comm_t *communities, aggc_maxheap_t *maxheap
 }
 
 
-double aggc_merge_communities(aggc_comm_t *communities, 
+double aggc_merge_communities(aggc_comm_t *communities, attr_id_t seed, 
         aggc_maxheap_t *maxheap, 
         aggc_adjcomm_t *adj_buffer,
         attr_id_t num_communities,
@@ -1285,9 +1285,16 @@ double aggc_merge_communities(aggc_comm_t *communities,
     updated_weight.weighted = L->weighted;
 
     HIGH_VID = 1<<30;
-    comm1 = heap[0].comm_id;
-    max_key = heap[0].val;
-    max_key_idx = communities[comm1].max_key_idx;
+	if (seed < 0) {
+	    comm1 = heap[0].comm_id;
+  	  max_key = heap[0].val;
+    	max_key_idx = communities[comm1].max_key_idx;
+	}
+	else {
+		comm1 = seed;
+		max_key = communities[comm1].max_key;
+		max_key_idx = communities[comm1].max_key_idx;
+	}
 
     if (max_key != communities[comm1].max_key) {
 #if 1
@@ -1536,14 +1543,20 @@ double aggc_merge_communities(aggc_comm_t *communities,
         communities[comm2].max_key_idx = ins_pos;
     }
 
-    if (communities[comm1].degree < communities[comm2].degree) {
-        from = comm1;
-        to = comm2;
-    } 
-    else {
-        from = comm2;
-        to = comm1;
-    }
+	if (seed < 0) {
+    	if (communities[comm1].degree < communities[comm2].degree) {
+        	from = comm1;
+        	to = comm2;
+    	} 
+    	else {
+        	from = comm2;
+        	to = comm1;
+    	}
+	}
+	else {
+		from = comm2;
+		to = comm1;
+	}
 
     from_deg = communities[from].degree;
     from_adj = communities[from].adjcomm;
@@ -2018,7 +2031,7 @@ attr_id_t aggc_compute_membership(aggc_comm_t *communities, attr_id_t *membershi
  * goal of maximizing modularity. There are several heuristics for this, and we
  * use a similar representation of communities for all of them. */
 
-void modularity_greedy_agglomerative(graph_t *g, char *alg_type, 
+void _modularity_greedy_agglomerative(graph_t *g, char *alg_type, int seed,
         attr_id_t *membership, 
         attr_id_t *num_communities, 
         double *modularity) {
@@ -2054,6 +2067,14 @@ void modularity_greedy_agglomerative(graph_t *g, char *alg_type,
     attr_id_t bcc_total;
 #endif
 
+	if (seed >= 0) {
+		if (g->zero_indexed == 1) {
+			assert (seed < g->n);
+		}
+		else {
+			assert (seed <= g->n);
+		}
+	}
     printf("alg_type: %s\n",alg_type);
 
     keytype = NUMKEYTYPE;
@@ -2525,7 +2546,7 @@ void modularity_greedy_agglomerative(graph_t *g, char *alg_type,
         aggc_maxkey_check(communities,maxheap);
 #endif
 
-        new_max_key = aggc_merge_communities(communities, maxheap, adj_buffer, n - no_of_joins, &L);
+        new_max_key = aggc_merge_communities(communities, seed, maxheap, adj_buffer, n - no_of_joins, &L);
 
 #if 0
         final_num_communities = aggc_compute_membership(communities, membership, n);
@@ -2630,3 +2651,10 @@ void modularity_greedy_agglomerative(graph_t *g, char *alg_type,
 }
 
 
+void modularity_greedy_agglomerative(graph_t *g, char *alg_type, 
+        attr_id_t *membership, 
+        attr_id_t *num_communities, 
+        double *modularity) {
+	
+	_modularity_greedy_agglomerative (g, alg_type, -1, membership, num_communities, modularity);
+}

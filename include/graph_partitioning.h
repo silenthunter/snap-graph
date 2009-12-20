@@ -17,4 +17,8 @@ void single_seed_community_detection (graph_t *g, char *alg_type, attr_id_t seed
 void seed_set_community_detection (graph_t *g, char *alg_type, attr_id_t* seeds, 
         int uniform, attr_id_t n_seeds, attr_id_t *membership, attr_id_t *num_communities,
 		double *modularity);
+long BFS_Community(graph_t *g, attr_id_t seed, long size, 
+    attr_id_t* membership, attr_id_t *num_communities);
+attr_id_t community_edges_external (graph_t *g, attr_id_t *membership, attr_id_t commId);
+attr_id_t community_edges_internal (graph_t *g, attr_id_t *membership, attr_id_t commId);
 #endif

@@ -1,7 +1,6 @@
 #include <string.h>
 #include "graph_partitioning.h"
 #include "graph_kernels.h"
-#include "graph_kernels.h"
 
 #undef VERBOSE
 
@@ -1515,7 +1514,7 @@ double aggc_merge_communities2(aggc_comm_t *communities, attr_id_t seed,
     max_dq = communities[comm1].adjcomm[max_key_idx].value[KEY_CNM];
 
     comm2 = communities[comm1].adjcomm[max_key_idx].comm_id;
-#if 1
+#ifdef DEBUG
 		fprintf (stderr, "Merging communities comm1(to): %d and comm2(from): %d\n", comm1, comm2);
 #endif
 
@@ -2007,7 +2006,10 @@ attr_id_t aggc_compute_membership2(aggc_comm_t *communities, attr_id_t *membersh
 
 
 
-
+/**
+ * Identifies the smallest community that contains all the seeds from the seed set,
+ * the algorithm stops when all the seeds are in the same community.
+ */
 /* Greedy community detection algorithms that optimize modularity. These are 
  * agglomerative approaches, i.e., we start by assuming a partitioning of
  * singleton communities, and then repeatedly merge communities with the 
@@ -2494,7 +2496,7 @@ void seed_set_community_detection(graph_t *g, char *alg_type,
         maxheap->n++;
     }
 
-#if 1
+#ifdef DEBUG
     fprintf(stderr, "n: %d   Number of initial communities: %d\n", n, maxheap->n);
 #endif  
 
@@ -2650,7 +2652,7 @@ void seed_set_community_detection(graph_t *g, char *alg_type,
             fprintf(stderr, "join: %d, mod %9.6f\n", no_of_joins, mod_val);
     }
 
-#if 1
+#ifdef DEBUG
     fprintf(stderr, "n: %d   Number of non-singleton communities: %d\n", 
             n, maxheap->n);
 #endif  
@@ -2717,12 +2719,104 @@ void single_seed_community_detection (graph_t *g, char *alg_type, attr_id_t seed
 	_modularity_greedy_agglomerative (g, alg_type, seed, membership, num_communities, modularity);
 }
 
-
-/**
- * Identifies the smallest community that contains all the seeds from the seed set,
- * the algorithm stops when all the seeds are in the same community.
+/*
+ * Run BFS to get a seed community with atleast 'size' vertices
  */
-/*void seed_set_community_detection (graph_t *g, char *alg_type, attr_id_t* seeds, 
-        attr_id_t n_seeds, attr_id_t *membership, attr_id_t *num_communities,
-		double *modularity) {
-}*/
+long BFS_Community(graph_t *g, attr_id_t seed, long size, 
+    attr_id_t* membership, attr_id_t *num_communities)
+{
+    long i, num_visited, est_diameter;
+    /* Initially assume each vertex to be a single community */
+    for (i = 0; i < g->n; i++)
+        membership[i] = -1;
+
+    est_diameter = 100;
+    num_visited = BFS_parallel_frontier_expansion(g, seed, est_diameter,
+        size, membership);
+    for (i = 0; i < g->n; i++)
+        if (membership[i] != -1)
+            membership[i] = 0;
+
+    *num_communities = 1;
+    for (i = 0; i < g->n; i++)
+        if (membership[i] == -1)
+            membership[i] = (*num_communities)++;
+    return num_visited;
+}
+
+/*
+ * Returns the number of distinct external edges for the community, (edges that form the edge cut)
+ */
+attr_id_t community_edges_external (graph_t *g, attr_id_t *membership, attr_id_t commId)
+{
+	attr_id_t i, j, v, degree, start, ex_edge_count, *visited;
+	ex_edge_count = 0;
+	visited = (attr_id_t *) calloc (g->n, sizeof(attr_id_t));
+
+	for (i = 0; i < g->n; i++)
+	{
+		if (membership[i] != commId)
+			continue;
+		degree = g->numEdges[i+1] - g->numEdges[i];
+		start  = g->numEdges[i];
+
+		for (j = 0; j < degree; j++)
+		{
+			v = g->endV[start + j];
+			if (membership[v] != commId && visited[v] == 0)
+			{
+				ex_edge_count++;
+				visited[v] = 1;
+			}
+		}
+		
+		for (j = 0; j < degree; j++)
+		{
+			v = g->endV[start + j];
+			visited[v] = 0;
+		}
+	}
+	
+	free (visited);
+	return ex_edge_count;
+}
+
+/*
+ * Returns the number of distinct internal edges for the community, (removing duplicate
+ * edges and self loops)
+ */
+attr_id_t community_edges_internal (graph_t *g, attr_id_t *membership, attr_id_t commId)
+{
+	attr_id_t i, j, v, degree, start, int_edge_count, *visited;
+	int_edge_count = 0;
+	visited = (attr_id_t *) calloc (g->n, sizeof(attr_id_t));
+	
+	for (i = 0; i < g->n; i++)
+	{
+		if (membership[i] != commId)
+			continue;
+		degree = g->numEdges[i+1] - g->numEdges[i];
+		start  = g->numEdges[i];
+
+		for (j = 0; j < degree; j++)
+		{
+			v = g->endV[start + j];
+			if (membership[v] == commId && visited[v] == 0 && v != i)
+			{
+				int_edge_count++;
+				visited[v] = 1;
+			}
+		}
+		
+		for (j = 0; j < degree; j++)
+		{
+			v = g->endV[start + j];
+			visited[v] = 0;
+		}
+	}
+	
+	free (visited);
+	return int_edge_count;
+}
+
+

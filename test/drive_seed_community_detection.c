@@ -5,8 +5,6 @@
 #include "graph_partitioning.h"
 #include "utils.h"
 
-#define DEBUG
-
 attr_id_t* getSeeds(attr_id_t *n_seeds, char* seedsfile) {
 	attr_id_t* seeds;
 	FILE* fp;
@@ -48,10 +46,12 @@ int main(int argc, char** argv) {
 	attr_id_t seed;
 	attr_id_t n_seeds;
 	attr_id_t commId;
+    attr_id_t num_visited;
+    attr_id_t ext_edges, int_edges;
 	int uniform;
     int num_communities;
     double modularity, mod_val, time0;
-    long i;
+    long i, size;
     int run_approxBC;
     int digits;
 
@@ -101,6 +101,7 @@ int main(int argc, char** argv) {
     graph_type = (char *) calloc(500, sizeof(char));
     alg_type = (char *) calloc(500, sizeof(char));
 	seeds = NULL;
+    size  = 0;
 
     strcpy(alg_type,"CNM");
     strcpy(outfilename, "output.txt");
@@ -232,6 +233,15 @@ int main(int argc, char** argv) {
     time0 = get_seconds() - time0;
 
     mod_val = get_community_modularity(g, membership, num_communities);
+	
+    if (opt_seeds == 1) {
+		commId = membership[seeds[0]];
+	}
+	else {
+		commId = membership[seed];
+	}
+    int_edges = community_edges_internal (g, membership, commId);
+    ext_edges = community_edges_external (g, membership, commId);
 
     /* Step 4: Write output to file */
     fp = fopen(outfilename, "w");
@@ -240,15 +250,9 @@ int main(int argc, char** argv) {
             modularity);
     fprintf(fp, "\n<Vertex ID> <Community ID>\n\n");
 
-	if (opt_seeds == 1) {
-		commId = membership[seeds[0]];
-	}
-	else {
-		commId = membership[seed];
-	}
-	
 	for (i=0; i<g->n; i++) {
 		if (commId == membership[i]) {
+            size++;
 			if (g->zero_indexed)
 				fprintf (fp, "%ld\t%d\n", i, membership[i]);
 			else
@@ -256,10 +260,45 @@ int main(int argc, char** argv) {
 		}
 	}
 
+    fprintf(stderr, "Number of communities: %d\n", num_communities);
     fprintf(stderr, "Modularity: %f (full), %f (w/o dup)\n", mod_val,
             modularity);
-    fprintf(stderr, "Number of communities: %d\n", num_communities);
+    fprintf(stderr, "Number of internal edges: %ld\n", int_edges);
+    fprintf(stderr, "Number of external edges: %ld\n", ext_edges);
     fprintf(stderr, "Execution Time: %f seconds\n", time0);
+
+    /* BFS community */
+    if (opt_seeds != 1) {
+        fprintf (stderr, "\n*** BFS community detection. ***\n");
+
+        time0 = get_seconds() - time0;
+        num_visited = BFS_Community(g, seed, size, membership, &num_communities);
+        time0 = get_seconds() - time0;
+
+        mod_val = get_community_modularity(g, membership, num_communities);
+        int_edges = community_edges_internal (g, membership, commId);
+        ext_edges = community_edges_external (g, membership, commId);
+
+        fprintf(fp, "\n\nBreadth first community :-");
+        fprintf(fp, "\nNumber of communities: %d", num_communities);
+        fprintf(fp, "\nModularity score: %f (w/o dup)\n", mod_val);
+        fprintf(fp, "\n<Vertex ID> <Community ID>\n\n");
+		commId = membership[seed];
+        for (i = 0; i < g->n; i++) {
+		    if (commId == membership[i]) {
+    			if (g->zero_indexed)
+				    fprintf (fp, "%ld\t%d\n", i, membership[i]);
+			    else
+			    	fprintf (fp, "%ld\t%d\n", i, membership[i]);
+		    }
+        }
+        
+        fprintf(stderr, "Number of communities: %d\n", num_communities);
+        fprintf(stderr, "Modularity score: %f (w/o dup)\n", mod_val);
+        fprintf(stderr, "Number of internal edges: %ld\n", int_edges);
+        fprintf(stderr, "Number of external edges: %ld\n", ext_edges);
+        fprintf(stderr, "Execution Time: %f seconds\n", time0);
+    }
 
 #if 0
     {
@@ -407,7 +446,7 @@ int main(int argc, char** argv) {
     free_graph(g);
     free(g);
     free(membership);
-	free (seeds);
+	free(seeds);
 
     return 0;
 }

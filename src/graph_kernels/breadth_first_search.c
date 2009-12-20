@@ -104,8 +104,9 @@ long BFS_parallel_frontier_expansion(graph_t* G, long src, long diameter,
 			if (tid == 0) {
 				if (size <= count){
 					if (aVisited)
-						memcpy(aVisited, S, count * sizeof(attr_id_t));
-#if 1
+                        for (i = 0; i < count; i++)
+                            aVisited[S[i]] = src;
+#ifdef DEBUG
 	fprintf(stdout, "Number of vertices visited during BFS: %ld\n", count);
 #endif
 					break;

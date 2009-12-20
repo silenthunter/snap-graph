@@ -16,7 +16,8 @@ int aux_connected_components_init(graph_t* G);
 int aux_connected_components_update(graph_t* G, attr_id_t mnum_components, attr_id_t maxbc_component);
 
 
-long BFS_parallel_frontier_expansion(graph_t* G, long src, long diameter);
+long BFS_parallel_frontier_expansion(graph_t* G, long src, long diameter,
+		long maxVertices, attr_id_t* visited);
 void BFS_path_limited_search(graph_t* G, long src, long diameter);
 void BFS_sequential(graph_t* G, long src, int* d);
 int vertex_cover_weighted(graph_t*);

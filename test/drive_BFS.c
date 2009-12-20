@@ -15,8 +15,9 @@ int main(int argc, char** argv) {
     int curArgIndex;
     int est_diameter;
     long num_vertices_visited;
+    long size;
     
-    int proc_pid;
+    int i, proc_pid;
     
     /* Step 1: Parse command line arguments */
     if (argc < 3) {
@@ -38,11 +39,16 @@ int main(int argc, char** argv) {
     sprintf(outfilename, "results.%d.txt", proc_pid);
 
     src = -1;
+    size = -1;
 
     while (curArgIndex < argc) {
         
         if (strcmp(argv[curArgIndex],"-src")==0) {
             src = atol(argv[++curArgIndex]);
+        }
+
+        if (strcmp(argv[curArgIndex],"-size")==0) {
+            size = atol(argv[++curArgIndex]);
         }
 
         if (strcmp(argv[curArgIndex],"-infile")==0) {
@@ -96,6 +102,9 @@ int main(int argc, char** argv) {
 
     assert((src >= 0) && (src < g->n));
 
+    if (size == -1)
+        size = g->n;
+
     fprintf(stdout, "  Source vertex      : %ld\n\n", src);
     fprintf(fp    , "  Source vertex      : %ld\n\n", src);
     
@@ -104,7 +113,8 @@ int main(int argc, char** argv) {
     /* Assuming a low diameter graph */
     /* change the est_diameter value for high diameter graphs */
     est_diameter = 100;
-    num_vertices_visited = BFS_parallel_frontier_expansion(g, src, est_diameter);
+    num_vertices_visited = BFS_parallel_frontier_expansion(g, src, est_diameter, 
+            size, NULL);
 
     /* Step 4: Write output to file */
     fprintf(fp, "  Breadth-first search from vertex %ld\n", src); 

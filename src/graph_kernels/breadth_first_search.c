@@ -1,11 +1,13 @@
 #include "graph_defs.h"
 #include "graph_kernels.h"
+#define VERBOSE
 
 void BFS_sequential(graph_t* G, long src, int* d) {
 
 }
 
-long BFS_parallel_frontier_expansion(graph_t* G, long src, long diameter) {
+long BFS_parallel_frontier_expansion(graph_t* G, long src, long diameter, 
+		long size, attr_id_t* aVisited) {
 
     attr_id_t* S;
     long *start;
@@ -99,6 +101,20 @@ long BFS_parallel_frontier_expansion(graph_t* G, long src, long diameter) {
 #endif
 
         while (start[phase_num+1] - start[phase_num] > 0) {
+			if (tid == 0) {
+				if (size <= count){
+					if (aVisited)
+						memcpy(aVisited, S, count * sizeof(attr_id_t));
+#if 1
+	fprintf(stdout, "Number of vertices visited during BFS: %ld\n", count);
+#endif
+					break;
+				}
+			}
+
+#ifdef _OPENMP
+#pragma omp barrier
+#endif
 
             pCount = 0;
 

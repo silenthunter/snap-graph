@@ -1292,6 +1292,10 @@ double aggc_merge_communities(aggc_comm_t *communities, attr_id_t seed,
 	}
 	else {
 		comm1 = seed;
+		if (communities[comm1].degree == 0) {
+			/* The seed community does not have any neighbor, no adjacencies to merge */
+			return;
+		}
 		max_key = communities[comm1].max_key;
 		max_key_idx = communities[comm1].max_key_idx;
 	}
@@ -1928,7 +1932,7 @@ double aggc_merge_communities(aggc_comm_t *communities, attr_id_t seed,
 
 #ifdef DEBUGXX
     heap_pos = index[from];
-    if (max_key_old != heap[heap_pos].value[KEY_CNM]) {
+    if (max_key_old != heap[heap_pos].val) {
         fprintf(stderr, "DEBUGXX %lf %lf\n", max_key_old, heap[heap_pos].val);
     }
 #endif

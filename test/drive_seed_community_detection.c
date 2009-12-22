@@ -276,14 +276,14 @@ int main(int argc, char** argv) {
         time0 = get_seconds() - time0;
 
         mod_val = get_community_modularity(g, membership, num_communities);
+		commId = membership[seed];
         int_edges = community_edges_internal (g, membership, commId);
         ext_edges = community_edges_external (g, membership, commId);
 
         fprintf(fp, "\n\nBreadth first community :-");
         fprintf(fp, "\nNumber of communities: %d", num_communities);
-        fprintf(fp, "\nModularity score: %f (w/o dup)\n", mod_val);
+        fprintf(fp, "\nModularity score: %f (full)\n", mod_val);
         fprintf(fp, "\n<Vertex ID> <Community ID>\n\n");
-		commId = membership[seed];
         for (i = 0; i < g->n; i++) {
 		    if (commId == membership[i]) {
     			if (g->zero_indexed)
@@ -294,7 +294,7 @@ int main(int argc, char** argv) {
         }
         
         fprintf(stderr, "Number of communities: %d\n", num_communities);
-        fprintf(stderr, "Modularity score: %f (w/o dup)\n", mod_val);
+        fprintf(stderr, "Modularity score: %f (full)\n", mod_val);
         fprintf(stderr, "Number of internal edges: %ld\n", int_edges);
         fprintf(stderr, "Number of external edges: %ld\n", ext_edges);
         fprintf(stderr, "Execution Time: %f seconds\n", time0);

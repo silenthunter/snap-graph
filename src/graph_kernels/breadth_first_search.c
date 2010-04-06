@@ -36,12 +36,12 @@ long BFS_parallel_frontier_expansion(graph_t* G, long src, long diameter,
         int tid, nthreads;
         long start_iter, end_iter;    
         long j, k, vert, n;
+        long i;
 #ifdef _OPENMP
         int myLock;
 #endif
 
 #ifdef _OPENMP    
-        long i;
         tid = omp_get_thread_num();
         nthreads = omp_get_num_threads();
 #else

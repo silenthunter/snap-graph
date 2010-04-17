@@ -1,5 +1,5 @@
 # run autoconf to produce the configure script
-AC_PREREQ(2.63)
+AC_PREREQ(2.65)
 
 # initialize
 AC_INIT([snap],[0.4],[snap-graph-support@sourceforge.net])

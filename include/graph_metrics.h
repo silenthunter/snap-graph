@@ -4,6 +4,7 @@
 void vertex_betweenness_centrality(graph_t* G, double* BC, long numSrcs);
 void vertex_betweenness_centrality_simple(graph_t* G, double* BC, long numSrcs);
 void vertex_betweenness_centrality_parBFS(graph_t* G, double* BC, long numSrcs);
+void cuda_betweenness_centrality(graph_t* G, double* BC, long numSrcs);
 
 void edge_betweenness_centrality(graph_t* G, double* BC, long numSrcs);
 void edge_betweenness_centrality_simple(graph_t* G, double* BC, long numSrcs);

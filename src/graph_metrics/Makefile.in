@@ -55,7 +55,7 @@ CONFIG_CLEAN_VPATH_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libgraph_metrics_la_LIBADD =
 am_libgraph_metrics_la_OBJECTS = vertex_betweenness_centrality.lo \
-	edge_betweenness_centrality.lo community_modularity.lo
+	edge_betweenness_centrality.lo community_modularity.lo cuda_betweenness_centrality.lo bc_cuda.lo
 libgraph_metrics_la_OBJECTS = $(am_libgraph_metrics_la_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
@@ -191,7 +191,7 @@ top_srcdir = @top_srcdir@
 AM_CPPFLAGS = -I$(top_srcdir)/include
 noinst_LTLIBRARIES = libgraph_metrics.la
 libgraph_metrics_la_SOURCES = vertex_betweenness_centrality.c \
-edge_betweenness_centrality.c community_modularity.c
+edge_betweenness_centrality.c community_modularity.c cuda_betweenness_centrality.c bc_cuda.cu
 
 all: all-am
 
@@ -248,6 +248,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/community_modularity.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/edge_betweenness_centrality.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/vertex_betweenness_centrality.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cuda_betweenness_centrality.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bc_cuda.Plo@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<

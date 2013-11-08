@@ -135,7 +135,15 @@ int main(int argc, char** argv) {
     numSrcs = g->n * (sampling_val/100.0);
     if (numSrcs == 0) 
         numSrcs = 1;
+
+    struct timeval startTime;
+    struct timeval endTime;
+    gettimeofday(&startTime, NULL);
+    //cuda_betweenness_centrality(g, vBC, numSrcs);
     vertex_betweenness_centrality(g, vBC, numSrcs);
+    gettimeofday(&endTime, NULL);
+
+    long usec = (endTime.tv_sec * 1000000 + endTime.tv_usec) - (startTime.tv_sec * 1000000 + startTime.tv_usec);
   
     /* Step 4: Write results to output file */ 
     fp = fopen(outfilename, "w"); 
@@ -145,6 +153,7 @@ int main(int argc, char** argv) {
     else 
         fprintf(fp, "n: %ld, m: %ld\n", g->n, g->m);
     fprintf(fp, "numSrcs: %ld\n", numSrcs);
+    fprintf(fp, "Time Taken: %ld\n", usec);
     fprintf(fp, "\n<BC score> <Vertex ID>\n\n");
 
     vBetArray = (vBC_t *)malloc(g->n * sizeof(vBC_t));

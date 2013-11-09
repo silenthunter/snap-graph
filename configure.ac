@@ -60,6 +60,14 @@ if test "$enable_openmp" = "yes"; then
          Please set the CFLAGS variable manually for OpenMP support.])])
 fi
 
+#NVCCFLAGS="$NVCCFLAGS"
+#CUDA_CFLAGS="$CUDA_CFLAGS"
+#CUDA_LIBS="-lcuda -lcudart -cufft"
+#NVCCFLAGS="$NVCCFLAGS $CUDA_CFLAGS $CUDA_LDFLAGS $CUDA_LIBS"
+NVCC="nvcc"
+AC_SUBST(NVCC)
+#AC_SUBST(NVCCFLAGS)
+
 # checks for libraries
 AC_CHECK_LIB(m, sin)
 

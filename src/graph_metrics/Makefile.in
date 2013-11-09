@@ -272,6 +272,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
 
+.cu.o:
+	$(NVCC) -c -o $@ $<
+
 mostlyclean-libtool:
 	-rm -f *.lo
 
